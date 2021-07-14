@@ -66,13 +66,13 @@ void ThriftClient::setHTTPUrl(const std::string& url) {
 
 void ThriftClient::sendRequestResponse(
     const RpcOptions& rpcOptions,
-    ManagedStringView&& methodName,
+    MethodMetadata&& methodMetadata,
     SerializedRequest&& serializedRequest,
     std::shared_ptr<THeader> header,
     RequestClientCallback::Ptr cb) {
   auto buf = LegacySerializedRequest(
                  header->getProtocolId(),
-                 methodName.view(),
+                 methodMetadata.name_view(),
                  std::move(serializedRequest))
                  .buffer;
 
@@ -86,13 +86,13 @@ void ThriftClient::sendRequestResponse(
 
 void ThriftClient::sendRequestNoResponse(
     const RpcOptions& rpcOptions,
-    ManagedStringView&& methodName,
+    MethodMetadata&& methodMetadata,
     SerializedRequest&& serializedRequest,
     std::shared_ptr<THeader> header,
     RequestClientCallback::Ptr cb) {
   auto buf = LegacySerializedRequest(
                  header->getProtocolId(),
-                 methodName.view(),
+                 methodMetadata.name_view(),
                  std::move(serializedRequest))
                  .buffer;
 
@@ -110,6 +110,7 @@ ThriftClient::createRequestMetadata(
     RpcKind kind,
     apache::thrift::ProtocolId protocolId,
     THeader* header) {
+  preprocessHeader(header);
   auto requestMetadata = std::make_unique<ThriftChannelIf::RequestMetadata>();
   auto& metadata = requestMetadata->requestRpcMetadata;
   metadata.protocol_ref() = protocolId;
@@ -123,7 +124,7 @@ ThriftClient::createRequestMetadata(
   if (rpcOptions.getTimeout() > std::chrono::milliseconds(0)) {
     metadata.clientTimeoutMs_ref() = rpcOptions.getTimeout().count();
   } else {
-    metadata.clientTimeoutMs_ref() = kDefaultRpcTimeout.count();
+    metadata.clientTimeoutMs_ref() = connection_->getTimeout();
   }
   if (rpcOptions.getQueueTimeout() > std::chrono::milliseconds(0)) {
     metadata.queueTimeoutMs_ref() = rpcOptions.getQueueTimeout().count();
@@ -156,8 +157,6 @@ ThriftClient::createRequestMetadata(
       (*otherMetadata)[entry.first] = entry.second;
     }
   }
-  auto& pwh = getPersistentWriteHeaders();
-  otherMetadata->insert(pwh.begin(), pwh.end());
   if (otherMetadata->empty()) {
     otherMetadata.reset();
   }

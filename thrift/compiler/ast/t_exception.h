@@ -23,7 +23,9 @@ namespace thrift {
 namespace compiler {
 
 enum class t_error_kind {
-  transient = 0, // The associated RPC might succeed if retried.
+  unspecified = 0, // The kind of error was not specified and the associated RPC
+                   // might succeed if retried.
+  transient, // The associated RPC might succeed if retried.
   stateful, // Server state must be change for the associated RPC to have
             // any chance of succeeding.
   permanent, // The associated RPC can never succeed, and should not be retried.
@@ -48,50 +50,36 @@ enum class t_error_safety {
  * Exceptions are structured, like unions and structs, but can only
  * be used in error-specific contexts.
  */
+// TODO(afuller): Inherit from t_structured instead.
 class t_exception : public t_struct {
  public:
   using t_struct::t_struct;
 
-  // TODO: remove old function "xception" once everything has been swtiched to
-  // "exception"
-  bool is_xception() const override {
-    return is_exception();
-  }
+  t_error_kind kind() const { return kind_; }
+  void set_kind(t_error_kind kind) { kind_ = kind; }
 
-  bool is_exception() const override {
-    return true;
-  }
+  t_error_blame blame() const { return blame_; }
+  void set_blame(t_error_blame blame) { blame_ = blame; }
 
-  t_error_kind kind() const {
-    return kind_;
-  }
-  void set_kind(t_error_kind kind) {
-    kind_ = kind;
-  }
-
-  t_error_blame blame() const {
-    return blame_;
-  }
-  void set_blame(t_error_blame blame) {
-    blame_ = blame;
-  }
-
-  t_error_safety safety() const {
-    return safety_;
-  }
-  void set_safety(t_error_safety safety) {
-    safety_ = safety;
-  }
+  t_error_safety safety() const { return safety_; }
+  void set_safety(t_error_safety safety) { safety_ = safety; }
 
  private:
   t_error_kind kind_{};
   t_error_blame blame_{};
   t_error_safety safety_{};
 
+  // TODO(afuller): Remove everything below this comment. It is only provided
+  // for backwards compatibility.
+ public:
+  bool is_xception() const override { return is_exception(); }
+  bool is_exception() const override { return true; }
+
+ private:
   friend class t_struct;
   t_exception* clone_DO_NOT_USE() const override {
     auto clone = std::make_unique<t_exception>(program_, name_);
-    cloneStruct(clone.get());
+    clone_structured(clone.get());
     clone->kind_ = kind_;
     clone->blame_ = blame_;
     clone->safety_ = safety_;

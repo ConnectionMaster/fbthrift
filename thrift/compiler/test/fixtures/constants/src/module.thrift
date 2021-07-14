@@ -101,11 +101,11 @@ struct struct1 {
 
 const struct1 pod_0 = {};
 
-const struct1 pod_s_0 = struct1 {};
+const struct1 pod_s_0 = struct1{};
 
 const struct1 pod_1 = {"a": 10, "b": "foo"};
 
-const struct1 pod_s_1 = struct1 {a = 10, b = foo};
+const struct1 pod_s_1 = struct1{a = 10, b = foo};
 
 struct struct2 {
   1: i32 a;
@@ -128,10 +128,10 @@ const struct2 pod_trailing_commas = {
   "d": [11, 22, 33],
 };
 
-const struct2 pod_s_2 = struct2 {
+const struct2 pod_s_2 = struct2{
   a = 98,
   b = "gaz",
-  c = struct1 {a = 12, b = "bar"},
+  c = struct1{a = 12, b = "bar"},
   d = [11, 22, 33],
 };
 
@@ -147,10 +147,10 @@ const struct3 pod_3 = {
   "c": {"a": 888, "c": {"b": "gaz"}, "d": [1, 2, 3]},
 };
 
-const struct3 pod_s_3 = struct3 {
+const struct3 pod_s_3 = struct3{
   a = "abc",
   b = 456,
-  c = struct2 {a = 888, c = struct1 {b = 'gaz'}, d = [1, 2, 3]},
+  c = struct2{a = 888, c = struct1{b = 'gaz'}, d = [1, 2, 3]},
 };
 
 struct struct4 {
@@ -226,10 +226,10 @@ const i32 zero32 = 0;
 const i64 zero64 = 0;
 const double zero_dot_zero = 0.0;
 const string empty_string = "";
-const list<i32> empty_int_list = {};
-const list<string> empty_string_list = {};
-const set<i32> empty_int_set = {};
-const set<string> empty_string_set = {};
+const list<i32> empty_int_list = [];
+const list<string> empty_string_list = [];
+const set<i32> empty_int_set = [];
+const set<string> empty_string_set = [];
 const map<i32, i32> empty_int_int_map = {};
 const map<i32, string> empty_int_string_map = {};
 const map<string, i32> empty_string_int_map = {};

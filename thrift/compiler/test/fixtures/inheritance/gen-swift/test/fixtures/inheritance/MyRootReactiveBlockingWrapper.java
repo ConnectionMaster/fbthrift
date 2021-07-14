@@ -18,14 +18,30 @@ public class MyRootReactiveBlockingWrapper
     this._delegate = _delegate;
   }
 
+  public MyRootReactiveBlockingWrapper(org.apache.thrift.ProtocolId _protocolId, reactor.core.publisher.Mono<? extends com.facebook.thrift.client.RpcClient> _rpcClient, Map<String, String> _headers, Map<String, String> _persistentHeaders) {
+    this(new MyRootReactiveClient(_protocolId, _rpcClient, _headers, _persistentHeaders));
+  }
+
   @java.lang.Override
   public void close() {
-    _delegate.close();
+    _delegate.dispose();
   }
 
   @java.lang.Override
   public void doRoot() throws org.apache.thrift.TException {
       _delegate.doRoot().block();
+  }
+
+  @java.lang.Override
+  public void doRoot(
+        com.facebook.thrift.client.RpcOptions rpcOptions) throws org.apache.thrift.TException {
+      _delegate.doRoot().block();
+  }
+
+  @java.lang.Override
+  public com.facebook.thrift.client.ResponseWrapper<Void> doRootWrapper(
+    com.facebook.thrift.client.RpcOptions rpcOptions) throws org.apache.thrift.TException {
+      return _delegate.doRootWrapper(rpcOptions).block();
   }
 
 }

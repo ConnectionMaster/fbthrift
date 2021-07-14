@@ -104,6 +104,13 @@ func (p ctxProcessorFunctionAdapter) RunContext(ctx context.Context, args Struct
 	return p.ProcessorFunction.Run(args)
 }
 
+func errorType(err error) string {
+	// get type name without package or pointer information
+	fqet := strings.Replace(fmt.Sprintf("%T", err), "*", "", -1)
+	et := strings.Split(fqet, ".")
+	return et[len(et)-1]
+}
+
 // ProcessContext is a Process that supports contexts.
 func ProcessContext(ctx context.Context, processor ProcessorContext, iprot, oprot Protocol) (keepOpen bool, ext Exception) {
 	name, messageType, seqID, rerr := iprot.ReadMessageBegin()
@@ -148,7 +155,7 @@ func ProcessContext(ctx context.Context, processor ProcessorContext, iprot, opro
 				return false, e2
 			}
 		}
-		return true, err
+		return true, nil
 	}
 
 	if pfunc == nil {
@@ -169,13 +176,8 @@ func ProcessContext(ctx context.Context, processor ProcessorContext, iprot, opro
 		if err != nil {
 			switch oprotHeader := oprot.(type) {
 			case *HeaderProtocol:
-				// get type name without package or pointer information
-				fqet := strings.Replace(fmt.Sprintf("%T", err), "*", "", -1)
-				et := strings.Split(fqet, ".")
-				errorType := et[len(et)-1]
-
 				// set header for ServiceRouter
-				oprotHeader.SetHeader("uex", errorType)
+				oprotHeader.SetHeader("uex", errorType(err))
 				oprotHeader.SetHeader("uexw", err.Error())
 			}
 			// it's an application generated error, so serialize it
@@ -183,9 +185,23 @@ func ProcessContext(ctx context.Context, processor ProcessorContext, iprot, opro
 			result = err
 		}
 
-		if e2 := pfunc.Write(seqID, result, oprot); e2 != nil {
-			// close connection on write failure
-			return false, err
+		// If we got a structured exception back, write metadata about it into headers
+		if rr, ok := result.(WritableResult); ok && rr.Exception() != nil {
+			switch oprotHeader := oprot.(type) {
+			case *HeaderProtocol:
+				terr := rr.Exception()
+				oprotHeader.SetHeader("uex", errorType(terr))
+				oprotHeader.SetHeader("uexw", terr.Error())
+			}
+		}
+
+		// if result was nil, call was oneway
+		// often times oneway calls do not even have msgType ONEWAY
+		if result != nil {
+			if e2 := pfunc.Write(seqID, result, oprot); e2 != nil {
+				// close connection on write failure
+				return false, err
+			}
 		}
 	}
 

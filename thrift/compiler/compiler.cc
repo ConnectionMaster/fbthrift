@@ -37,10 +37,13 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem.hpp>
 
+#include <thrift/compiler/ast/diagnostic.h>
+#include <thrift/compiler/ast/diagnostic_context.h>
 #include <thrift/compiler/generate/t_generator.h>
 #include <thrift/compiler/mutator/mutator.h>
 #include <thrift/compiler/parse/parsing_driver.h>
 #include <thrift/compiler/platform.h>
+#include <thrift/compiler/sema/ast_validator.h>
 #include <thrift/compiler/validator/validator.h>
 
 namespace apache {
@@ -128,7 +131,8 @@ bool isComma(const char& c) {
 std::string parseArgs(
     const std::vector<std::string>& arguments,
     parsing_params& pparams,
-    gen_params& gparams) {
+    gen_params& gparams,
+    diagnostic_params& dparams) {
   // Check for necessary arguments, you gotta have at least a filename and
   // an output language flag.
   if (arguments.size() < 2) {
@@ -179,25 +183,25 @@ std::string parseArgs(
       boost::algorithm::split(
           pparams.allow_experimental_features, *arg, isComma);
     } else if (flag == "debug") {
-      pparams.debug = true;
+      dparams.debug = true;
       g_debug = 1;
     } else if (flag == "nowarn") {
-      pparams.warn = g_warn = 0;
+      dparams.warn_level = g_warn = 0;
       nowarn = true;
     } else if (flag == "strict") {
       pparams.strict = 255;
       if (!nowarn) { // Don't override nowarn.
-        pparams.warn = g_warn = 2;
+        dparams.warn_level = g_warn = 2;
       }
     } else if (flag == "v" || flag == "verbose") {
-      pparams.verbose = true;
+      dparams.info = true;
       g_verbose = 1;
     } else if (flag == "r" || flag == "recurse") {
       gparams.gen_recurse = true;
     } else if (flag == "allow-neg-keys") {
       pparams.allow_neg_field_keys = true;
     } else if (flag == "allow-neg-enum-vals") {
-      pparams.allow_neg_enum_vals = true;
+      dparams.allow_neg_enum_vals = true;
     } else if (flag == "allow-64bit-consts") {
       pparams.allow_64bit_consts = true;
     } else if (flag == "record-genfiles") {
@@ -230,7 +234,7 @@ std::string parseArgs(
       bool out_path_is_absolute = (flag == "out");
 
       // Strip out trailing \ on a Windows path
-      if (isWindows()) {
+      if (platform_is_windows()) {
         int last = out_path.length() - 1;
         if (out_path[last] == '\\') {
           out_path.erase(last);
@@ -327,7 +331,7 @@ bool generate(
 
       bool has_failure = false;
       for (const auto& d : diagnostics) {
-        has_failure = has_failure || (d.getType() == diagnostic::type::failure);
+        has_failure = has_failure || (d.level() == diagnostic_level::failure);
         std::cerr << d << std::endl;
       }
       if (has_failure) {
@@ -398,54 +402,52 @@ std::string get_include_path(
 
 compile_result compile(const std::vector<std::string>& arguments) {
   compile_result result;
-  result.retcode = compile_retcode::FAILURE;
 
-  // Parese arguments.
+  // Parse arguments.
   g_stage = "arguments";
   parsing_params pparams{};
   gen_params gparams{};
-  std::string input_filename = parseArgs(arguments, pparams, gparams);
+  diagnostic_params dparams{};
+  std::string input_filename = parseArgs(arguments, pparams, gparams, dparams);
   if (input_filename.empty()) {
     return result;
   }
+  diagnostic_context ctx{result.detail, std::move(dparams)};
 
   // Parse it!
   g_stage = "parse";
-  parsing_driver driver{input_filename, std::move(pparams)};
-  auto program = driver.parse(result.diagnostics);
+  parsing_driver driver{ctx, input_filename, std::move(pparams)};
+  auto program = driver.parse();
   if (!program) {
     return result;
   }
 
   // Mutate it!
-  mutator::mutate(program->get_root_program());
-  program->get_root_program()->set_include_prefix(
+  try {
+    mutator::mutate(program->root_program());
+  } catch (MutatorException& e) {
+    ctx.report(std::move(e.message));
+    return result;
+  }
+
+  program->root_program()->set_include_prefix(
       get_include_path(gparams.targets, input_filename));
 
   // Validate it!
-  auto diagnostics = validator::validate(program->get_root_program());
-  bool has_failure = false;
-  for (const auto& d : diagnostics) {
-    has_failure = has_failure || (d.getType() == diagnostic::type::failure);
-    std::cerr << d << std::endl;
-  }
-  if (has_failure) {
+  ctx.report_all(validator::validate(program->root_program()));
+  standard_validator()(ctx, *program->root_program());
+  if (result.detail.has_failure()) {
     return result;
   }
 
   // Generate it!
   g_stage = "generation";
   try {
-    if (generate(gparams, program->get_root_program())) {
-      result.retcode = compile_retcode::SUCCESS;
+    if (generate(gparams, program->root_program())) {
+      result.retcode = compile_retcode::success;
     }
   } catch (const std::exception& e) {
-    result.diagnostics.push_back(diagnostic_message(
-        diagnostic_level::FAILURE,
-        program->get_root_program()->path(),
-        0,
-        {},
-        e.what()));
+    ctx.failure(*program->root_program(), e.what());
   }
   return result;
 }

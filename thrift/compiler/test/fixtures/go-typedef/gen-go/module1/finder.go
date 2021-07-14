@@ -344,6 +344,11 @@ type finderProcessorByPlate struct {
   handler Finder
 }
 
+func (p *FinderByPlateResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *finderProcessorByPlate) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := FinderByPlateArgs{}
   if err := args.Read(iprot); err != nil {
@@ -394,6 +399,11 @@ type finderProcessorAliasByPlate struct {
   handler Finder
 }
 
+func (p *FinderAliasByPlateResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *finderProcessorAliasByPlate) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := FinderAliasByPlateArgs{}
   if err := args.Read(iprot); err != nil {
@@ -442,6 +452,11 @@ func (p *finderProcessorAliasByPlate) Run(argStruct thrift.Struct) (thrift.Writa
 
 type finderProcessorPreviousPlate struct {
   handler Finder
+}
+
+func (p *FinderPreviousPlateResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *finderProcessorPreviousPlate) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -610,7 +625,7 @@ func (p *FinderByPlateArgs) String() string {
 //  - Success
 type FinderByPlateResult struct {
   thrift.IResponse
-  Success *Automobile `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *Automobile `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewFinderByPlateResult() *FinderByPlateResult {
@@ -849,7 +864,7 @@ func (p *FinderAliasByPlateArgs) String() string {
 //  - Success
 type FinderAliasByPlateResult struct {
   thrift.IResponse
-  Success *Car `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *Car `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewFinderAliasByPlateResult() *FinderAliasByPlateResult {
@@ -1088,7 +1103,7 @@ func (p *FinderPreviousPlateArgs) String() string {
 //  - Success
 type FinderPreviousPlateResult struct {
   thrift.IResponse
-  Success *Plate `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *Plate `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewFinderPreviousPlateResult() *FinderPreviousPlateResult {

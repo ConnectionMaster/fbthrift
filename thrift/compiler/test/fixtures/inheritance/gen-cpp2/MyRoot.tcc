@@ -25,6 +25,10 @@ void MyRootAsyncProcessor::setUpAndProcess_do_root(apache::thrift::ResponseChann
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void MyRootAsyncProcessor::process_do_root(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -34,12 +38,9 @@ void MyRootAsyncProcessor::process_do_root(apache::thrift::ResponseChannelReques
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "do_root");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "do_root");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<void>>(std::move(req), std::move(ctxStack), return_do_root<ProtocolIn_,ProtocolOut_>, throw_wrapped_do_root<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -47,10 +48,10 @@ void MyRootAsyncProcessor::process_do_root(apache::thrift::ResponseChannelReques
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue MyRootAsyncProcessor::return_do_root(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
+apache::thrift::LegacySerializedResponse MyRootAsyncProcessor::return_do_root(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
   ProtocolOut_ prot;
   MyRoot_do_root_presult result;
-  return serializeResponse("do_root", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("do_root", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>

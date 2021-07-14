@@ -7,21 +7,20 @@
 
 package test.fixtures.stream;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class PubSubStreamingServiceBlockingReactiveWrapper 
     implements PubSubStreamingService.Reactive {
     private final PubSubStreamingService _delegate;
-    private final reactor.core.scheduler.Scheduler _scheduler;
 
-    public PubSubStreamingServiceBlockingReactiveWrapper(PubSubStreamingService _delegate, reactor.core.scheduler.Scheduler _scheduler) {
+    public PubSubStreamingServiceBlockingReactiveWrapper(PubSubStreamingService _delegate) {
         
         this._delegate = _delegate;
-        this._scheduler = _scheduler;
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
@@ -41,7 +40,7 @@ public class PubSubStreamingServiceBlockingReactiveWrapper
     }
 
     @java.lang.Override
-    public reactor.core.publisher.Flux<com.facebook.swift.transport.model.StreamResponse<Integer,Integer>> responseandstreamthrows(final int foo) {
+    public reactor.core.publisher.Flux<com.facebook.thrift.model.StreamResponse<Integer,Integer>> responseandstreamthrows(final int foo) {
         throw new UnsupportedOperationException();
     }
 

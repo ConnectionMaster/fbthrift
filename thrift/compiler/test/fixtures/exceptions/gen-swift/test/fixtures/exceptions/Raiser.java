@@ -10,7 +10,7 @@ package test.fixtures.exceptions;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.codec.ThriftField.Requiredness;
 import com.facebook.swift.service.*;
-import com.facebook.swift.transport.client.*;
+import com.facebook.thrift.client.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.util.*;
@@ -149,9 +149,8 @@ public interface Raiser extends java.io.Closeable {
     }
 
     @com.facebook.swift.service.ThriftService("Raiser")
-    interface Reactive extends Closeable {
-        @java.lang.Override void close();
-
+    interface Reactive extends reactor.core.Disposable {
+        @ThriftMethod(value = "doBland")
         reactor.core.publisher.Mono<Void> doBland();
 
         default reactor.core.publisher.Mono<Void> doBland(RpcOptions rpcOptions) {
@@ -162,6 +161,12 @@ public interface Raiser extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "doRaise",
+                  exception = { 
+                      @ThriftException(type=test.fixtures.exceptions.Banal.class, id=1),
+                      @ThriftException(type=test.fixtures.exceptions.Fiery.class, id=2),
+                      @ThriftException(type=test.fixtures.exceptions.Serious.class, id=3)
+                  })
         reactor.core.publisher.Mono<Void> doRaise();
 
         default reactor.core.publisher.Mono<Void> doRaise(RpcOptions rpcOptions) {
@@ -172,6 +177,7 @@ public interface Raiser extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "get200")
         reactor.core.publisher.Mono<String> get200();
 
         default reactor.core.publisher.Mono<String> get200(RpcOptions rpcOptions) {
@@ -182,6 +188,12 @@ public interface Raiser extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "get500",
+                  exception = { 
+                      @ThriftException(type=test.fixtures.exceptions.Fiery.class, id=1),
+                      @ThriftException(type=test.fixtures.exceptions.Banal.class, id=2),
+                      @ThriftException(type=test.fixtures.exceptions.Serious.class, id=3)
+                  })
         reactor.core.publisher.Mono<String> get500();
 
         default reactor.core.publisher.Mono<String> get500(RpcOptions rpcOptions) {

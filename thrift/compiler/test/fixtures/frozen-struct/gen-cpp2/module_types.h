@@ -124,6 +124,13 @@ class ModuleB;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace some { namespace ns {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ModuleA final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -147,14 +154,13 @@ class ModuleA final  {
   [[deprecated("This constructor is deprecated")]]
   ModuleA(apache::thrift::FragileConstructor, ::std::int32_t i32Field__arg, ::std::string strField__arg, ::std::vector<::std::int16_t> listField__arg, ::std::map<::std::string, ::std::int32_t> mapField__arg, ::some::ns::IncludedA inclAField__arg, ::some::ns::IncludedB inclBField__arg);
 
-  ModuleA(ModuleA&&) = default;
+  ModuleA(ModuleA&&) noexcept;
 
-  ModuleA(const ModuleA&) = default;
+  ModuleA(const ModuleA& src);
 
 
-  ModuleA& operator=(ModuleA&&) = default;
-
-  ModuleA& operator=(const ModuleA&) = default;
+  ModuleA& operator=(ModuleA&&) noexcept;
+  ModuleA& operator=(const ModuleA& src);
   void __clear();
 
   ~ModuleA();
@@ -172,7 +178,7 @@ class ModuleA final  {
  private:
   ::some::ns::IncludedB inclBField;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool i32Field;
@@ -182,24 +188,11 @@ class ModuleA final  {
     bool inclAField;
     bool inclBField;
   } __isset = {};
-  bool operator==(const ModuleA& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ModuleA& __x, const ModuleA& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ModuleA& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ModuleA& __x, const ModuleA& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ModuleA& __x, const ModuleA& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ModuleA& __x, const ModuleA& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ModuleA&) const;
+  bool operator<(const ModuleA&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> i32Field_ref() const& {
@@ -325,6 +318,7 @@ class ModuleA final  {
     return i32Field;
   }
 
+  [[deprecated("Use `FOO.i32Field_ref() = BAR;` instead of `FOO.set_i32Field(BAR);`")]]
   ::std::int32_t& set_i32Field(::std::int32_t i32Field_) {
     i32Field = i32Field_;
     __isset.i32Field = true;
@@ -340,6 +334,7 @@ class ModuleA final  {
   }
 
   template <typename T_ModuleA_strField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.strField_ref() = BAR;` instead of `FOO.set_strField(BAR);`")]]
   ::std::string& set_strField(T_ModuleA_strField_struct_setter&& strField_) {
     strField = std::forward<T_ModuleA_strField_struct_setter>(strField_);
     __isset.strField = true;
@@ -349,6 +344,7 @@ class ModuleA final  {
   ::std::vector<::std::int16_t> get_listField() &&;
 
   template <typename T_ModuleA_listField_struct_setter = ::std::vector<::std::int16_t>>
+  [[deprecated("Use `FOO.listField_ref() = BAR;` instead of `FOO.set_listField(BAR);`")]]
   ::std::vector<::std::int16_t>& set_listField(T_ModuleA_listField_struct_setter&& listField_) {
     listField = std::forward<T_ModuleA_listField_struct_setter>(listField_);
     __isset.listField = true;
@@ -358,6 +354,7 @@ class ModuleA final  {
   ::std::map<::std::string, ::std::int32_t> get_mapField() &&;
 
   template <typename T_ModuleA_mapField_struct_setter = ::std::map<::std::string, ::std::int32_t>>
+  [[deprecated("Use `FOO.mapField_ref() = BAR;` instead of `FOO.set_mapField(BAR);`")]]
   ::std::map<::std::string, ::std::int32_t>& set_mapField(T_ModuleA_mapField_struct_setter&& mapField_) {
     mapField = std::forward<T_ModuleA_mapField_struct_setter>(mapField_);
     __isset.mapField = true;
@@ -367,6 +364,7 @@ class ModuleA final  {
   ::some::ns::IncludedA get_inclAField() &&;
 
   template <typename T_ModuleA_inclAField_struct_setter = ::some::ns::IncludedA>
+  [[deprecated("Use `FOO.inclAField_ref() = BAR;` instead of `FOO.set_inclAField(BAR);`")]]
   ::some::ns::IncludedA& set_inclAField(T_ModuleA_inclAField_struct_setter&& inclAField_) {
     inclAField = std::forward<T_ModuleA_inclAField_struct_setter>(inclAField_);
     __isset.inclAField = true;
@@ -376,6 +374,7 @@ class ModuleA final  {
   ::some::ns::IncludedB get_inclBField() &&;
 
   template <typename T_ModuleA_inclBField_struct_setter = ::some::ns::IncludedB>
+  [[deprecated("Use `FOO.inclBField_ref() = BAR;` instead of `FOO.set_inclBField(BAR);`")]]
   ::some::ns::IncludedB& set_inclBField(T_ModuleA_inclBField_struct_setter&& inclBField_) {
     inclBField = std::forward<T_ModuleA_inclBField_struct_setter>(inclBField_);
     __isset.inclBField = true;
@@ -395,7 +394,7 @@ class ModuleA final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ModuleA >;
+  friend class ::apache::thrift::Cpp2Ops<ModuleA>;
   friend void swap(ModuleA& a, ModuleA& b);
 };
 
@@ -408,6 +407,13 @@ uint32_t ModuleA::read(Protocol_* iprot) {
 
 }} // some::ns
 namespace some { namespace ns {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ModuleB final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -427,7 +433,8 @@ class ModuleB final  {
 
   ModuleB() :
       i32Field(0),
-      inclEnumB(static_cast< ::some::ns::EnumB>(0)) {}
+      inclEnumB(static_cast< ::some::ns::EnumB>(0)) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   ModuleB(apache::thrift::FragileConstructor, ::std::int32_t i32Field__arg, ::some::ns::EnumB inclEnumB__arg);
@@ -446,30 +453,17 @@ class ModuleB final  {
  private:
   ::some::ns::EnumB inclEnumB;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool i32Field;
     bool inclEnumB;
   } __isset = {};
-  bool operator==(const ModuleB& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ModuleB& __x, const ModuleB& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ModuleB& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ModuleB& __x, const ModuleB& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ModuleB& __x, const ModuleB& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ModuleB& __x, const ModuleB& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ModuleB&) const;
+  bool operator<(const ModuleB&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> i32Field_ref() const& {
@@ -515,6 +509,7 @@ class ModuleB final  {
     return i32Field;
   }
 
+  [[deprecated("Use `FOO.i32Field_ref() = BAR;` instead of `FOO.set_i32Field(BAR);`")]]
   ::std::int32_t& set_i32Field(::std::int32_t i32Field_) {
     i32Field = i32Field_;
     __isset.i32Field = true;
@@ -525,6 +520,7 @@ class ModuleB final  {
     return inclEnumB;
   }
 
+  [[deprecated("Use `FOO.inclEnumB_ref() = BAR;` instead of `FOO.set_inclEnumB(BAR);`")]]
   ::some::ns::EnumB& set_inclEnumB(::some::ns::EnumB inclEnumB_) {
     inclEnumB = inclEnumB_;
     __isset.inclEnumB = true;
@@ -544,7 +540,7 @@ class ModuleB final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ModuleB >;
+  friend class ::apache::thrift::Cpp2Ops<ModuleB>;
   friend void swap(ModuleB& a, ModuleB& b);
 };
 

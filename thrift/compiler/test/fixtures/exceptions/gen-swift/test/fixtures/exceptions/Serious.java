@@ -22,7 +22,7 @@ import org.apache.thrift.meta_data.FieldValueMetaData;
 
 @SwiftGenerated
 @com.facebook.swift.codec.ThriftStruct("Serious")
-public final class Serious extends java.lang.RuntimeException {
+public final class Serious extends java.lang.RuntimeException implements com.facebook.thrift.payload.ThriftSerializable {
     private static final long serialVersionUID = 1L;
 
 
@@ -79,6 +79,10 @@ public final class Serious extends java.lang.RuntimeException {
     @java.lang.Override
     public String getMessage() {
       return sonnet;
+    }
+    
+    public static com.facebook.thrift.payload.Reader<Serious> asReader() {
+      return Serious::read0;
     }
     
     public static Serious read0(TProtocol oprot) throws TException {

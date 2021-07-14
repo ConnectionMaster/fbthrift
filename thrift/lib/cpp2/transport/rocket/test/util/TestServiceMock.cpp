@@ -39,15 +39,11 @@ class LeakDetector {
     return *this;
   }
 
-  virtual ~LeakDetector() {
-    --instanceCount();
-  }
+  virtual ~LeakDetector() { --instanceCount(); }
 
   std::shared_ptr<testing::StrictMock<InternalClass>> internal_;
 
-  static int32_t getInstanceCount() {
-    return instanceCount();
-  }
+  static int32_t getInstanceCount() { return instanceCount(); }
 
  protected:
   static std::atomic_int& instanceCount() {
@@ -78,8 +74,18 @@ ServerStream<std::string> TestStreamServiceMock::buffers(int32_t count) {
   return std::move(stream);
 }
 
-ServerStream<int32_t>
-TestStreamServiceMock::slowRange(int32_t from, int32_t to, int32_t millis) {
+ServerStream<std::string> TestStreamServiceMock::customBuffers(
+    int32_t count, int32_t size) {
+  auto [stream, publisher] = ServerStream<std::string>::createPublisher();
+  for (int i = 0; i < count; i++) {
+    publisher.next(std::string(size, 'x'));
+  }
+  std::move(publisher).complete();
+  return std::move(stream);
+}
+
+ServerStream<int32_t> TestStreamServiceMock::slowRange(
+    int32_t from, int32_t to, int32_t millis) {
   auto [stream, publisher] = ServerStream<int32_t>::createPublisher();
   auto eb = folly::getEventBase();
   std::shared_ptr<std::function<void(decltype(publisher), int32_t)>> schedule =
@@ -130,8 +136,7 @@ ServerStream<int32_t> TestStreamServiceMock::slowCancellation() {
 }
 
 ResponseAndServerStream<int32_t, int32_t> TestStreamServiceMock::leakCheck(
-    int32_t from,
-    int32_t to) {
+    int32_t from, int32_t to) {
 #if FOLLY_HAS_COROUTINES
   auto stream = folly::coro::co_invoke(
       [=,
@@ -148,9 +153,7 @@ ResponseAndServerStream<int32_t, int32_t> TestStreamServiceMock::leakCheck(
 
 ResponseAndServerStream<int32_t, int32_t>
 TestStreamServiceMock::leakCheckWithSleep(
-    int32_t from,
-    int32_t to,
-    int32_t sleepMs) {
+    int32_t from, int32_t to, int32_t sleepMs) {
   std::this_thread::sleep_for(std::chrono::milliseconds{sleepMs});
   return leakCheck(from, to);
 }
@@ -198,9 +201,7 @@ TestStreamServiceMock::streamServerSlow() {
 }
 
 void TestStreamServiceMock::sendMessage(
-    int32_t messageId,
-    bool complete,
-    bool error) {
+    int32_t messageId, bool complete, bool error) {
   if (!messages_) {
     throw std::runtime_error("First call registerToMessages");
   }

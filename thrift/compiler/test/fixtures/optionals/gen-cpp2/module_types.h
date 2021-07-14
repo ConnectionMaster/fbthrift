@@ -183,6 +183,13 @@ typedef ::std::int64_t PersonID;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Color final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -204,7 +211,8 @@ class Color final  {
       red(0),
       green(0),
       blue(0),
-      alpha(0) {}
+      alpha(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Color(apache::thrift::FragileConstructor, double red__arg, double green__arg, double blue__arg, double alpha__arg);
@@ -227,7 +235,7 @@ class Color final  {
  private:
   double alpha;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool red;
@@ -235,24 +243,11 @@ class Color final  {
     bool blue;
     bool alpha;
   } __isset = {};
-  bool operator==(const Color& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Color& __x, const Color& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Color& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Color& __x, const Color& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Color& __x, const Color& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Color& __x, const Color& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Color&) const;
+  bool operator<(const Color&) const;
 
   template <typename..., typename T = double>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> red_ref() const& {
@@ -338,6 +333,7 @@ class Color final  {
     return red;
   }
 
+  [[deprecated("Use `FOO.red_ref() = BAR;` instead of `FOO.set_red(BAR);`")]]
   double& set_red(double red_) {
     red = red_;
     __isset.red = true;
@@ -348,6 +344,7 @@ class Color final  {
     return green;
   }
 
+  [[deprecated("Use `FOO.green_ref() = BAR;` instead of `FOO.set_green(BAR);`")]]
   double& set_green(double green_) {
     green = green_;
     __isset.green = true;
@@ -358,6 +355,7 @@ class Color final  {
     return blue;
   }
 
+  [[deprecated("Use `FOO.blue_ref() = BAR;` instead of `FOO.set_blue(BAR);`")]]
   double& set_blue(double blue_) {
     blue = blue_;
     __isset.blue = true;
@@ -368,6 +366,7 @@ class Color final  {
     return alpha;
   }
 
+  [[deprecated("Use `FOO.alpha_ref() = BAR;` instead of `FOO.set_alpha(BAR);`")]]
   double& set_alpha(double alpha_) {
     alpha = alpha_;
     __isset.alpha = true;
@@ -387,7 +386,7 @@ class Color final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Color >;
+  friend class ::apache::thrift::Cpp2Ops<Color>;
   friend void swap(Color& a, Color& b);
 };
 
@@ -400,6 +399,13 @@ uint32_t Color::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Vehicle final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -423,14 +429,13 @@ class Vehicle final  {
   [[deprecated("This constructor is deprecated")]]
   Vehicle(apache::thrift::FragileConstructor, ::cpp2::Color color__arg, ::std::string licensePlate__arg, ::std::string description__arg, ::std::string name__arg, bool hasAC__arg);
 
-  Vehicle(Vehicle&&) = default;
+  Vehicle(Vehicle&&) noexcept;
 
-  Vehicle(const Vehicle&) = default;
+  Vehicle(const Vehicle& src);
 
 
-  Vehicle& operator=(Vehicle&&) = default;
-
-  Vehicle& operator=(const Vehicle&) = default;
+  Vehicle& operator=(Vehicle&&) noexcept;
+  Vehicle& operator=(const Vehicle& src);
   void __clear();
 
   ~Vehicle();
@@ -446,7 +451,7 @@ class Vehicle final  {
  private:
   bool hasAC;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool color;
@@ -455,24 +460,11 @@ class Vehicle final  {
     bool name;
     bool hasAC;
   } __isset = {};
-  bool operator==(const Vehicle& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Vehicle& __x, const Vehicle& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Vehicle& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Vehicle& __x, const Vehicle& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Vehicle& __x, const Vehicle& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Vehicle& __x, const Vehicle& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Vehicle&) const;
+  bool operator<(const Vehicle&) const;
 
   template <typename..., typename T = ::cpp2::Color>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> color_ref() const& {
@@ -577,6 +569,7 @@ class Vehicle final  {
   ::cpp2::Color get_color() &&;
 
   template <typename T_Vehicle_color_struct_setter = ::cpp2::Color>
+  [[deprecated("Use `FOO.color_ref() = BAR;` instead of `FOO.set_color(BAR);`")]]
   ::cpp2::Color& set_color(T_Vehicle_color_struct_setter&& color_) {
     color = std::forward<T_Vehicle_color_struct_setter>(color_);
     __isset.color = true;
@@ -593,6 +586,7 @@ class Vehicle final  {
   ::std::string* get_licensePlate() && = delete;
 
   template <typename T_Vehicle_licensePlate_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.licensePlate_ref() = BAR;` instead of `FOO.set_licensePlate(BAR);`")]]
   ::std::string& set_licensePlate(T_Vehicle_licensePlate_struct_setter&& licensePlate_) {
     licensePlate = std::forward<T_Vehicle_licensePlate_struct_setter>(licensePlate_);
     __isset.licensePlate = true;
@@ -609,6 +603,7 @@ class Vehicle final  {
   ::std::string* get_description() && = delete;
 
   template <typename T_Vehicle_description_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.description_ref() = BAR;` instead of `FOO.set_description(BAR);`")]]
   ::std::string& set_description(T_Vehicle_description_struct_setter&& description_) {
     description = std::forward<T_Vehicle_description_struct_setter>(description_);
     __isset.description = true;
@@ -625,6 +620,7 @@ class Vehicle final  {
   ::std::string* get_name() && = delete;
 
   template <typename T_Vehicle_name_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.name_ref() = BAR;` instead of `FOO.set_name(BAR);`")]]
   ::std::string& set_name(T_Vehicle_name_struct_setter&& name_) {
     name = std::forward<T_Vehicle_name_struct_setter>(name_);
     __isset.name = true;
@@ -640,6 +636,7 @@ class Vehicle final  {
   }
   bool* get_hasAC() && = delete;
 
+  [[deprecated("Use `FOO.hasAC_ref() = BAR;` instead of `FOO.set_hasAC(BAR);`")]]
   bool& set_hasAC(bool hasAC_) {
     hasAC = hasAC_;
     __isset.hasAC = true;
@@ -659,7 +656,7 @@ class Vehicle final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Vehicle >;
+  friend class ::apache::thrift::Cpp2Ops<Vehicle>;
   friend void swap(Vehicle& a, Vehicle& b);
 };
 
@@ -672,6 +669,13 @@ uint32_t Vehicle::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Person final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -695,14 +699,13 @@ class Person final  {
   [[deprecated("This constructor is deprecated")]]
   Person(apache::thrift::FragileConstructor, ::cpp2::PersonID id__arg, ::std::string name__arg, ::std::int16_t age__arg, ::std::string address__arg, ::cpp2::Color favoriteColor__arg, ::std::set<::cpp2::PersonID> friends__arg, ::cpp2::PersonID bestFriend__arg, ::std::map<::cpp2::Animal, ::std::string> petNames__arg, ::cpp2::Animal afraidOfAnimal__arg, ::std::vector<::cpp2::Vehicle> vehicles__arg);
 
-  Person(Person&&) = default;
+  Person(Person&&) noexcept;
 
-  Person(const Person&) = default;
+  Person(const Person& src);
 
 
-  Person& operator=(Person&&) = default;
-
-  Person& operator=(const Person&) = default;
+  Person& operator=(Person&&) noexcept;
+  Person& operator=(const Person& src);
   void __clear();
 
   ~Person();
@@ -728,7 +731,7 @@ class Person final  {
  private:
   ::std::vector<::cpp2::Vehicle> vehicles;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool id;
@@ -742,24 +745,11 @@ class Person final  {
     bool afraidOfAnimal;
     bool vehicles;
   } __isset = {};
-  bool operator==(const Person& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Person& __x, const Person& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Person& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Person& __x, const Person& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Person& __x, const Person& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Person& __x, const Person& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Person&) const;
+  bool operator<(const Person&) const;
 
   template <typename..., typename T = ::cpp2::PersonID>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> id_ref() const& {
@@ -965,6 +955,7 @@ class Person final  {
     return id;
   }
 
+  [[deprecated("Use `FOO.id_ref() = BAR;` instead of `FOO.set_id(BAR);`")]]
   ::cpp2::PersonID& set_id(::cpp2::PersonID id_) {
     id = id_;
     __isset.id = true;
@@ -980,6 +971,7 @@ class Person final  {
   }
 
   template <typename T_Person_name_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.name_ref() = BAR;` instead of `FOO.set_name(BAR);`")]]
   ::std::string& set_name(T_Person_name_struct_setter&& name_) {
     name = std::forward<T_Person_name_struct_setter>(name_);
     __isset.name = true;
@@ -995,6 +987,7 @@ class Person final  {
   }
   ::std::int16_t* get_age() && = delete;
 
+  [[deprecated("Use `FOO.age_ref() = BAR;` instead of `FOO.set_age(BAR);`")]]
   ::std::int16_t& set_age(::std::int16_t age_) {
     age = age_;
     __isset.age = true;
@@ -1011,6 +1004,7 @@ class Person final  {
   ::std::string* get_address() && = delete;
 
   template <typename T_Person_address_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.address_ref() = BAR;` instead of `FOO.set_address(BAR);`")]]
   ::std::string& set_address(T_Person_address_struct_setter&& address_) {
     address = std::forward<T_Person_address_struct_setter>(address_);
     __isset.address = true;
@@ -1021,6 +1015,7 @@ class Person final  {
   ::cpp2::Color* get_favoriteColor() && = delete;
 
   template <typename T_Person_favoriteColor_struct_setter = ::cpp2::Color>
+  [[deprecated("Use `FOO.favoriteColor_ref() = BAR;` instead of `FOO.set_favoriteColor(BAR);`")]]
   ::cpp2::Color& set_favoriteColor(T_Person_favoriteColor_struct_setter&& favoriteColor_) {
     favoriteColor = std::forward<T_Person_favoriteColor_struct_setter>(favoriteColor_);
     __isset.favoriteColor = true;
@@ -1031,6 +1026,7 @@ class Person final  {
   ::std::set<::cpp2::PersonID>* get_friends() && = delete;
 
   template <typename T_Person_friends_struct_setter = ::std::set<::cpp2::PersonID>>
+  [[deprecated("Use `FOO.friends_ref() = BAR;` instead of `FOO.set_friends(BAR);`")]]
   ::std::set<::cpp2::PersonID>& set_friends(T_Person_friends_struct_setter&& friends_) {
     friends = std::forward<T_Person_friends_struct_setter>(friends_);
     __isset.friends = true;
@@ -1046,6 +1042,7 @@ class Person final  {
   }
   ::cpp2::PersonID* get_bestFriend() && = delete;
 
+  [[deprecated("Use `FOO.bestFriend_ref() = BAR;` instead of `FOO.set_bestFriend(BAR);`")]]
   ::cpp2::PersonID& set_bestFriend(::cpp2::PersonID bestFriend_) {
     bestFriend = bestFriend_;
     __isset.bestFriend = true;
@@ -1056,6 +1053,7 @@ class Person final  {
   ::std::map<::cpp2::Animal, ::std::string>* get_petNames() && = delete;
 
   template <typename T_Person_petNames_struct_setter = ::std::map<::cpp2::Animal, ::std::string>>
+  [[deprecated("Use `FOO.petNames_ref() = BAR;` instead of `FOO.set_petNames(BAR);`")]]
   ::std::map<::cpp2::Animal, ::std::string>& set_petNames(T_Person_petNames_struct_setter&& petNames_) {
     petNames = std::forward<T_Person_petNames_struct_setter>(petNames_);
     __isset.petNames = true;
@@ -1071,6 +1069,7 @@ class Person final  {
   }
   ::cpp2::Animal* get_afraidOfAnimal() && = delete;
 
+  [[deprecated("Use `FOO.afraidOfAnimal_ref() = BAR;` instead of `FOO.set_afraidOfAnimal(BAR);`")]]
   ::cpp2::Animal& set_afraidOfAnimal(::cpp2::Animal afraidOfAnimal_) {
     afraidOfAnimal = afraidOfAnimal_;
     __isset.afraidOfAnimal = true;
@@ -1081,6 +1080,7 @@ class Person final  {
   ::std::vector<::cpp2::Vehicle>* get_vehicles() && = delete;
 
   template <typename T_Person_vehicles_struct_setter = ::std::vector<::cpp2::Vehicle>>
+  [[deprecated("Use `FOO.vehicles_ref() = BAR;` instead of `FOO.set_vehicles(BAR);`")]]
   ::std::vector<::cpp2::Vehicle>& set_vehicles(T_Person_vehicles_struct_setter&& vehicles_) {
     vehicles = std::forward<T_Person_vehicles_struct_setter>(vehicles_);
     __isset.vehicles = true;
@@ -1100,7 +1100,7 @@ class Person final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Person >;
+  friend class ::apache::thrift::Cpp2Ops<Person>;
   friend void swap(Person& a, Person& b);
 };
 

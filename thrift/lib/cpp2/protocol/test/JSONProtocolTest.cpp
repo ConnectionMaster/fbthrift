@@ -212,14 +212,6 @@ TEST_F(JSONProtocolTest, writeBinary) {
       }));
 }
 
-TEST_F(JSONProtocolTest, writeSerializedData) {
-  auto expected = "foobar";
-  EXPECT_EQ(expected, writing_cpp2([](W& p) {
-              p.writeSerializedData(
-                  IOBuf::wrapBuffer(ByteRange(StringPiece("foobar"))));
-            }));
-}
-
 TEST_F(JSONProtocolTest, writeMessage) {
   auto expected = R"([1,"foobar",1,3])";
   EXPECT_EQ(expected, writing_cpp2([](W& p) {
@@ -616,9 +608,7 @@ TEST_F(JSONProtocolTest, readStruct) {
 TEST_F(JSONProtocolTest, readMessage) {
   auto input = R"([1,"foobar",1,3])";
   struct Unit {
-    bool operator==(Unit) const {
-      return true;
-    }
+    bool operator==(Unit) const { return true; }
   };
   auto expected = Unit{};
   EXPECT_EQ(expected, reading_cpp2<Unit>(input, [](R& p) {

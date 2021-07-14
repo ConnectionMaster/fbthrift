@@ -49,6 +49,13 @@ typedef ::cpp2::Foo TransitiveFoo;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Included final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -68,7 +75,8 @@ class Included final  {
 
   Included() :
       MyIntField(0LL),
-      MyTransitiveField(::apache::thrift::detail::make_constant< ::cpp2::Foo>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::a>(2LL))) {}
+      MyTransitiveField(::apache::thrift::detail::make_constant< ::cpp2::Foo>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::a>(2LL))) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Included(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg, ::cpp2::Foo MyTransitiveField__arg);
@@ -87,30 +95,17 @@ class Included final  {
  private:
   ::cpp2::Foo MyTransitiveField;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool MyIntField;
     bool MyTransitiveField;
   } __isset = {};
-  bool operator==(const Included& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Included& __x, const Included& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Included& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Included& __x, const Included& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Included& __x, const Included& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Included& __x, const Included& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Included&) const;
+  bool operator<(const Included&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> MyIntField_ref() const& {
@@ -156,6 +151,7 @@ class Included final  {
     return MyIntField;
   }
 
+  [[deprecated("Use `FOO.MyIntField_ref() = BAR;` instead of `FOO.set_MyIntField(BAR);`")]]
   ::std::int64_t& set_MyIntField(::std::int64_t MyIntField_) {
     MyIntField = MyIntField_;
     __isset.MyIntField = true;
@@ -165,6 +161,7 @@ class Included final  {
   ::cpp2::Foo get_MyTransitiveField() &&;
 
   template <typename T_Included_MyTransitiveField_struct_setter = ::cpp2::Foo>
+  [[deprecated("Use `FOO.MyTransitiveField_ref() = BAR;` instead of `FOO.set_MyTransitiveField(BAR);`")]]
   ::cpp2::Foo& set_MyTransitiveField(T_Included_MyTransitiveField_struct_setter&& MyTransitiveField_) {
     MyTransitiveField = std::forward<T_Included_MyTransitiveField_struct_setter>(MyTransitiveField_);
     __isset.MyTransitiveField = true;
@@ -184,7 +181,7 @@ class Included final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Included >;
+  friend class ::apache::thrift::Cpp2Ops<Included>;
   friend void swap(Included& a, Included& b);
 };
 

@@ -10,7 +10,7 @@ package test.fixtures.basic;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.codec.ThriftField.Requiredness;
 import com.facebook.swift.service.*;
-import com.facebook.swift.transport.client.*;
+import com.facebook.thrift.client.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.util.*;
@@ -89,9 +89,8 @@ public interface DbMixedStackArguments extends java.io.Closeable {
     }
 
     @com.facebook.swift.service.ThriftService("DbMixedStackArguments")
-    interface Reactive extends Closeable {
-        @java.lang.Override void close();
-
+    interface Reactive extends reactor.core.Disposable {
+        @ThriftMethod(value = "getDataByKey0")
         reactor.core.publisher.Mono<byte[]> getDataByKey0(final String key);
 
         default reactor.core.publisher.Mono<byte[]> getDataByKey0(final String key, RpcOptions rpcOptions) {
@@ -102,6 +101,7 @@ public interface DbMixedStackArguments extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "getDataByKey1")
         reactor.core.publisher.Mono<byte[]> getDataByKey1(final String key);
 
         default reactor.core.publisher.Mono<byte[]> getDataByKey1(final String key, RpcOptions rpcOptions) {

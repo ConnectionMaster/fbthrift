@@ -5,7 +5,6 @@
 #  @generated
 #
 cimport cython as __cython
-from cpython.bytes cimport PyBytes_AsStringAndSize
 from cpython.object cimport PyTypeObject, Py_LT, Py_LE, Py_EQ, Py_NE, Py_GT, Py_GE
 from libcpp.memory cimport shared_ptr, make_shared, unique_ptr, make_unique
 from libcpp.string cimport string
@@ -45,7 +44,7 @@ from thrift.py3.types cimport (
 )
 cimport thrift.py3.std_libcpp as std_libcpp
 cimport thrift.py3.serializer as serializer
-import folly.iobuf as __iobuf
+import folly.iobuf as _fbthrift_iobuf
 from folly.optional cimport cOptional
 from folly.memory cimport to_shared_ptr as __to_shared_ptr
 from folly.range cimport Range as __cRange
@@ -54,8 +53,59 @@ import sys
 from collections.abc import Sequence, Set, Mapping, Iterable
 import weakref as __weakref
 import builtins as _builtins
+import asyncio
+from folly.coro cimport bridgeCoroTaskWith
 
 cimport test.fixtures.interactions.module.types_reflection as _types_reflection
 
 
+
+
+cdef class ClientBufferedStream__bool(ClientBufferedStream):
+
+    @staticmethod
+    cdef create(cClientBufferedStream[cbool]& c_obj, __RpcOptions rpc_options):
+        __fbthrift_inst = ClientBufferedStream__bool(rpc_options)
+        __fbthrift_inst._gen = make_unique[cClientBufferedStreamWrapper[cbool]](c_obj)
+        return __fbthrift_inst
+
+    @staticmethod
+    cdef void callback(
+        cFollyTry[__cOptional[cbool]]&& result,
+        PyObject* userdata,
+    ):
+        cdef __cOptional[cbool] opt_val
+        cdef cbool _value
+        stream, pyfuture, rpc_options = <object> userdata
+        if result.hasException():
+            pyfuture.set_exception(
+                thrift.py3.exceptions.create_py_exception(result.exception(), <__RpcOptions>rpc_options)
+            )
+        else:
+            opt_val = result.value()
+            if opt_val.has_value():
+                try:
+                    _value = opt_val.value()
+                    pyfuture.set_result(<bint>_value)
+                except Exception as ex:
+                    pyfuture.set_exception(ex.with_trackback(None))
+            else:
+                pyfuture.set_exception(StopAsyncIteration())
+
+    def __anext__(self):
+        __loop = asyncio.get_event_loop()
+        __future = __loop.create_future()
+        # to avoid "Future exception was never retrieved" error at SIGINT
+        __future.add_done_callback(lambda x: x.exception())
+        __userdata = (self, __future, self._rpc_options)
+        bridgeCoroTaskWith[__cOptional[cbool]](
+            self._executor,
+            deref(self._gen).getNext(),
+            ClientBufferedStream__bool.callback,
+            <PyObject *>__userdata,
+        )
+        return asyncio.shield(__future)
+
+cdef class ServerStream__bool(ServerStream):
+    pass
 

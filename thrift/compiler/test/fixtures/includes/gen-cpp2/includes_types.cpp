@@ -35,6 +35,7 @@ void TccStructTraits<::cpp2::Included>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Included::Included(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg, ::cpp2::Foo MyTransitiveField__arg) :
     MyIntField(std::move(MyIntField__arg)),
@@ -43,10 +44,11 @@ Included::Included(apache::thrift::FragileConstructor, ::std::int64_t MyIntField
   __isset.MyTransitiveField = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void Included::__clear() {
   // clear all fields
-  MyIntField = 0LL;
-  MyTransitiveField.__clear();
+  this->MyIntField = 0LL;
+  this->MyTransitiveField.__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

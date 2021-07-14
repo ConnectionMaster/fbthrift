@@ -148,7 +148,7 @@ trait BarClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -157,7 +157,7 @@ trait BarClientBase {
         $result = Bar_baz_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("baz failed: sequence id is out of order");
         }
       }
@@ -351,6 +351,41 @@ abstract class BarAsyncProcessorBase extends \ThriftAsyncProcessor {
     }
     $this->eventHandler_->postWrite($handler_ctx, 'baz', $result);
   }
+  protected async function process_getThriftServiceMetadata(int $seqid, \TProtocol $input, \TProtocol $output): Awaitable<void> {
+    $reply_type = \TMessageType::REPLY;
+
+    if ($input is \TBinaryProtocolAccelerated) {
+      $args = \thrift_protocol_read_binary_struct($input, '\tmeta_ThriftMetadataService_getThriftServiceMetadata_args');
+    } else if ($input is \TCompactProtocolAccelerated) {
+      $args = \thrift_protocol_read_compact_struct($input, '\tmeta_ThriftMetadataService_getThriftServiceMetadata_args');
+    } else {
+      $args = \tmeta_ThriftMetadataService_getThriftServiceMetadata_args::withDefaultValues();
+      $args->read($input);
+    }
+    $input->readMessageEnd();
+    $result = \tmeta_ThriftMetadataService_getThriftServiceMetadata_result::withDefaultValues();
+    try {
+      $result->success = BarStaticMetadata::getServiceMetadataResponse();
+    } catch (\Exception $ex) {
+      $reply_type = \TMessageType::EXCEPTION;
+      $result = new \TApplicationException($ex->getMessage()."\n".$ex->getTraceAsString());
+    }
+    if ($output is \TBinaryProtocolAccelerated)
+    {
+      \thrift_protocol_write_binary($output, 'getThriftServiceMetadata', $reply_type, $result, $seqid, $output->isStrictWrite());
+    }
+    else if ($output is \TCompactProtocolAccelerated)
+    {
+      \thrift_protocol_write_compact($output, 'getThriftServiceMetadata', $reply_type, $result, $seqid);
+    }
+    else
+    {
+      $output->writeMessageBegin("getThriftServiceMetadata", $reply_type, $seqid);
+      $result->write($output);
+      $output->writeMessageEnd();
+      $output->getTransport()->flush();
+    }
+  }
 }
 class BarAsyncProcessor extends BarAsyncProcessorBase {
   const type TThriftIf = BarAsyncIf;
@@ -401,6 +436,41 @@ abstract class BarSyncProcessorBase extends \ThriftSyncProcessor {
       $output->getTransport()->flush();
     }
     $this->eventHandler_->postWrite($handler_ctx, 'baz', $result);
+  }
+  protected function process_getThriftServiceMetadata(int $seqid, \TProtocol $input, \TProtocol $output): void {
+    $reply_type = \TMessageType::REPLY;
+
+    if ($input is \TBinaryProtocolAccelerated) {
+      $args = \thrift_protocol_read_binary_struct($input, '\tmeta_ThriftMetadataService_getThriftServiceMetadata_args');
+    } else if ($input is \TCompactProtocolAccelerated) {
+      $args = \thrift_protocol_read_compact_struct($input, '\tmeta_ThriftMetadataService_getThriftServiceMetadata_args');
+    } else {
+      $args = \tmeta_ThriftMetadataService_getThriftServiceMetadata_args::withDefaultValues();
+      $args->read($input);
+    }
+    $input->readMessageEnd();
+    $result = \tmeta_ThriftMetadataService_getThriftServiceMetadata_result::withDefaultValues();
+    try {
+      $result->success = BarStaticMetadata::getServiceMetadataResponse();
+    } catch (\Exception $ex) {
+      $reply_type = \TMessageType::EXCEPTION;
+      $result = new \TApplicationException($ex->getMessage()."\n".$ex->getTraceAsString());
+    }
+    if ($output is \TBinaryProtocolAccelerated)
+    {
+      \thrift_protocol_write_binary($output, 'getThriftServiceMetadata', $reply_type, $result, $seqid, $output->isStrictWrite());
+    }
+    else if ($output is \TCompactProtocolAccelerated)
+    {
+      \thrift_protocol_write_compact($output, 'getThriftServiceMetadata', $reply_type, $result, $seqid);
+    }
+    else
+    {
+      $output->writeMessageBegin("getThriftServiceMetadata", $reply_type, $seqid);
+      $result->write($output);
+      $output->writeMessageEnd();
+      $output->getTransport()->flush();
+    }
   }
 }
 class BarSyncProcessor extends BarSyncProcessorBase {
@@ -506,11 +576,118 @@ class Bar_baz_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Bar_baz_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.baz_args",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_set" => tmeta_ThriftSetType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I32_TYPE,
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "a",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_list" => tmeta_ThriftListType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_map" => tmeta_ThriftMapType::fromShape(
+                            shape(
+                              "keyType" => tmeta_ThriftType::fromShape(
+                                shape(
+                                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I32_TYPE,
+                                )
+                              ),
+                              "valueType" => tmeta_ThriftType::fromShape(
+                                shape(
+                                  "t_set" => tmeta_ThriftSetType::fromShape(
+                                    shape(
+                                      "valueType" => tmeta_ThriftType::fromShape(
+                                        shape(
+                                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                                        )
+                                      ),
+                                    )
+                                  ),
+                                )
+                              ),
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "b",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I64_TYPE,
+                )
+              ),
+              "name" => "c",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 4,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Foo",
+                    )
+                  ),
+                )
+              ),
+              "name" => "d",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 5,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I64_TYPE,
+                )
+              ),
+              "name" => "e",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -553,11 +730,33 @@ class Bar_baz_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Bar_baz_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Bar_baz_result",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 0,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "success",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -568,10 +767,10 @@ class Bar_baz_result implements \IThriftStruct {
 }
 
 class BarStaticMetadata implements \IThriftServiceStaticMetadata {
-  public static function getServiceMetadata(): \tmeta_ThriftService {
+  public static function getServiceMetadata()[]: \tmeta_ThriftService {
     return tmeta_ThriftService::fromShape(
       shape(
-        "name" => "Bar",
+        "name" => "module.Bar",
         "functions" => vec[
           tmeta_ThriftFunction::fromShape(
             shape(
@@ -659,7 +858,7 @@ class BarStaticMetadata implements \IThriftServiceStaticMetadata {
                       shape(
                         "t_struct" => tmeta_ThriftStructType::fromShape(
                           shape(
-                            "name" => "Foo",
+                            "name" => "module.Foo",
                           )
                         ),
                       )
@@ -685,7 +884,38 @@ class BarStaticMetadata implements \IThriftServiceStaticMetadata {
       )
     );
   }
-  public static function getAllStructuredAnnotations(): \TServiceAnnotations {
+
+  public static function getServiceMetadataResponse()[]: \tmeta_ThriftServiceMetadataResponse {
+    return \tmeta_ThriftServiceMetadataResponse::fromShape(
+      shape(
+        'context' => \tmeta_ThriftServiceContext::fromShape(
+          shape(
+            'service_info' => self::getServiceMetadata(),
+            'module' => \tmeta_ThriftModuleContext::fromShape(
+              shape(
+                'name' => 'module',
+              )
+            ),
+          )
+        ),
+        'metadata' => \tmeta_ThriftMetadata::fromShape(
+          shape(
+            'enums' => dict[
+            ],
+            'structs' => dict[
+              'module.Foo' => Foo::getStructMetadata(),
+            ],
+            'exceptions' => dict[
+            ],
+            'services' => dict[
+            ],
+          )
+        ),
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TServiceAnnotations {
     return shape(
       'service' => dict[],
       'functions' => dict[

@@ -37,12 +37,11 @@
 
 #include <boost/optional.hpp>
 
-#include <thrift/compiler/ast/base_types.h>
-#include <thrift/compiler/ast/t_annotated.h>
 #include <thrift/compiler/ast/t_scope.h>
 #include <thrift/compiler/ast/t_union.h>
 #include <thrift/compiler/parse/parsing_driver.h>
 #include <thrift/compiler/ast/t_container.h>
+
 /**
  * Note macro expansion because this is different between OSS and internal
  * build, sigh.
@@ -60,36 +59,12 @@ namespace thrift {
 namespace compiler {
 namespace {
 
-/**
- * This global variable is used for automatic numbering of field indices etc.
- * when parsing the members of a struct. Field values are automatically
- * assigned starting from -1 and working their way down.
- */
-int y_field_val = -1;
-
-/**
- * This global variable is used for automatic numbering of enum values.
- * y_enum_val is the last value assigned; the next auto-assigned value will be
- * y_enum_val+1, and then it continues working upwards.  Explicitly specified
- * enum values reset y_enum_val to that value.
- */
-int32_t y_enum_val = -1;
 int g_arglist = 0;
-const char* y_enum_name = nullptr;
 
 // Assume ownership of a pointer.
 template <typename T>
 std::unique_ptr<T> own(T* ptr) {
   return std::unique_ptr<T>(ptr);
-}
-
-// Return the value being pointed to as a temporary and deletes the given pointer.
-template<typename T>
-T consume(T* ptr) {
-  assert(ptr != nullptr);
-  T result(std::move(*ptr));
-  delete ptr;
-  return result;
 }
 
 } // namespace
@@ -106,7 +81,7 @@ namespace apache {
 namespace thrift {
 namespace compiler {
 
-using t_typestructpair = std::pair<t_type_ref*, t_struct*>;
+using t_typethrowspair = std::pair<t_type_ref, t_throws*>;
 class t_container_type;
 
 } // namespace compiler
@@ -115,11 +90,17 @@ class t_container_type;
 
 }
 
+%defines
+%locations
 %define api.token.constructor
 %define api.value.type variant
 %define api.namespace {apache::thrift::compiler::yy}
 
-%param {apache::thrift::compiler::parsing_driver& driver} {yyscan_t raw_scanner}
+%param
+    {apache::thrift::compiler::parsing_driver& driver}
+    {apache::thrift::compiler::yyscan_t raw_scanner}
+    {YYSTYPE * yylval_param}
+    {YYLTYPE * yylloc_param}
 
 /**
  * Strings identifier
@@ -207,7 +188,7 @@ class t_container_type;
  */
 %token tok_typedef
 %token tok_struct
-%token tok_xception
+%token tok_exception
 %token tok_throws
 %token tok_extends
 %token tok_service
@@ -224,87 +205,87 @@ class t_container_type;
 /**
  * Grammar nodes
  *
- * Memory managment rules:
+ * Memory management rules:
  * - mutable pointers in the process of being build, and
  * need to be owned when complete.
  * - t_refs are already owned.
  */
 
-%type<t_ref<t_base_type>>    BaseType
-%type<t_container*>          ContainerType
-%type<t_container*>          MapType
-%type<t_container*>          SetType
-%type<t_container*>          ListType
+%type<t_ref<t_base_type>>          BaseType
+%type<t_container*>                ContainerType
+%type<t_container*>                MapType
+%type<t_container*>                SetType
+%type<t_container*>                ListType
 
-%type<std::string>           Identifier
-%type<t_ref<t_node>>         Definition
+%type<std::string>                 Identifier
+%type<t_def_attrs*>                DefinitionAttrs
+%type<t_ref<t_node>>               Definition
 
-%type<t_typedef*>            Typedef
+%type<t_typedef*>                  Typedef
 
-%type<t_annotation*>         TypeAnnotation
-%type<t_annotations*>        TypeAnnotations
-%type<t_annotations*>        TypeAnnotationList
-%type<t_annotations*>        FunctionAnnotations
+%type<t_annotation*>               TypeAnnotation
+%type<t_annotations*>              TypeAnnotations
+%type<t_annotations*>              TypeAnnotationList
+%type<t_annotations*>              FunctionAnnotations
 
-%type<t_const*>              StructuredAnnotation
-%type<t_struct_annotations*> StructuredAnnotations
-%type<t_struct_annotations*> NonEmptyStructuredAnnotationList
+%type<t_const*>                    StructuredAnnotation
+%type<t_struct_annotations*>       StructuredAnnotations
+%type<t_struct_annotations*>       NonEmptyStructuredAnnotationList
 
-%type<t_field*>              Field
-%type<t_field_id>            FieldIdentifier
-%type<t_field::e_req>        FieldRequiredness
-%type<t_type_ref*>           FieldType
-%type<t_stream_response*>    ResponseAndStreamReturnType
-%type<t_sink*>               ResponseAndSinkReturnType
-%type<t_stream_response*>    StreamReturnType
-%type<t_sink*>               SinkReturnType
-%type<t_typestructpair>      SinkFieldType
-%type<t_const_value*>        FieldValue
-%type<t_field_list*>         FieldList
+%type<t_field*>                    Field
+%type<boost::optional<t_field_id>> FieldIdentifier
+%type<t_field_qualifier>           FieldQualifier
+%type<t_type_ref>                  FieldType
+%type<t_stream_response*>          ResponseAndStreamReturnType
+%type<t_sink*>                     ResponseAndSinkReturnType
+%type<t_stream_response*>          StreamReturnType
+%type<t_sink*>                     SinkReturnType
+%type<t_typethrowspair>            SinkFieldType
+%type<t_const_value*>              FieldValue
+%type<t_field_list*>               FieldList
 
-%type<t_enum*>               Enum
-%type<t_enum*>               EnumDefList
-%type<t_enum_value*>         EnumDef
-%type<t_enum_value*>         EnumValue
+%type<t_enum*>                     Enum
+%type<t_enum_value_list*>          EnumValueList
+%type<t_enum_value*>               EnumValueDef
+%type<t_enum_value*>               EnumValue
 
-%type<t_const*>              Const
-%type<t_const_value*>        ConstValue
-%type<t_const_value*>        ConstList
-%type<t_const_value*>        ConstListContents
-%type<t_const_value*>        ConstMap
-%type<t_const_value*>        ConstMapContents
-%type<t_const_value*>        ConstStruct
-%type<t_type_ref*>           ConstStructType
-%type<t_const_value*>        ConstStructContents
+%type<t_const*>                    Const
+%type<t_const_value*>              ConstValue
+%type<t_const_value*>              ConstList
+%type<t_const_value*>              ConstListContents
+%type<t_const_value*>              ConstMap
+%type<t_const_value*>              ConstMapContents
+%type<t_const_value*>              ConstStruct
+%type<t_type_ref>                  ConstStructType
+%type<t_const_value*>              ConstStructContents
 
-%type<t_struct*>             Struct
-%type<t_union*>              Union
+%type<t_struct*>                   Struct
+%type<t_union*>                    Union
 
-%type<t_error_kind>          ErrorKind
-%type<t_error_blame>         ErrorBlame
-%type<t_error_safety>        ErrorSafety
-%type<t_exception*>          Xception
+%type<t_error_kind>                ErrorKind
+%type<t_error_blame>               ErrorBlame
+%type<t_error_safety>              ErrorSafety
+%type<t_exception*>                Exception
 
-%type<t_service*>            Service
-%type<t_service*>            Interaction
+%type<t_service*>                  Service
+%type<t_interaction*>              Interaction
 
-%type<t_function*>           Function
-%type<t_type_ref*>           FunctionType
-%type<t_service*>            FunctionList
+%type<t_function*>                 Function
+%type<t_type_ref>                  FunctionType
+%type<t_function_list*>            FunctionList
 
-%type<t_paramlist*>          ParamList
-%type<t_paramlist*>          EmptyParamList
-%type<t_field*>              Param
+%type<t_paramlist*>                ParamList
+%type<t_paramlist*>                EmptyParamList
+%type<t_field*>                    Param
 
-%type<t_struct*>             Throws
-%type<t_struct*>             MaybeThrows
-%type<t_service*>            Extends
-%type<t_function_qualifier>  FunctionQualifier
+%type<t_throws*>                   MaybeThrows
+%type<t_ref<t_service>>            Extends
+%type<t_function_qualifier>        FunctionQualifier
 
-%type<t_doc>                 CaptureDocText
-%type<std::string>           IntOrLiteral
+%type<t_doc>                       CaptureDocText
+%type<std::string>                 IntOrLiteral
 
-%type<bool>                  CommaOrSemicolonOptional
+%type<bool>                        CommaOrSemicolonOptional
 
 %%
 
@@ -459,6 +440,17 @@ Include:
       }
     }
 
+DefinitionAttrs:
+  CaptureDocText StructuredAnnotations
+    {
+      driver.debug("DefinitionAttrs -> CaptureDocText StructuredAnnotations");
+      if ($1 || $2 != nullptr) {
+        $$ = new t_def_attrs{std::move($1), own($2)};
+      } else {
+        $$ = nullptr;
+      }
+    }
+
 DefinitionList:
   DefinitionList Definition
     {
@@ -470,58 +462,58 @@ DefinitionList:
     }
 
 Definition:
-  CaptureDocText Const
+  Const
     {
       driver.debug("Definition -> Const");
-      $$ = driver.add_decl(own($2), std::move($1));
+      $$ = driver.add_def(own($1));
     }
-| CaptureDocText Typedef
+| Typedef
     {
       driver.debug("Definition -> Typedef");
-      $$ = driver.add_decl(own($2), std::move($1));
+      $$ = driver.add_def(own($1));
     }
-| CaptureDocText Enum
+| Enum
     {
       driver.debug("Definition -> Enum");
-      $$ = driver.add_decl(own($2), std::move($1));
+      $$ = driver.add_def(own($1));
     }
-| CaptureDocText Struct
+| Struct
     {
       driver.debug("Definition -> Struct");
-      $$ = driver.add_decl(own($2), std::move($1));
+      $$ = driver.add_def(own($1));
     }
-| CaptureDocText Union
+| Union
     {
       driver.debug("Definition -> Union");
-      $$ = driver.add_decl(own($2), std::move($1));
+      $$ = driver.add_def(own($1));
     }
-| CaptureDocText Xception
+| Exception
     {
-      driver.debug("Definition -> Xception");
-      $$ = driver.add_decl(own($2), std::move($1));
+      driver.debug("Definition -> Exception");
+      $$ = driver.add_def(own($1));
     }
-| CaptureDocText Service
+| Service
     {
       driver.debug("Definition -> Service");
-      $$ = driver.add_decl(own($2), std::move($1));
+      $$ = driver.add_def(own($1));
     }
-| CaptureDocText Interaction
+| Interaction
     {
       driver.debug("Definition -> Interaction");
-      $$ = driver.add_decl(own($2), std::move($1));
+      $$ = driver.add_def(own($1));
     }
 
 Typedef:
-  StructuredAnnotations tok_typedef
+  DefinitionAttrs tok_typedef FieldType Identifier
     {
       driver.start_node(LineType::Typedef);
     }
-  FieldType Identifier TypeAnnotations
+   TypeAnnotations
     {
-      driver.debug("TypeDef => StructuredAnnotations tok_typedef FieldType "
+      driver.debug("TypeDef => DefinitionAttrs tok_typedef FieldType "
           "Identifier TypeAnnotations");
-      $$ = new t_typedef(driver.program, consume($4), std::move($5), driver.scope_cache);
-      driver.finish_node($$, LineType::Typedef, own($6), own($1));
+      $$ = new t_typedef(driver.program, std::move($4), std::move($3));
+      driver.finish_node($$, LineType::Typedef, own($1), own($6));
     }
 
 CommaOrSemicolon:
@@ -541,119 +533,85 @@ CommaOrSemicolonOptional:
     }
 
 Enum:
-  StructuredAnnotations tok_enum
+  DefinitionAttrs tok_enum Identifier
     {
       driver.start_node(LineType::Enum);
     }
-  Identifier
+  "{" EnumValueList "}" TypeAnnotations
     {
-      assert(!y_enum_name);
-      y_enum_name = $4.c_str();
-    }
-  "{" EnumDefList "}" TypeAnnotations
-    {
-      driver.debug("Enum => StructuredAnnotations tok_enum Identifier { EnumDefList } TypeAnnotations");
-      driver.finish_node($7, LineType::Enum, $4, own($9), own($1));
-      $$ = $7;
-      y_enum_name = nullptr;
+      driver.debug("Enum => DefinitionAttrs tok_enum Identifier { EnumValueList } TypeAnnotations");
+      $$ = new t_enum(driver.program, std::move($3));
+      auto values = own($6);
+      $$->set_values(std::move(*values));
+      driver.finish_node($$, LineType::Enum, own($1), own($8));
     }
 
-EnumDefList:
-  EnumDefList EnumDef
+EnumValueList:
+  EnumValueList EnumValueDef
     {
-      driver.debug("EnumDefList -> EnumDefList EnumDef");
+      driver.debug("EnumValueList -> EnumValueList EnumValueDef");
       $$ = $1;
-
-      if (driver.mode == parsing_mode::PROGRAM) {
-        auto const_val = std::make_unique<t_const_value>($2->get_value());
-
-        const_val->set_is_enum();
-        const_val->set_enum($$);
-        const_val->set_enum_value($2);
-
-        auto tconst = std::make_unique<t_const>(
-            driver.program, &t_base_type::t_i32(), $2->get_name(), std::move(const_val));
-
-        assert(y_enum_name != nullptr);
-        std::string type_prefix = std::string(y_enum_name) + ".";
-        driver.scope_cache->add_constant(
-            driver.program->name() + "." + $2->get_name(), tconst.get());
-        driver.scope_cache->add_constant(
-            driver.program->name() + "." + type_prefix + $2->get_name(), tconst.get());
-
-        $$->append(own($2), std::move(tconst));
-      } else {
-        driver.delete_at_the_end($2);
-      }
+      $$->emplace_back(own($2));
     }
 |
     {
-      driver.debug("EnumDefList -> ");
-      $$ = new t_enum(driver.program);
-      y_enum_val = -1;
+      driver.debug("EnumValueList -> ");
+      $$ = new t_enum_value_list;
     }
 
-EnumDef:
-  CaptureDocText StructuredAnnotations EnumValue TypeAnnotations CommaOrSemicolonOptional
+EnumValueDef:
+  DefinitionAttrs EnumValue
     {
-      driver.debug("EnumDef => CaptureDocText StructuredAnnotations EnumValue "
+      driver.start_node(LineType::EnumValue);
+    }
+  TypeAnnotations CommaOrSemicolonOptional
+    {
+      driver.debug("EnumValueDef => DefinitionAttrs EnumValue "
         "TypeAnnotations CommaOrSemicolonOptional");
-      $$ = $3;
-      if ($1) {
-        $$->set_doc(std::move(*$1));
-      }
-      driver.set_annotations($$, own($4), own($2));
+      driver.finish_node($2, LineType::EnumValue, own($1), own($4));
+      $$ = $2;
     }
 
 EnumValue:
   Identifier "=" tok_int_constant
     {
       driver.debug("EnumValue -> Identifier = tok_int_constant");
-      if ($3 < 0 && !driver.params.allow_neg_enum_vals) {
-        driver.warning(1, "Negative value supplied for enum %s.", $1.c_str());
-      }
       if ($3 < INT32_MIN || $3 > INT32_MAX) {
         // Note: this used to be just a warning.  However, since thrift always
         // treats enums as i32 values, I'm changing it to a fatal error.
         // I doubt this will affect many people, but users who run into this
         // will have to update their thrift files to manually specify the
         // truncated i32 value that thrift has always been using anyway.
-        driver.failure("64-bit value supplied for enum %s will be truncated.", $1.c_str());
+        driver.failure([&](auto& o) {
+          o << "64-bit value supplied for enum " << $1 << " will be truncated.";
+        });
       }
-      y_enum_val = $3;
-      $$ = new t_enum_value;
-      $$->set_name($1);
-      $$->set_value(y_enum_val);
+      $$ = new t_enum_value(std::move($1));
+      $$->set_value($3);
       $$->set_lineno(driver.scanner->get_lineno());
     }
 |
   Identifier
     {
       driver.debug("EnumValue -> Identifier");
-      if (y_enum_val == INT32_MAX) {
-        driver.failure("enum value overflow at enum %s", $1.c_str());
-      }
-      $$ = new t_enum_value;
-      $$->set_name($1);
-      $$->set_implicit_value(++y_enum_val);
+      $$ = new t_enum_value(std::move($1));
       $$->set_lineno(driver.scanner->get_lineno());
     }
 
 Const:
-  StructuredAnnotations tok_const
+  DefinitionAttrs tok_const FieldType Identifier
     {
       driver.start_node(LineType::Const);
     }
-  FieldType Identifier "=" ConstValue TypeAnnotations CommaOrSemicolonOptional
+  "=" ConstValue TypeAnnotations CommaOrSemicolonOptional
     {
-      driver.debug("StructuredAnnotations Const => tok_const FieldType Identifier = ConstValue");
+      driver.debug("DefinitionAttrs Const => tok_const FieldType Identifier = ConstValue");
       if (driver.mode == parsing_mode::PROGRAM) {
-        $$ = new t_const(driver.program, consume($4), std::move($5), own($7));
-        driver.finish_node($$, LineType::Const, own($8), own($1));
+        $$ = new t_const(driver.program, std::move($3), std::move($4), own($7));
+        driver.finish_node($$, LineType::Const, own($1), own($8));
       } else {
         // TODO(afuller): Looks like a bug where driver.finish_node is never called in this case.
         delete $1;
-        delete $4;
         delete $7;
         delete $8;
         $$ = nullptr;
@@ -674,7 +632,9 @@ ConstValue:
       $$->set_integer($1);
       if (driver.mode == parsing_mode::PROGRAM) {
         if (!driver.params.allow_64bit_consts && ($1 < INT32_MIN || $1 > INT32_MAX)) {
-          driver.warning(1, "64-bit constant \"%" PRIi64 "\" may not work in all languages.", $1);
+          driver.warning([&](auto& o) {
+            o << "64-bit constant \"" << $1 << "\" may not work in all languages.";
+          });
         }
       }
     }
@@ -692,7 +652,7 @@ ConstValue:
 | Identifier
     {
       driver.debug("ConstValue => Identifier");
-      t_const* constant = driver.scope_cache->get_constant($1);
+      const t_const* constant = driver.scope_cache->get_constant($1);
       driver.validate_not_ambiguous_enum($1);
       if (constant == nullptr) {
         auto name_with_program_name = driver.program->name() + "." + $1;
@@ -706,13 +666,15 @@ ConstValue:
 
         // We only want to clone the value, while discarding all real type
         // information.
-        $$->set_ttype(nullptr);
+        $$->set_ttype(boost::none);
         $$->set_is_enum(false);
         $$->set_enum(nullptr);
         $$->set_enum_value(nullptr);
       } else {
         if (driver.mode == parsing_mode::PROGRAM) {
-          driver.warning(1, "Constant strings should be quoted: %s", $1.c_str());
+          driver.warning([&](auto& o) {
+            o << "Constant strings should be quoted: " << $1;
+          });
         }
         $$ = new t_const_value($1);
       }
@@ -795,21 +757,21 @@ ConstStruct:
     {
       driver.debug("ConstStruct => ConstStructType { ConstStructContents CommaOrSemicolonOptional }");
       $$ = $3;
-      $$->set_ttype(own($1));
+      $$->set_ttype($1);
     }
 | ConstStructType "{" "}"
     {
       driver.debug("ConstStruct => ConstStructType { }");
       $$ = new t_const_value();
       $$->set_map();
-      $$->set_ttype(own($1));
+      $$->set_ttype($1);
     }
 
 ConstStructType:
   Identifier
     {
       driver.debug("ConstStructType -> Identifier");
-      $$ = driver.new_type_ref(std::move($1), nullptr, /*is_const=*/true).release();
+      $$ = driver.new_type_ref(std::move($1), nullptr, /*is_const=*/true);
     }
 
 ConstStructContents:
@@ -828,48 +790,46 @@ ConstStructContents:
     }
 
 Struct:
-  StructuredAnnotations tok_struct
+  DefinitionAttrs tok_struct Identifier
     {
       driver.start_node(LineType::Struct);
     }
-  Identifier "{" FieldList "}" TypeAnnotations
+  "{" FieldList "}" TypeAnnotations
     {
-      driver.debug("Struct => StructuredAnnotations tok_struct Identifier "
+      driver.debug("Struct => DefinitionAttrs tok_struct Identifier "
         "{ FieldList } TypeAnnotations");
-      $$ = new t_struct(driver.program);
-      driver.finish_node($$, LineType::Struct, $4, own($6), own($8), own($1));
-      y_field_val = -1;
+      $$ = new t_struct(driver.program, std::move($3));
+      driver.finish_node($$, LineType::Struct, own($1), own($6), own($8));
     }
 
 Union:
-  StructuredAnnotations tok_union
+  DefinitionAttrs tok_union Identifier
     {
       driver.start_node(LineType::Union);
     }
-  Identifier "{" FieldList "}" TypeAnnotations
+  "{" FieldList "}" TypeAnnotations
     {
-      driver.debug("Union => StructuredAnnotations tok_union Identifier "
+      driver.debug("Union => DefinitionAttrs tok_union Identifier "
         "{ FieldList } TypeAnnotations");
-      $$ = new t_union(driver.program);
-      driver.finish_node($$, LineType::Union, $4, own($6), own($8), own($1));
-      y_field_val = -1;
+      $$ = new t_union(driver.program, std::move($3));
+      driver.finish_node($$, LineType::Union, own($1), own($6), own($8));
     }
 
-Xception:
+Exception:
   // TODO(afuller): Either make the qualifiers order agnostic or produce a better error message.
-  StructuredAnnotations ErrorSafety ErrorKind ErrorBlame tok_xception
+  DefinitionAttrs ErrorSafety ErrorKind ErrorBlame tok_exception Identifier
     {
-      driver.start_node(LineType::Xception);
+      driver.start_node(LineType::Exception);
     }
-  Identifier "{" FieldList "}" TypeAnnotations
+  "{" FieldList "}" TypeAnnotations
     {
-      driver.debug("Xception => StructuredAnnotations tok_xception "
+      driver.debug("Exception => DefinitionAttrs tok_exception "
         "Identifier { FieldList } TypeAnnotations");
-      $$ = new t_exception(driver.program);
+      $$ = new t_exception(driver.program, std::move($6));
       $$->set_safety($2);
       $$->set_kind($3);
       $$->set_blame($4);
-      driver.finish_node($$, LineType::Xception, $7, own($9), own($11), own($1));
+      driver.finish_node($$, LineType::Exception, own($1), own($9), own($11));
 
       const char* annotations[] = {"message", "code"};
       for (auto& annotation: annotations) {
@@ -877,8 +837,10 @@ Xception:
             && $$->get_field_by_name(annotation) != nullptr
             && $$->has_annotation(annotation)
             && strcmp(annotation, $$->get_annotation(annotation).c_str()) != 0) {
-          driver.warning(1, "Some generators (e.g. PHP) will ignore annotation '%s' "
-                         "as it is also used as field", annotation);
+          driver.warning([&](auto& o) {
+            o << "Some generators (e.g. PHP) will ignore annotation '"
+              << annotation << "' as it is also used as field";
+          });
         }
       }
 
@@ -889,17 +851,19 @@ Xception:
         const std::string& v = $$->get_annotation("message");
         const auto* field = $$->get_field_by_name(v);
         if (field == nullptr) {
-          driver.failure("member specified as exception 'message' should be a valid"
-                         " struct member, '%s' in '%s' is not", v.c_str(), $7.c_str());
+          driver.failure([&](auto& o) {
+            o << "member specified as exception 'message' should be a valid"
+              << " struct member, '" << v << "' in '" << $$->name() << "' is not";
+          });
         }
 
         if (!field->get_type()->is_string_or_binary()) {
-          driver.failure("member specified as exception 'message' should be of type "
-                         "STRING, '%s' in '%s' is not", v.c_str(), $7.c_str());
+          driver.failure([&](auto& o) {
+            o << "member specified as exception 'message' should be of type "
+              << "STRING, '" << v << "' in '" << $$->name() << "' is not";
+          });
         }
       }
-
-      y_field_val = -1;
     }
 
 ErrorSafety:
@@ -955,18 +919,17 @@ ErrorBlame:
 
 
 Service:
-  StructuredAnnotations tok_service
+  DefinitionAttrs tok_service Identifier
     {
       driver.start_node(LineType::Service);
     }
-  Identifier Extends "{" FlagArgs FunctionList UnflagArgs "}" FunctionAnnotations
+  Extends "{" FlagArgs FunctionList UnflagArgs "}" FunctionAnnotations
     {
-      driver.debug("Service => StructuredAnnotations tok_service "
+      driver.debug("Service => DefinitionAttrs tok_service "
         "Identifier Extends { FlagArgs FunctionList UnflagArgs } "
         "FunctionAnnotations");
-      $$ = $8;
-      $$->set_extends($5);
-      driver.finish_node($$, LineType::Service, $4, own($11), own($1));
+      $$ = new t_service(driver.program, std::move($3), $5);
+      driver.finish_node($$, LineType::Service, own($1), own($8), own($11));
     }
 
 FlagArgs:
@@ -990,7 +953,9 @@ Extends:
           $$ = driver.scope_cache->get_service(driver.program->name() + "." + $2);
         }
         if (!$$) {
-          driver.failure("Service \"%s\" has not been defined.", $2.c_str());
+          driver.failure([&](auto& o) {
+            o << "Service \"" << $2 << "\" has not been defined.";
+          });
         }
       }
     }
@@ -1000,18 +965,17 @@ Extends:
     }
 
 Interaction:
-  // TODO(afuller): Allow structured annotations.
-  tok_interaction
+  DefinitionAttrs tok_interaction Identifier
     {
-      driver.start_node(LineType::Service);
+      driver.start_node(LineType::Interaction);
     }
-  Identifier "{" FlagArgs FunctionList UnflagArgs "}" TypeAnnotations
+  "{" FlagArgs FunctionList UnflagArgs "}" TypeAnnotations
     {
       driver.debug("Interaction -> tok_interaction Identifier { FunctionList }");
-      $$ = $6;
-      $$->set_is_interaction();
-      driver.finish_node($$, LineType::Service, $3, own($9), nullptr);
+      $$ = new t_interaction(driver.program, std::move($3));
+      driver.finish_node($$, LineType::Interaction, own($1), own($7), own($10));
 
+      // TODO(afuller): Move this to a post parse phase.
       for (auto* func : $$->get_functions()) {
         func->set_is_interaction_member();
         if (func->has_annotation("thread")) {
@@ -1026,8 +990,6 @@ Interaction:
         for (auto* func : $$->get_functions()) {
           func->set_annotation("thread", "eb");
         }
-      } else if ($$->has_annotation("serial")) {
-        $$->set_is_serial_interaction();
       }
     }
 
@@ -1035,64 +997,42 @@ FunctionList:
   FunctionList Function
     {
       driver.debug("FunctionList -> FunctionList Function");
+      $1->emplace_back(own($2));
       $$ = $1;
-      $1->add_function(own($2));
     }
 |
     {
       driver.debug("FunctionList -> ");
-      $$ = new t_service(driver.program);
+      $$ = new t_function_list;
     }
 
 Function:
-  CaptureDocText StructuredAnnotations FunctionQualifier FunctionType Identifier "(" ParamList ")" MaybeThrows FunctionAnnotations CommaOrSemicolonOptional
+  DefinitionAttrs FunctionQualifier FunctionType Identifier
     {
-      driver.debug("Function => CaptureDocText StructuredAnnotations FunctionQualifier "
+      driver.start_node(LineType::Function);
+    }
+  "(" ParamList ")" MaybeThrows FunctionAnnotations CommaOrSemicolonOptional
+    {
+      driver.debug("Function => DefinitionAttrs FunctionQualifier "
         "FunctionType Identifier ( ParamList ) MaybeThrows "
         "FunctionAnnotations CommaOrSemicolonOptional");
-      $7->set_name(std::string($5) + "_args");
-      auto rettype = own($4);
-      auto* paramlist = $7;
-      t_struct* streamthrows = nullptr;
-      if (const auto* tstream_resp = dynamic_cast<const t_stream_response*>(rettype->get_type())) {
-        streamthrows = tstream_resp->get_throws_struct();
-      }
-      t_function* func;
-      if (const auto* tsink = dynamic_cast<const t_sink*>(rettype->get_type())) {
-        // TODO(afuller): Remove special case for sink.
-        func = new t_function(
-          tsink,
-          $5,
-          own(paramlist),
-          own($9)
-        );
-      } else {
-        func = new t_function(
-          std::move(*rettype),
-          $5,
-          own(paramlist),
-          own($9),
-          own(streamthrows),
-          $3
-        );
-      }
-      $$ = func;
-      driver.set_annotations($$, own($10), own($2));
-      if ($1) {
-        $$->set_doc(std::string{*$1});
-      }
-      $$->set_lineno(driver.scanner->get_lineno());
-      y_field_val = -1;
+      // TODO(afuller): Leave the param list unnamed.
+      $7->set_name(std::string($4) + "_args");
+      auto func = std::make_unique<t_function>(std::move($3), std::move($4), own($7), $2);
+      func->set_exceptions(own($9));
+
+      driver.finish_node(func.get(), LineType::Function, own($1), own($10));
+      $$ = func.release();
     }
   | tok_performs FieldType ";"
     {
       driver.debug("Function => tok_performs FieldType");
-      auto ret = own($2);
-      std::string name = ret->get_type()
-          ? "create" + ret->get_type()->get_name()
+      auto& ret = $2;
+      std::string name = ret.get_type()
+          ? "create" + ret.get_type()->get_name()
           : "<interaction placeholder>";
       $$ = new t_function(
-        std::move(*ret),
+        std::move(ret),
         std::move(name),
         std::make_unique<t_paramlist>(driver.program)
       );
@@ -1107,8 +1047,10 @@ ParamList:
       $$ = $1;
       auto param = own($2);
       if (!$$->try_append_field(std::move(param))) {
-        driver.failure("Parameter identifier %d for \"%s\" has already been used",
-                       param->get_key(), param->get_name().c_str());
+        driver.failure([&](auto& o) {
+          o << "Parameter identifier " << param->get_key() << " for \""
+          << param->get_name() << "\" has already been used";
+        });
       }
     }
 | EmptyParamList
@@ -1146,22 +1088,18 @@ FunctionQualifier:
     }
 |
     {
-      $$ = t_function_qualifier::none;
+      $$ = {};
     }
 
-Throws:
+MaybeThrows:
   tok_throws "(" FieldList ")"
     {
-      driver.debug("Throws -> tok_throws ( FieldList )");
+      driver.debug("MaybeThrows -> tok_throws ( FieldList )");
       $$ = driver.new_throws(own($3)).release();
     }
-MaybeThrows:
-  Throws
-		{
-			$$ = $1;
-		}
 |   {
-      $$ = driver.new_throws().release();
+      driver.debug("MaybeThrows -> ");
+      $$ = nullptr;
 		}
 
 FieldList:
@@ -1178,107 +1116,99 @@ FieldList:
     }
 
 Field:
-  CaptureDocText StructuredAnnotations FieldIdentifier
+  DefinitionAttrs FieldIdentifier FieldQualifier FieldType Identifier
     {
       driver.start_node(LineType::Field);
     }
-  FieldRequiredness FieldType Identifier FieldValue TypeAnnotations CommaOrSemicolonOptional
+   FieldValue TypeAnnotations CommaOrSemicolonOptional
     {
-      driver.debug("Field => CaptureDocText FieldIdentifier FieldRequiredness "
-        "FieldType Identifier FieldValue TypeAnnotations "
-        "StructuredAnnotations CommaOrSemicolonOptional");
-      if ($3.auto_assigned) {
-        driver.warning(1, "No field key specified for %s, resulting protocol may have conflicts "
-          "or not be backwards compatible!", $7.c_str());
-        if (driver.params.strict >= 192) {
-          driver.failure("Implicit field keys are deprecated and not allowed with -strict");
+      driver.debug("Field => DefinitionAttrs FieldIdentifier FieldQualifier "
+        "FieldType Identifier FieldValue TypeAnnotations CommaOrSemicolonOptional");
+      t_field_id id;
+      if ($2 == boost::none) {
+        // Auto assign an id.
+        id = driver.allocate_field_id($5);
+      } else {
+        id = *$2;
+        if (id <= 0) {
+          // TODO(afuller): Move this validation to ast_validator.
+          if (driver.params.allow_neg_field_keys) {
+            /*
+              * allow_neg_field_keys exists to allow users to add explicitly
+              * specified id values to old .thrift files without breaking
+              * protocol compatibility.
+              */
+            if (id != driver.next_field_id()) {
+              /*
+                * warn if the user-specified negative value isn't what
+                * thrift would have auto-assigned.
+                */
+              driver.warning([&](auto& o) {
+                o << "Nonpositive field id (" << id << ") differs from what would "
+                  << "be auto-assigned by thrift (" << driver.next_field_id() << ").";
+              });
+            }
+          } else if (id == driver.next_field_id()) {
+            driver.warning([&](auto& o) {
+              o << "Nonpositive value (" << id << ") not allowed as a field id.";
+            });
+          } else {
+            // TODO(afuller): Make ignoring the user provided value a failure.
+            driver.warning([&](auto& o) {
+              o << "Nonpositive field id (" << id<< ") differs from what is auto-"
+                  "assigned by thrift. The id must positive or " << driver.next_field_id() << ".";
+            });
+            // Ignore user provided value and auto assign an id.
+            id = driver.allocate_field_id($5);
+            $2 = boost::none;
+          }
+          driver.reserve_field_id(id);
         }
       }
-
-      $$ = new t_field(consume($6), std::move($7), $3.value);
-      if ($1) {
-        $$->set_doc(std::move(*$1));
+      $$ = new t_field(std::move($4), std::move($5), id, $2 != boost::none);
+      $$->set_qualifier($3);
+      if ($7 != nullptr) {
+        $$->set_default_value(own($7));
       }
-      $$->set_req($5);
-      if ($8) {
-        driver.validate_field_value($$, $8);
-        $$->set_value(own($8));
-      }
-      driver.finish_node($$, LineType::Field, own($9), own($2));
-
-      if ($5 != t_field::e_req::optional && $$->has_annotation({"cpp.ref", "cpp2.ref"})) {
-        driver.warning(1, "`cpp.ref` field must be optional if it is recursive.");
-      }
+      driver.finish_node($$, LineType::Field, own($1), own($8));
     }
 
 FieldIdentifier:
   tok_int_constant ":"
     {
-      if ($1 <= 0) {
-        if (driver.params.allow_neg_field_keys) {
-          /*
-           * allow_neg_field_keys exists to allow users to add explicitly
-           * specified key values to old .thrift files without breaking
-           * protocol compatibility.
-           */
-          if ($1 != y_field_val) {
-            /*
-             * warn if the user-specified negative value isn't what
-             * thrift would have auto-assigned.
-             */
-            driver.warning(1, "Negative field key (%d) differs from what would be "
-                           "auto-assigned by thrift (%d).", $1, y_field_val);
-          }
-          /*
-           * Leave $1 as-is, and update y_field_val to be one less than $1.
-           * The FieldList parsing will catch any duplicate key values.
-           */
-          y_field_val = $1 - 1;
-          $$.value = $1;
-          $$.auto_assigned = false;
-        } else {
-          driver.warning(1, "Nonpositive value (%d) not allowed as a field key.",
-                         $1);
-          $$.value = y_field_val--;
-          $$.auto_assigned = true;
-        }
-      } else {
-        $$.value = $1;
-        $$.auto_assigned = false;
-      }
+      $$ = driver.as_field_id($1);
     }
 |
     {
-      $$.value = y_field_val--;
-      $$.auto_assigned = true;
+      $$ = boost::none;
     }
 
-FieldRequiredness:
+FieldQualifier:
   tok_required
     {
       if (g_arglist) {
         if (driver.mode == parsing_mode::PROGRAM) {
-          driver.warning(1, "required keyword is ignored in argument lists.");
+          driver.warning("required keyword is ignored in argument lists.");
         }
-        $$ = t_field::e_req::opt_in_req_out;
+        $$ = {};
       } else {
-        $$ = t_field::e_req::required;
+        $$ = t_field_qualifier::required;
       }
     }
 | tok_optional
     {
       if (g_arglist) {
         if (driver.mode == parsing_mode::PROGRAM) {
-          driver.warning(1, "optional keyword is ignored in argument lists.");
+          driver.warning("optional keyword is ignored in argument lists.");
         }
-        $$ = t_field::e_req::opt_in_req_out;
+        $$ = {};
       } else {
-        $$ = t_field::e_req::optional;
+        $$ = t_field_qualifier::optional;
       }
     }
 |
     {
-      $$ = t_field::e_req::opt_in_req_out;
+      $$ = {};
     }
 
 FieldValue:
@@ -1300,12 +1230,12 @@ FunctionType:
   ResponseAndStreamReturnType
     {
       driver.debug("FunctionType -> ResponseAndStreamReturnType");
-      $$ = driver.new_type_ref(own($1), nullptr).release();
+      $$ = driver.new_type_ref(own($1), nullptr);
     }
 | ResponseAndSinkReturnType
     {
       driver.debug("FunctionType -> ResponseAndSinkReturnType");
-      $$ = driver.new_type_ref(own($1), nullptr).release();
+      $$ = driver.new_type_ref(own($1), nullptr);
     }
 | FieldType
     {
@@ -1315,14 +1245,14 @@ FunctionType:
 | tok_void
     {
       driver.debug("FunctionType -> tok_void");
-      $$ = new t_type_ref(&t_base_type::t_void());
+      $$ = t_base_type::t_void();
     }
 
 ResponseAndStreamReturnType:
   FieldType "," StreamReturnType
     {
       driver.debug("ResponseAndStreamReturnType -> FieldType, StreamReturnType");
-      $3->set_first_response_type(own($1));
+      $3->set_first_response_type(std::move($1));
       $$ = $3;
     }
 | StreamReturnType
@@ -1332,22 +1262,19 @@ ResponseAndStreamReturnType:
     }
 
 StreamReturnType:
-  tok_stream "<" FieldType ">"
+  tok_stream "<" FieldType MaybeThrows ">"
   {
-    driver.debug("StreamReturnType -> tok_stream < FieldType >");
-    $$ = new t_stream_response(consume($3));
-  }
-| tok_stream "<" FieldType Throws ">"
-  {
-    driver.debug("StreamReturnType -> tok_stream < FieldType Throws >");
-    $$ = new t_stream_response(consume($3), $4);
+    driver.debug("StreamReturnType -> tok_stream < FieldType MaybeThrows >");
+    auto stream_res = std::make_unique<t_stream_response>(std::move($3));
+    stream_res->set_exceptions(own($4));
+    $$ = stream_res.release();
   }
 
 ResponseAndSinkReturnType:
   FieldType "," SinkReturnType
     {
       driver.debug("ResponseAndSinkReturnType -> FieldType, SinkReturnType");
-      $3->set_first_response_type(own($1));
+      $3->set_first_response_type(std::move($1));
       $$ = $3;
     }
 | SinkReturnType
@@ -1360,16 +1287,14 @@ SinkReturnType:
   tok_sink "<" SinkFieldType "," SinkFieldType ">"
     {
       driver.debug("SinkReturnType -> tok_sink<FieldType, FieldType>");
-      $$ = new t_sink(
-        consume($3.first), $3.second,
-        consume($5.first), $5.second);
+      auto sink = std::make_unique<t_sink>(std::move($3.first), std::move($5.first));
+      sink->set_sink_exceptions(own($3.second));
+      sink->set_final_response_exceptions(own($5.second));
+      $$ = sink.release();
     }
+
 SinkFieldType:
-  FieldType
-    {
-      $$ = std::make_pair($1, nullptr);
-    }
-| FieldType Throws
+  FieldType MaybeThrows
     {
       $$ = std::make_pair($1, $2);
     }
@@ -1378,17 +1303,17 @@ FieldType:
   Identifier TypeAnnotations
     {
       driver.debug("FieldType => Identifier TypeAnnotations");
-      $$ = driver.new_type_ref(std::move($1), own($2)).release();
+      $$ = driver.new_type_ref(std::move($1), own($2));
     }
 | BaseType TypeAnnotations
     {
       driver.debug("FieldType -> BaseType");
-      $$ = driver.new_type_ref($1, own($2)).release();
+      $$ = driver.new_type_ref(*$1, own($2));
     }
 | ContainerType TypeAnnotations
     {
       driver.debug("FieldType -> ContainerType");
-      $$ = driver.new_type_ref(own($1), own($2)).release();
+      $$ = driver.new_type_ref(own($1), own($2));
     }
 
 BaseType:
@@ -1459,21 +1384,21 @@ MapType:
   tok_map "<" FieldType "," FieldType ">"
     {
       driver.debug("MapType -> tok_map<FieldType, FieldType>");
-      $$ = new t_map(consume($3), consume($5));
+      $$ = new t_map(std::move($3), std::move($5));
     }
 
 SetType:
   tok_set "<" FieldType ">"
     {
       driver.debug("SetType -> tok_set<FieldType>");
-      $$ = new t_set(consume($3));
+      $$ = new t_set(std::move($3));
     }
 
 ListType:
   tok_list "<" FieldType ">"
     {
       driver.debug("ListType -> tok_list<FieldType>");
-      $$ = new t_list(consume($3));
+      $$ = new t_list(std::move($3));
     }
 
 TypeAnnotations:
@@ -1563,7 +1488,7 @@ StructuredAnnotation:
       driver.debug("StructuredAnnotation => @ConstStructType");
       auto value = std::make_unique<t_const_value>();
       value->set_map();
-      value->set_ttype(own($2));
+      value->set_ttype(std::move($2));
       $$ = driver.new_struct_annotation(std::move(value)).release();
     }
 
@@ -1590,8 +1515,9 @@ FunctionAnnotations:
           s += prio + "','";
         }
         s.erase(s.length() - 3);
-        driver.failure("Bad priority '%s'. Choose one of '%s'.",
-                       prio.c_str(), s.c_str());
+        driver.failure([&](auto& o) {
+          o << "Bad priority '" << prio << "'. Choose one of '" << s << "'.";
+        });
       }
     }
 
@@ -1623,6 +1549,9 @@ IntOrLiteral:
 /**
  * Method that will be called by the generated parser upon errors.
  */
-void apache::thrift::compiler::yy::parser::error(std::string const& message) {
-  driver.yyerror("%s", message.c_str());
+void apache::thrift::compiler::yy::parser::error(const location_type&, std::string const& message) {
+  /*
+   * TODO(urielrivas): Pass the location as argument to yyerror.
+   */
+  driver.yyerror(message);
 }

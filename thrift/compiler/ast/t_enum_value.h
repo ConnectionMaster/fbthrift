@@ -18,6 +18,7 @@
 
 #include <string>
 
+#include <thrift/compiler/ast/node_list.h>
 #include <thrift/compiler/ast/t_named.h>
 
 namespace apache {
@@ -34,7 +35,9 @@ namespace compiler {
  */
 class t_enum_value : public t_named {
  public:
-  t_enum_value() = default;
+  explicit t_enum_value(std::string name) : t_named(std::move(name)) {}
+  t_enum_value(std::string name, int32_t value)
+      : t_named(std::move(name)), value_(value), has_value_(true) {}
 
   /**
    * t_enum_value setters
@@ -52,18 +55,16 @@ class t_enum_value : public t_named {
   /**
    * t_enum_value getters
    */
-  int32_t get_value() const {
-    return value_;
-  }
+  int32_t get_value() const { return value_; }
 
-  bool has_value() {
-    return has_value_;
-  }
+  bool has_value() const { return has_value_; }
 
  private:
   int32_t value_{0};
   bool has_value_{false};
 };
+
+using t_enum_value_list = node_list<t_enum_value>;
 
 } // namespace compiler
 } // namespace thrift

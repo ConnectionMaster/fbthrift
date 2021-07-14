@@ -139,6 +139,13 @@ typedef ::std::map<::std::int16_t, ::std::string> containerTypedef;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ComplexUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -168,7 +175,7 @@ class ComplexUnion final  {
   ComplexUnion()
       : type_(Type::__EMPTY__) {}
 
-  ComplexUnion(ComplexUnion&& rhs)
+  ComplexUnion(ComplexUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -255,7 +262,7 @@ class ComplexUnion final  {
     }
   }
 
-  ComplexUnion& operator=(ComplexUnion&& rhs) {
+  ComplexUnion& operator=(ComplexUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -354,29 +361,14 @@ class ComplexUnion final  {
     ::std::vector<::std::int64_t> intListValue;
     ::std::vector<::std::string> stringListValue;
     ::cpp2::containerTypedef typedefValue;
-    std::unique_ptr<::std::string> stringRef;
+    ::std::unique_ptr<::std::string> stringRef;
 
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const ComplexUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ComplexUnion& __x, const ComplexUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ComplexUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ComplexUnion& __x, const ComplexUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ComplexUnion& __x, const ComplexUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ComplexUnion& __x, const ComplexUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const ComplexUnion&) const;
+  bool operator<(const ComplexUnion&) const;
 
   ::std::int64_t& set_intValue(::std::int64_t t = ::std::int64_t()) {
     __clear();
@@ -469,83 +461,95 @@ class ComplexUnion final  {
     return value_.typedefValue;
   }
 
-  std::unique_ptr<::std::string>& set_stringRef(::std::string const &t) {
+  ::std::unique_ptr<::std::string>& set_stringRef(::std::string const &t) {
     __clear();
     type_ = Type::stringRef;
-    ::new (std::addressof(value_.stringRef)) std::unique_ptr<::std::string>(new std::unique_ptr<::std::string>::element_type(t));
+    ::new (std::addressof(value_.stringRef)) ::std::unique_ptr<::std::string>(new ::std::unique_ptr<::std::string>::element_type(t));
     return value_.stringRef;
   }
 
-  std::unique_ptr<::std::string>& set_stringRef(::std::string&& t) {
+  ::std::unique_ptr<::std::string>& set_stringRef(::std::string&& t) {
     __clear();
     type_ = Type::stringRef;
-    ::new (std::addressof(value_.stringRef)) std::unique_ptr<::std::string>(new std::unique_ptr<::std::string>::element_type(std::move(t)));
+    ::new (std::addressof(value_.stringRef)) ::std::unique_ptr<::std::string>(new ::std::unique_ptr<::std::string>::element_type(std::move(t)));
     return value_.stringRef;
   }
 
-  template<typename... T, typename = ::apache::thrift::safe_overload_t<::std::string, T...>> std::unique_ptr<::std::string>& set_stringRef(T&&... t) {
+  template<typename... T, typename = ::apache::thrift::safe_overload_t<::std::string, T...>> ::std::unique_ptr<::std::string>& set_stringRef(T&&... t) {
     __clear();
     type_ = Type::stringRef;
-    ::new (std::addressof(value_.stringRef)) std::unique_ptr<::std::string>(new std::unique_ptr<::std::string>::element_type(std::forward<T>(t)...));
+    ::new (std::addressof(value_.stringRef)) ::std::unique_ptr<::std::string>(new ::std::unique_ptr<::std::string>::element_type(std::forward<T>(t)...));
     return value_.stringRef;
   }
 
-  ::std::int64_t const & get_intValue() const {
+  ::std::int64_t const& get_intValue() const {
+    if (type_ != Type::intValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
+    return value_.intValue;
+  }
+
+  ::std::string const& get_stringValue() const {
+    if (type_ != Type::stringValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
+    return value_.stringValue;
+  }
+
+  ::std::vector<::std::int64_t> const& get_intListValue() const {
+    if (type_ != Type::intListValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
+    return value_.intListValue;
+  }
+
+  ::std::vector<::std::string> const& get_stringListValue() const {
+    if (type_ != Type::stringListValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
+    return value_.stringListValue;
+  }
+
+  ::cpp2::containerTypedef const& get_typedefValue() const {
+    if (type_ != Type::typedefValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
+    return value_.typedefValue;
+  }
+
+  ::std::unique_ptr<::std::string> const& get_stringRef() const {
+    if (type_ != Type::stringRef) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
+    return value_.stringRef;
+  }
+
+  ::std::int64_t& mutable_intValue() {
     assert(type_ == Type::intValue);
     return value_.intValue;
   }
 
-  ::std::string const & get_stringValue() const {
+  ::std::string& mutable_stringValue() {
     assert(type_ == Type::stringValue);
     return value_.stringValue;
   }
 
-  ::std::vector<::std::int64_t> const & get_intListValue() const {
+  ::std::vector<::std::int64_t>& mutable_intListValue() {
     assert(type_ == Type::intListValue);
     return value_.intListValue;
   }
 
-  ::std::vector<::std::string> const & get_stringListValue() const {
+  ::std::vector<::std::string>& mutable_stringListValue() {
     assert(type_ == Type::stringListValue);
     return value_.stringListValue;
   }
 
-  ::cpp2::containerTypedef const & get_typedefValue() const {
+  ::cpp2::containerTypedef& mutable_typedefValue() {
     assert(type_ == Type::typedefValue);
     return value_.typedefValue;
   }
 
-  std::unique_ptr<::std::string> const & get_stringRef() const {
-    assert(type_ == Type::stringRef);
-    return value_.stringRef;
-  }
-
-  ::std::int64_t & mutable_intValue() {
-    assert(type_ == Type::intValue);
-    return value_.intValue;
-  }
-
-  ::std::string & mutable_stringValue() {
-    assert(type_ == Type::stringValue);
-    return value_.stringValue;
-  }
-
-  ::std::vector<::std::int64_t> & mutable_intListValue() {
-    assert(type_ == Type::intListValue);
-    return value_.intListValue;
-  }
-
-  ::std::vector<::std::string> & mutable_stringListValue() {
-    assert(type_ == Type::stringListValue);
-    return value_.stringListValue;
-  }
-
-  ::cpp2::containerTypedef & mutable_typedefValue() {
-    assert(type_ == Type::typedefValue);
-    return value_.typedefValue;
-  }
-
-  std::unique_ptr<::std::string> & mutable_stringRef() {
+  ::std::unique_ptr<::std::string>& mutable_stringRef() {
     assert(type_ == Type::stringRef);
     return value_.stringRef;
   }
@@ -575,7 +579,7 @@ class ComplexUnion final  {
     return std::move(value_.typedefValue);
   }
 
-  std::unique_ptr<::std::string> move_stringRef() {
+  ::std::unique_ptr<::std::string> move_stringRef() {
     assert(type_ == Type::stringRef);
     return std::move(value_.stringRef);
   }
@@ -717,7 +721,7 @@ class ComplexUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ComplexUnion >;
+  friend class ::apache::thrift::Cpp2Ops<ComplexUnion>;
   friend void swap(ComplexUnion& a, ComplexUnion& b);
 };
 
@@ -730,6 +734,13 @@ uint32_t ComplexUnion::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ListUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -755,7 +766,7 @@ class ListUnion final  {
   ListUnion()
       : type_(Type::__EMPTY__) {}
 
-  ListUnion(ListUnion&& rhs)
+  ListUnion(ListUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -802,7 +813,7 @@ class ListUnion final  {
     }
   }
 
-  ListUnion& operator=(ListUnion&& rhs) {
+  ListUnion& operator=(ListUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -862,24 +873,9 @@ class ListUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const ListUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ListUnion& __x, const ListUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ListUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ListUnion& __x, const ListUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ListUnion& __x, const ListUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ListUnion& __x, const ListUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const ListUnion&) const;
+  bool operator<(const ListUnion&) const;
 
   ::std::vector<::std::int64_t>& set_intListValue(::std::vector<::std::int64_t> const &t) {
     __clear();
@@ -923,22 +919,26 @@ class ListUnion final  {
     return value_.stringListValue;
   }
 
-  ::std::vector<::std::int64_t> const & get_intListValue() const {
-    assert(type_ == Type::intListValue);
+  ::std::vector<::std::int64_t> const& get_intListValue() const {
+    if (type_ != Type::intListValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.intListValue;
   }
 
-  ::std::vector<::std::string> const & get_stringListValue() const {
-    assert(type_ == Type::stringListValue);
+  ::std::vector<::std::string> const& get_stringListValue() const {
+    if (type_ != Type::stringListValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.stringListValue;
   }
 
-  ::std::vector<::std::int64_t> & mutable_intListValue() {
+  ::std::vector<::std::int64_t>& mutable_intListValue() {
     assert(type_ == Type::intListValue);
     return value_.intListValue;
   }
 
-  ::std::vector<::std::string> & mutable_stringListValue() {
+  ::std::vector<::std::string>& mutable_stringListValue() {
     assert(type_ == Type::stringListValue);
     return value_.stringListValue;
   }
@@ -1014,7 +1014,7 @@ class ListUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ListUnion >;
+  friend class ::apache::thrift::Cpp2Ops<ListUnion>;
   friend void swap(ListUnion& a, ListUnion& b);
 };
 
@@ -1027,6 +1027,13 @@ uint32_t ListUnion::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class DataUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1052,7 +1059,7 @@ class DataUnion final  {
   DataUnion()
       : type_(Type::__EMPTY__) {}
 
-  DataUnion(DataUnion&& rhs)
+  DataUnion(DataUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -1099,7 +1106,7 @@ class DataUnion final  {
     }
   }
 
-  DataUnion& operator=(DataUnion&& rhs) {
+  DataUnion& operator=(DataUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -1159,24 +1166,9 @@ class DataUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const DataUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const DataUnion& __x, const DataUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const DataUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const DataUnion& __x, const DataUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const DataUnion& __x, const DataUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const DataUnion& __x, const DataUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const DataUnion&) const;
+  bool operator<(const DataUnion&) const;
 
   ::std::string& set_binaryData(::std::string const &t) {
     __clear();
@@ -1220,22 +1212,26 @@ class DataUnion final  {
     return value_.stringData;
   }
 
-  ::std::string const & get_binaryData() const {
-    assert(type_ == Type::binaryData);
+  ::std::string const& get_binaryData() const {
+    if (type_ != Type::binaryData) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.binaryData;
   }
 
-  ::std::string const & get_stringData() const {
-    assert(type_ == Type::stringData);
+  ::std::string const& get_stringData() const {
+    if (type_ != Type::stringData) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.stringData;
   }
 
-  ::std::string & mutable_binaryData() {
+  ::std::string& mutable_binaryData() {
     assert(type_ == Type::binaryData);
     return value_.binaryData;
   }
 
-  ::std::string & mutable_stringData() {
+  ::std::string& mutable_stringData() {
     assert(type_ == Type::stringData);
     return value_.stringData;
   }
@@ -1311,7 +1307,7 @@ class DataUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< DataUnion >;
+  friend class ::apache::thrift::Cpp2Ops<DataUnion>;
   friend void swap(DataUnion& a, DataUnion& b);
 };
 
@@ -1324,6 +1320,13 @@ uint32_t DataUnion::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Val final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1342,19 +1345,19 @@ class Val final  {
  public:
 
   Val() :
-      intVal(0) {}
+      intVal(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Val(apache::thrift::FragileConstructor, ::std::string strVal__arg, ::std::int32_t intVal__arg, ::cpp2::containerTypedef typedefValue__arg);
 
-  Val(Val&&) = default;
+  Val(Val&&) noexcept;
 
-  Val(const Val&) = default;
+  Val(const Val& src);
 
 
-  Val& operator=(Val&&) = default;
-
-  Val& operator=(const Val&) = default;
+  Val& operator=(Val&&) noexcept;
+  Val& operator=(const Val& src);
   void __clear();
  private:
   ::std::string strVal;
@@ -1363,31 +1366,18 @@ class Val final  {
  private:
   ::cpp2::containerTypedef typedefValue;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool strVal;
     bool intVal;
     bool typedefValue;
   } __isset = {};
-  bool operator==(const Val& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Val& __x, const Val& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Val& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Val& __x, const Val& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Val& __x, const Val& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Val& __x, const Val& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Val&) const;
+  bool operator<(const Val&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> strVal_ref() const& {
@@ -1458,6 +1448,7 @@ class Val final  {
   }
 
   template <typename T_Val_strVal_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.strVal_ref() = BAR;` instead of `FOO.set_strVal(BAR);`")]]
   ::std::string& set_strVal(T_Val_strVal_struct_setter&& strVal_) {
     strVal = std::forward<T_Val_strVal_struct_setter>(strVal_);
     __isset.strVal = true;
@@ -1468,6 +1459,7 @@ class Val final  {
     return intVal;
   }
 
+  [[deprecated("Use `FOO.intVal_ref() = BAR;` instead of `FOO.set_intVal(BAR);`")]]
   ::std::int32_t& set_intVal(::std::int32_t intVal_) {
     intVal = intVal_;
     __isset.intVal = true;
@@ -1477,6 +1469,7 @@ class Val final  {
   ::cpp2::containerTypedef get_typedefValue() &&;
 
   template <typename T_Val_typedefValue_struct_setter = ::cpp2::containerTypedef>
+  [[deprecated("Use `FOO.typedefValue_ref() = BAR;` instead of `FOO.set_typedefValue(BAR);`")]]
   ::cpp2::containerTypedef& set_typedefValue(T_Val_typedefValue_struct_setter&& typedefValue_) {
     typedefValue = std::forward<T_Val_typedefValue_struct_setter>(typedefValue_);
     __isset.typedefValue = true;
@@ -1496,7 +1489,7 @@ class Val final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Val >;
+  friend class ::apache::thrift::Cpp2Ops<Val>;
   friend void swap(Val& a, Val& b);
 };
 
@@ -1509,6 +1502,13 @@ uint32_t Val::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ValUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1534,7 +1534,7 @@ class ValUnion final  {
   ValUnion()
       : type_(Type::__EMPTY__) {}
 
-  ValUnion(ValUnion&& rhs)
+  ValUnion(ValUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -1581,7 +1581,7 @@ class ValUnion final  {
     }
   }
 
-  ValUnion& operator=(ValUnion&& rhs) {
+  ValUnion& operator=(ValUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -1641,24 +1641,9 @@ class ValUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const ValUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ValUnion& __x, const ValUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ValUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ValUnion& __x, const ValUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ValUnion& __x, const ValUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ValUnion& __x, const ValUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const ValUnion&) const;
+  bool operator<(const ValUnion&) const;
 
   ::cpp2::Val& set_v1(::cpp2::Val const &t) {
     __clear();
@@ -1702,22 +1687,26 @@ class ValUnion final  {
     return value_.v2;
   }
 
-  ::cpp2::Val const & get_v1() const {
-    assert(type_ == Type::v1);
+  ::cpp2::Val const& get_v1() const {
+    if (type_ != Type::v1) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.v1;
   }
 
-  ::cpp2::Val const & get_v2() const {
-    assert(type_ == Type::v2);
+  ::cpp2::Val const& get_v2() const {
+    if (type_ != Type::v2) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.v2;
   }
 
-  ::cpp2::Val & mutable_v1() {
+  ::cpp2::Val& mutable_v1() {
     assert(type_ == Type::v1);
     return value_.v1;
   }
 
-  ::cpp2::Val & mutable_v2() {
+  ::cpp2::Val& mutable_v2() {
     assert(type_ == Type::v2);
     return value_.v2;
   }
@@ -1793,7 +1782,7 @@ class ValUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ValUnion >;
+  friend class ::apache::thrift::Cpp2Ops<ValUnion>;
   friend void swap(ValUnion& a, ValUnion& b);
 };
 
@@ -1806,6 +1795,13 @@ uint32_t ValUnion::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class VirtualComplexUnion  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1831,7 +1827,7 @@ class VirtualComplexUnion  {
   VirtualComplexUnion()
       : type_(Type::__EMPTY__) {}
 
-  VirtualComplexUnion(VirtualComplexUnion&& rhs)
+  VirtualComplexUnion(VirtualComplexUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -1878,7 +1874,7 @@ class VirtualComplexUnion  {
     }
   }
 
-  VirtualComplexUnion& operator=(VirtualComplexUnion&& rhs) {
+  VirtualComplexUnion& operator=(VirtualComplexUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -1939,24 +1935,9 @@ class VirtualComplexUnion  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const VirtualComplexUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const VirtualComplexUnion& __x, const VirtualComplexUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const VirtualComplexUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const VirtualComplexUnion& __x, const VirtualComplexUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const VirtualComplexUnion& __x, const VirtualComplexUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const VirtualComplexUnion& __x, const VirtualComplexUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const VirtualComplexUnion&) const;
+  bool operator<(const VirtualComplexUnion&) const;
 
   ::std::string& set_thingOne(::std::string const &t) {
     __clear();
@@ -2000,22 +1981,26 @@ class VirtualComplexUnion  {
     return value_.thingTwo;
   }
 
-  ::std::string const & get_thingOne() const {
-    assert(type_ == Type::thingOne);
+  ::std::string const& get_thingOne() const {
+    if (type_ != Type::thingOne) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.thingOne;
   }
 
-  ::std::string const & get_thingTwo() const {
-    assert(type_ == Type::thingTwo);
+  ::std::string const& get_thingTwo() const {
+    if (type_ != Type::thingTwo) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.thingTwo;
   }
 
-  ::std::string & mutable_thingOne() {
+  ::std::string& mutable_thingOne() {
     assert(type_ == Type::thingOne);
     return value_.thingOne;
   }
 
-  ::std::string & mutable_thingTwo() {
+  ::std::string& mutable_thingTwo() {
     assert(type_ == Type::thingTwo);
     return value_.thingTwo;
   }
@@ -2091,7 +2076,7 @@ class VirtualComplexUnion  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< VirtualComplexUnion >;
+  friend class ::apache::thrift::Cpp2Ops<VirtualComplexUnion>;
   friend void swap(VirtualComplexUnion& a, VirtualComplexUnion& b);
 };
 
@@ -2104,6 +2089,13 @@ uint32_t VirtualComplexUnion::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class NonCopyableStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2122,7 +2114,8 @@ class NonCopyableStruct final  {
  public:
 
   NonCopyableStruct() :
-      num(0) {}
+      num(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   NonCopyableStruct(apache::thrift::FragileConstructor, ::std::int64_t num__arg);
@@ -2135,29 +2128,16 @@ class NonCopyableStruct final  {
  private:
   ::std::int64_t num;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool num;
   } __isset = {};
-  bool operator==(const NonCopyableStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const NonCopyableStruct& __x, const NonCopyableStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const NonCopyableStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const NonCopyableStruct& __x, const NonCopyableStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const NonCopyableStruct& __x, const NonCopyableStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const NonCopyableStruct& __x, const NonCopyableStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const NonCopyableStruct&) const;
+  bool operator<(const NonCopyableStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> num_ref() const& {
@@ -2183,6 +2163,7 @@ class NonCopyableStruct final  {
     return num;
   }
 
+  [[deprecated("Use `FOO.num_ref() = BAR;` instead of `FOO.set_num(BAR);`")]]
   ::std::int64_t& set_num(::std::int64_t num_) {
     num = num_;
     __isset.num = true;
@@ -2202,7 +2183,7 @@ class NonCopyableStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< NonCopyableStruct >;
+  friend class ::apache::thrift::Cpp2Ops<NonCopyableStruct>;
   friend void swap(NonCopyableStruct& a, NonCopyableStruct& b);
 };
 
@@ -2215,6 +2196,13 @@ uint32_t NonCopyableStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class NonCopyableUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2239,7 +2227,7 @@ class NonCopyableUnion final  {
   NonCopyableUnion()
       : type_(Type::__EMPTY__) {}
 
-  NonCopyableUnion(NonCopyableUnion&& rhs)
+  NonCopyableUnion(NonCopyableUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -2258,7 +2246,7 @@ class NonCopyableUnion final  {
     rhs.__clear();
   }
 
-  NonCopyableUnion& operator=(NonCopyableUnion&& rhs) {
+  NonCopyableUnion& operator=(NonCopyableUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -2288,24 +2276,9 @@ class NonCopyableUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const NonCopyableUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const NonCopyableUnion& __x, const NonCopyableUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const NonCopyableUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const NonCopyableUnion& __x, const NonCopyableUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const NonCopyableUnion& __x, const NonCopyableUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const NonCopyableUnion& __x, const NonCopyableUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const NonCopyableUnion&) const;
+  bool operator<(const NonCopyableUnion&) const;
 
 
   ::cpp2::NonCopyableStruct& set_s(::cpp2::NonCopyableStruct&& t) {
@@ -2322,12 +2295,14 @@ class NonCopyableUnion final  {
     return value_.s;
   }
 
-  ::cpp2::NonCopyableStruct const & get_s() const {
-    assert(type_ == Type::s);
+  ::cpp2::NonCopyableStruct const& get_s() const {
+    if (type_ != Type::s) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.s;
   }
 
-  ::cpp2::NonCopyableStruct & mutable_s() {
+  ::cpp2::NonCopyableStruct& mutable_s() {
     assert(type_ == Type::s);
     return value_.s;
   }
@@ -2379,7 +2354,7 @@ class NonCopyableUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< NonCopyableUnion >;
+  friend class ::apache::thrift::Cpp2Ops<NonCopyableUnion>;
   friend void swap(NonCopyableUnion& a, NonCopyableUnion& b);
 };
 

@@ -7,21 +7,20 @@
 
 package test.fixtures.basic_swift_bean;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class LegacyServiceBlockingReactiveWrapper 
     implements LegacyService.Reactive {
     private final LegacyService _delegate;
-    private final reactor.core.scheduler.Scheduler _scheduler;
 
-    public LegacyServiceBlockingReactiveWrapper(LegacyService _delegate, reactor.core.scheduler.Scheduler _scheduler) {
+    public LegacyServiceBlockingReactiveWrapper(LegacyService _delegate) {
         
         this._delegate = _delegate;
-        this._scheduler = _scheduler;
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
@@ -33,7 +32,7 @@ public class LegacyServiceBlockingReactiveWrapper
                 } catch (Throwable _e) {
                     throw reactor.core.Exceptions.propagate(_e);
                 }
-            }).subscribeOn(_scheduler);
+            }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
     }
 
 }

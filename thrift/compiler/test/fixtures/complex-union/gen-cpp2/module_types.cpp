@@ -397,6 +397,26 @@ void TccStructTraits<::cpp2::Val>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+Val::Val(const Val&) = default;
+Val& Val::operator=(const Val&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+Val::Val(Val&& other) noexcept  :
+    strVal(std::move(other.strVal)),
+    intVal(std::move(other.intVal)),
+    typedefValue(std::move(other.typedefValue)),
+    __isset(other.__isset) {}
+Val& Val::operator=(FOLLY_MAYBE_UNUSED Val&& other) noexcept {
+    this->strVal = std::move(other.strVal);
+    this->intVal = std::move(other.intVal);
+    this->typedefValue = std::move(other.typedefValue);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Val::Val(apache::thrift::FragileConstructor, ::std::string strVal__arg, ::std::int32_t intVal__arg, ::cpp2::containerTypedef typedefValue__arg) :
     strVal(std::move(strVal__arg)),
     intVal(std::move(intVal__arg)),
@@ -406,11 +426,12 @@ Val::Val(apache::thrift::FragileConstructor, ::std::string strVal__arg, ::std::i
   __isset.typedefValue = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void Val::__clear() {
   // clear all fields
-  strVal = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  intVal = 0;
-  typedefValue.clear();
+  this->strVal = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->intVal = 0;
+  this->typedefValue.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -747,15 +768,17 @@ void TccStructTraits<::cpp2::NonCopyableStruct>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 NonCopyableStruct::NonCopyableStruct(apache::thrift::FragileConstructor, ::std::int64_t num__arg) :
     num(std::move(num__arg)) {
   __isset.num = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void NonCopyableStruct::__clear() {
   // clear all fields
-  num = 0;
+  this->num = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

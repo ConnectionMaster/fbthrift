@@ -72,22 +72,19 @@ class RocketNetworkTest : public testing::Test {
   }
 
   void TearDown() override {
+    if (client_) {
+      client_->verifyVersion();
+    }
     client_.reset();
     server_.reset();
   }
 
  public:
-  void withClient(folly::Function<void(RocketTestClient&)> f) {
-    f(*client_);
-  }
+  void withClient(folly::Function<void(RocketTestClient&)> f) { f(*client_); }
 
-  folly::ManualExecutor* getUserExecutor() {
-    return &userExecutor_;
-  }
+  folly::ManualExecutor* getUserExecutor() { return &userExecutor_; }
 
-  void unsetExpectedSetupMetadata() {
-    server_->setExpectedSetupMetadata({});
-  }
+  void unsetExpectedSetupMetadata() { server_->setExpectedSetupMetadata({}); }
 
  protected:
   std::unique_ptr<RocketTestServer> server_;
@@ -98,9 +95,7 @@ class RocketNetworkTest : public testing::Test {
 struct OnWriteSuccess : RocketClient::WriteSuccessCallback {
   bool writeSuccess{false};
 
-  void onWriteSuccess() noexcept override {
-    writeSuccess = true;
-  }
+  void onWriteSuccess() noexcept override { writeSuccess = true; }
 };
 } // namespace
 
@@ -180,7 +175,6 @@ TEST_F(RocketNetworkTest, RequestResponseBasic) {
     EXPECT_EQ(kData, getRange(*dam.second));
     EXPECT_TRUE(reply->hasNonemptyMetadata());
     EXPECT_EQ(kMetadata, getRange(*dam.first));
-    client.wait();
   });
 }
 
@@ -311,6 +305,33 @@ TEST_F(RocketNetworkTest, RequestResponseDeadServer) {
       std::move(reply.exception()));
 }
 
+TEST_F(RocketNetworkTest, ServerShutdown) {
+  this->withClient(
+      [server = std::move(server_)](RocketTestClient& client) mutable {
+        constexpr folly::StringPiece kMetadata{"metadata"};
+        constexpr folly::StringPiece kData{"data_echo:"};
+
+        auto reply = client.sendRequestResponseSync(
+            Payload::makeFromMetadataAndData(kMetadata, kData));
+
+        EXPECT_TRUE(reply.hasValue());
+        EXPECT_TRUE(reply->hasNonemptyMetadata());
+
+        server.reset();
+
+        auto tew =
+            folly::via(&client.getEventBase(), [&] {
+              return std::make_optional(client.getRawClient().getLastError());
+            }).get();
+        auto tex = tew->get_exception<transport::TTransportException>();
+        ASSERT_NE(nullptr, tex);
+        EXPECT_EQ(
+            TTransportException::TTransportExceptionType::END_OF_FILE,
+            tex->getType());
+        EXPECT_EQ("Connection closed by server", std::string(tex->what()));
+      });
+}
+
 TEST_F(RocketNetworkTest, RocketClientEventBaseDestruction) {
   auto evb = std::make_unique<folly::EventBase>();
   folly::AsyncSocket::UniquePtr socket(new folly::AsyncSocket(
@@ -319,8 +340,7 @@ TEST_F(RocketNetworkTest, RocketClientEventBaseDestruction) {
   auto client = RocketClient::create(
       *evb,
       std::move(socket),
-      std::make_unique<SetupFrame>(this->client_->makeTestSetupFrame()),
-      {});
+      std::make_unique<SetupFrame>(this->client_->makeTestSetupFrame()));
   EXPECT_NE(nullptr, client->getTransportWrapper());
 
   evb.reset();
@@ -528,8 +548,7 @@ TEST_F(RocketNetworkTest, ClientCreationAndReconnectStreamOutlivesClient) {
 }
 
 TEST_F(
-    RocketNetworkTest,
-    ClientCreationAndReconnectSubscriptionOutlivesClient) {
+    RocketNetworkTest, ClientCreationAndReconnectSubscriptionOutlivesClient) {
   this->withClient([this](RocketTestClient& client) {
     constexpr size_t kNumRequestedPayloads = 1000000;
     constexpr folly::StringPiece kMetadata("metadata");
@@ -681,15 +700,9 @@ class TestClientCallback : public StreamClientCallback {
     }
   }
 
-  uint64_t payloadsReceived() const {
-    return received_;
-  }
-  uint64_t headersReceived() const {
-    return receivedHeaders_;
-  }
-  folly::exception_wrapper getError() const {
-    return ew_;
-  }
+  uint64_t payloadsReceived() const { return received_; }
+  uint64_t headersReceived() const { return receivedHeaders_; }
+  folly::exception_wrapper getError() const { return ew_; }
 
  private:
   folly::EventBase& evb_;
@@ -839,12 +852,14 @@ TEST_F(RocketNetworkTest, SinkBasic) {
           co_await sinkClientCallback->getFirstThriftResponse();
           auto clientSink = ClientSink<int, int>(
               std::move(sinkClientCallback),
-              [](folly::Try<int>&& i) {
+              [](folly::Try<int>&& i) -> folly::Try<StreamPayload> {
                 if (i.hasValue()) {
-                  return folly::IOBuf::copyBuffer(
-                      folly::StringPiece{folly::to<std::string>(*i)});
+                  return folly::Try<StreamPayload>(StreamPayload(
+                      folly::IOBuf::copyBuffer(folly::to<std::string>(*i)),
+                      {}));
                 } else {
-                  return folly::IOBuf::create(0);
+                  return folly::Try<StreamPayload>(
+                      StreamPayload(folly::IOBuf::create(0), {}));
                 }
               },
               [](folly::Try<StreamPayload>&& payload) -> folly::Try<int> {
@@ -891,12 +906,13 @@ TEST_F(RocketNetworkTest, SinkCloseClient) {
 
     auto sink = ClientSink<int, int>(
         std::move(sinkClientCallback),
-        [](folly::Try<int>&& i) {
+        [](folly::Try<int>&& i) -> folly::Try<StreamPayload> {
           if (i.hasValue()) {
-            return folly::IOBuf::copyBuffer(
-                folly::StringPiece{folly::to<std::string>(*i)});
+            return folly::Try<StreamPayload>(StreamPayload(
+                folly::IOBuf::copyBuffer(folly::to<std::string>(*i)), {}));
           } else {
-            return folly::IOBuf::create(0);
+            return folly::Try<StreamPayload>(
+                StreamPayload(folly::IOBuf::create(0), {}));
           }
         },
         [](folly::Try<StreamPayload>&& payload) -> folly::Try<int> {
@@ -932,15 +948,13 @@ TEST_F(RocketNetworkTest, CloseNowWithPendingWriteCallback) {
    public:
     explicit FakeTransport(folly::EventBase* e) : eventBase_(e) {}
     void setReadCB(ReadCallback*) override {}
-    ReadCallback* getReadCallback() const override {
-      return nullptr;
-    }
-    void write(WriteCallback* cb, const void*, size_t, folly::WriteFlags)
-        override {
+    ReadCallback* getReadCallback() const override { return nullptr; }
+    void write(
+        WriteCallback* cb, const void*, size_t, folly::WriteFlags) override {
       callbacks_.push_back(cb);
     }
-    void writev(WriteCallback* cb, const iovec*, size_t, folly::WriteFlags)
-        override {
+    void writev(
+        WriteCallback* cb, const iovec*, size_t, folly::WriteFlags) override {
       callbacks_.push_back(cb);
     }
     void writeChain(
@@ -949,9 +963,7 @@ TEST_F(RocketNetworkTest, CloseNowWithPendingWriteCallback) {
         folly::WriteFlags) override {
       callbacks_.push_back(cb);
     }
-    folly::EventBase* getEventBase() const override {
-      return eventBase_;
-    }
+    folly::EventBase* getEventBase() const override { return eventBase_; }
     void getAddress(folly::SocketAddress*) const override {}
     void close() override {}
     void closeNow() override {
@@ -965,45 +977,23 @@ TEST_F(RocketNetworkTest, CloseNowWithPendingWriteCallback) {
     }
     void shutdownWrite() override {}
     void shutdownWriteNow() override {}
-    bool good() const override {
-      return true;
-    }
-    bool readable() const override {
-      return true;
-    }
-    bool connecting() const override {
-      return true;
-    }
-    bool error() const override {
-      return true;
-    }
+    bool good() const override { return true; }
+    bool readable() const override { return true; }
+    bool connecting() const override { return true; }
+    bool error() const override { return true; }
     void attachEventBase(folly::EventBase*) override {}
     void detachEventBase() override {}
-    bool isDetachable() const override {
-      return true;
-    }
+    bool isDetachable() const override { return true; }
     void setSendTimeout(uint32_t) override {}
-    uint32_t getSendTimeout() const override {
-      return 0u;
-    }
+    uint32_t getSendTimeout() const override { return 0u; }
     void getLocalAddress(folly::SocketAddress*) const override {}
     void getPeerAddress(folly::SocketAddress*) const override {}
-    bool isEorTrackingEnabled() const override {
-      return true;
-    }
+    bool isEorTrackingEnabled() const override { return true; }
     void setEorTracking(bool) override {}
-    size_t getAppBytesWritten() const override {
-      return 0u;
-    }
-    size_t getRawBytesWritten() const override {
-      return 0u;
-    }
-    size_t getAppBytesReceived() const override {
-      return 0u;
-    }
-    size_t getRawBytesReceived() const override {
-      return 0u;
-    }
+    size_t getAppBytesWritten() const override { return 0u; }
+    size_t getRawBytesWritten() const override { return 0u; }
+    size_t getAppBytesReceived() const override { return 0u; }
+    size_t getRawBytesReceived() const override { return 0u; }
 
    private:
     folly::EventBase* eventBase_;
@@ -1015,8 +1005,7 @@ TEST_F(RocketNetworkTest, CloseNowWithPendingWriteCallback) {
   auto client = RocketClient::create(
       *evb,
       std::move(sock),
-      std::make_unique<SetupFrame>(this->client_->makeTestSetupFrame()),
-      {});
+      std::make_unique<SetupFrame>(this->client_->makeTestSetupFrame()));
   // write something to the socket, without holding keepalive of evb and waiting
   // for write callback
   client->cancelStream(StreamId(1));

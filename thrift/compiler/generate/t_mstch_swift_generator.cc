@@ -83,10 +83,7 @@ class t_mstch_swift_generator : public t_mstch_generator {
       const std::map<std::string, std::string>& parsed_options,
       const std::string& /* option_string */)
       : t_mstch_generator(
-            program,
-            std::move(context),
-            "java/swift",
-            parsed_options) {
+            program, std::move(context), "java/swift", parsed_options) {
     out_dir_base_ = "gen-swift";
   }
 
@@ -297,9 +294,7 @@ class mstch_swift_program : public mstch_program {
              &mstch_swift_program::constant_class_name},
         });
   }
-  mstch::node java_package() {
-    return get_namespace_or_default(*program_);
-  }
+  mstch::node java_package() { return get_namespace_or_default(*program_); }
   mstch::node constant_class_name() {
     return get_constants_class_name(*program_);
   }
@@ -341,15 +336,13 @@ class mstch_swift_struct : public mstch_struct {
         "struct:extendRuntimeException?", "legacy_extend_runtime_exception");
   }
   mstch::node java_package() {
-    return get_namespace_or_default(*(strct_->get_program()));
+    return get_namespace_or_default(*(strct_->program()));
   }
-  mstch::node is_struct_union() {
-    return strct_->is_union();
-  }
+  mstch::node is_struct_union() { return strct_->is_union(); }
   mstch::node is_union_field_type_unique() {
     std::set<std::string> field_types;
-    for (const auto* field : strct_->fields()) {
-      auto type_name = field->get_type()->get_full_name();
+    for (const auto& field : strct_->fields()) {
+      auto type_name = field.type()->get_full_name();
       std::string type_with_erasure = type_name.substr(0, type_name.find('<'));
       if (field_types.find(type_with_erasure) != field_types.end()) {
         return false;
@@ -428,7 +421,7 @@ class mstch_swift_service : public mstch_service {
         });
   }
   mstch::node java_package() {
-    return get_namespace_or_default(*(service_->get_program()));
+    return get_namespace_or_default(*(service_->program()));
   }
   mstch::node java_capital_name() {
     return java::mangle_java_name(service_->get_name(), true);
@@ -502,18 +495,10 @@ class mstch_swift_function : public mstch_function {
   int32_t nestedDepth = 0;
   bool isNestedContainerFlag = false;
 
-  mstch::node get_nested_depth() {
-    return nestedDepth;
-  }
-  mstch::node preceding_nested_depth() {
-    return (nestedDepth - 1);
-  }
-  mstch::node is_first_depth() {
-    return (nestedDepth == 1);
-  }
-  mstch::node get_nested_container_flag() {
-    return isNestedContainerFlag;
-  }
+  mstch::node get_nested_depth() { return nestedDepth; }
+  mstch::node preceding_nested_depth() { return (nestedDepth - 1); }
+  mstch::node is_first_depth() { return (nestedDepth == 1); }
+  mstch::node get_nested_container_flag() { return isNestedContainerFlag; }
   mstch::node set_nested_container_flag() {
     isNestedContainerFlag = true;
     return mstch::node();
@@ -535,9 +520,7 @@ class mstch_swift_function : public mstch_function {
     return java::mangle_java_name(function_->get_name(), false);
   }
 
-  mstch::node is_void_type() {
-    return function_->get_returntype()->is_void();
-  }
+  mstch::node is_void_type() { return function_->get_returntype()->is_void(); }
 };
 
 class mstch_swift_field : public mstch_field {
@@ -591,18 +574,10 @@ class mstch_swift_field : public mstch_field {
     }
     return field_->get_value();
   }
-  mstch::node get_nested_depth() {
-    return nestedDepth;
-  }
-  mstch::node preceding_nested_depth() {
-    return (nestedDepth - 1);
-  }
-  mstch::node is_first_depth() {
-    return (nestedDepth == 1);
-  }
-  mstch::node get_nested_container_flag() {
-    return isNestedContainerFlag;
-  }
+  mstch::node get_nested_depth() { return nestedDepth; }
+  mstch::node preceding_nested_depth() { return (nestedDepth - 1); }
+  mstch::node is_first_depth() { return (nestedDepth == 1); }
+  mstch::node get_nested_container_flag() { return isNestedContainerFlag; }
   mstch::node set_nested_container_flag() {
     isNestedContainerFlag = true;
     return mstch::node();
@@ -637,9 +612,7 @@ class mstch_swift_field : public mstch_field {
   mstch::node is_container() {
     return field_->get_type()->get_true_type()->is_container();
   }
-  mstch::node java_name() {
-    return get_java_swift_name(field_);
-  }
+  mstch::node java_name() { return get_java_swift_name(field_); }
 
   mstch::node type_field_name() {
     auto type_name = field_->get_type()->get_full_name();
@@ -658,15 +631,11 @@ class mstch_swift_field : public mstch_field {
     boost::to_upper(field_name);
     return field_name;
   }
-  mstch::node java_default_value() {
-    return default_value_for_field(field_);
-  }
+  mstch::node java_default_value() { return default_value_for_field(field_); }
   mstch::node is_recursive_reference() {
     return field_->get_annotation("swift.recursive_reference") == "true";
   }
-  mstch::node is_negative_id() {
-    return field_->get_key() < 0;
-  }
+  mstch::node is_negative_id() { return field_->get_key() < 0; }
   std::string default_value_for_field(const t_field* field) {
     if (field_->get_req() == t_field::e_req::optional) {
       return "null";
@@ -691,7 +660,7 @@ class mstch_swift_field : public mstch_field {
       } else if (type->is_enum()) {
         // we use fromInteger(0) as default value as it may be null or the enum
         // entry for 0.
-        auto javaNamespace = get_namespace_or_default(*(type->get_program()));
+        auto javaNamespace = get_namespace_or_default(*(type->program()));
         auto enumType = java::mangle_java_name(type->get_name(), true);
         return javaNamespace + "." + enumType + ".fromInteger(0)";
       }
@@ -744,7 +713,7 @@ class mstch_swift_enum : public mstch_enum {
         });
   }
   mstch::node java_package() {
-    return get_namespace_or_default(*(enm_->get_program()));
+    return get_namespace_or_default(*(enm_->program()));
   }
   mstch::node java_capital_name() {
     return java::mangle_java_name(enm_->get_name(), true);
@@ -876,9 +845,7 @@ class mstch_swift_const_value : public mstch_const_value {
     }
     return mstch::node();
   }
-  bool same_type_as_expected() const override {
-    return true;
-  }
+  bool same_type_as_expected() const override { return true; }
 };
 
 class mstch_swift_type : public mstch_type {
@@ -899,6 +866,7 @@ class mstch_swift_type : public mstch_type {
             {"type:isMapKey?", &mstch_swift_type::get_map_key_flag},
             {"type:setIsMapValue", &mstch_swift_type::set_is_map_value},
             {"type:isMapValue?", &mstch_swift_type::get_map_value_flag},
+            {"type:isBinaryString?", &mstch_swift_type::is_binary_string},
             {"type:setIsNotMap", &mstch_swift_type::set_is_not_map},
         });
   }
@@ -910,12 +878,8 @@ class mstch_swift_type : public mstch_type {
     isMapKeyFlag = false;
     return mstch::node();
   }
-  mstch::node get_map_value_flag() {
-    return isMapValueFlag;
-  }
-  mstch::node get_map_key_flag() {
-    return isMapKeyFlag;
-  }
+  mstch::node get_map_value_flag() { return isMapValueFlag; }
+  mstch::node get_map_key_flag() { return isMapKeyFlag; }
   mstch::node set_is_map_value() {
     isMapValueFlag = true;
     return mstch::node();
@@ -936,6 +900,9 @@ class mstch_swift_type : public mstch_type {
   }
   mstch::node java_type() {
     return type_->get_true_type()->get_annotation("java.swift.type");
+  }
+  mstch::node is_binary_string() {
+    return type_->get_true_type()->get_annotation("java.swift.binary_string");
   }
 };
 

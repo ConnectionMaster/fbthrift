@@ -66,7 +66,14 @@ THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 <%#program:structs%>
 <% > common/namespace_cpp2_begin%>
 
-class <%struct:name%> <%!
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class <%#struct:exception?%>FOLLY_EXPORT <%/struct:exception?%><%struct:name%> <%!
 %><%^struct:virtual%>final <%/struct:virtual%><%#struct:exception?%><%!
 %>: public apache::thrift::TException<%/struct:exception?%> {
  private:
@@ -82,6 +89,14 @@ class <%struct:name%> <%!
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = true;
   static const char* __fbthrift_cpp2_gen_thrift_uri();
   <%/struct:thrift_uri%>
+  <%#struct:exception?%>
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::<%struct:exception_kind%>;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::<%struct:exception_safety%>;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::<%struct:exception_blame%>;
+  <%/struct:exception?%>
 
  public:
   using __fbthrift_cpp2_type = <%struct:name%>;
@@ -135,8 +150,9 @@ class <%struct:name%> <%!
 <% > module_types_h/union_storage%>
 
 <%^struct:cpp_noncomparable%>
-<% > module_types_h/eq_overload%>
-<% > module_types_h/union_operator_less%>
+
+  bool operator==(const <%struct:name%>&) const;
+  bool operator<(const <%struct:name%>&) const;
 <%/struct:cpp_noncomparable%>
 <% > module_types_h/union_setters%>
 
@@ -167,43 +183,34 @@ class <%struct:name%> <%!
 
 <%#struct:is_large?%>
   <%struct:name%>();
+  <%#struct:message%>
+  explicit <%struct:name%>(std::string __message);
+  <%/struct:message%>
 <%/struct:is_large?%>
 <%^struct:is_large?%>
   <% > module_types_h/base_ctor%>
 <%/struct:is_large?%>
 
-<%#struct:exception?%><%#struct:message%>
-
-  explicit <%struct:name%>(const std::string& __message) :
-      <%struct:message%>(__message) {}
-
-  explicit <%struct:name%>(std::string&& __message) :
-      <%struct:message%>(std::move(__message)) {}
-<%/struct:message%><%/struct:exception?%>
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   <%struct:name%>(apache::thrift::FragileConstructor<% > module_types_h/fragile_ctor_param_list%>);
-<%#struct:cpp_noexcept_move_ctor%>
-<%^struct:fields?%>
-  <%struct:name%>(<%struct:name%>&& other) noexcept {}
-<%/struct:fields?%>
-<%#struct:fields?%>
-<%#struct:is_large?%>
-  <%struct:name%>(<%struct:name%>&& other) noexcept;
-<%/struct:is_large?%>
-<%^struct:is_large?%>
-  <% > module_types_cpp/move_ctor%>
-<%/struct:is_large?%>
-<%/struct:fields?%>
-<%/struct:cpp_noexcept_move_ctor%>
-<%^struct:cpp_noexcept_move_ctor%>
 
+<%#struct:is_eligible_for_constexpr?%>
   <%struct:name%>(<%struct:name%>&&) = default;
-<%/struct:cpp_noexcept_move_ctor%>
+<%/struct:is_eligible_for_constexpr?%>
+<%^struct:is_eligible_for_constexpr?%>
+  <%struct:name%>(<%struct:name%>&&) noexcept;
+<%/struct:is_eligible_for_constexpr?%>
 <%^struct:cpp_noncopyable%>
 <%^struct:nondefault_copy_ctor_and_assignment?%>
+<%#struct:is_eligible_for_constexpr?%>
 
   <%struct:name%>(const <%struct:name%>&) = default;
+<%/struct:is_eligible_for_constexpr?%>
+<%^struct:is_eligible_for_constexpr?%>
+
+  <%struct:name%>(const <%struct:name%>& src);
+<%/struct:is_eligible_for_constexpr?%>
 <%/struct:nondefault_copy_ctor_and_assignment?%>
 <%#struct:nondefault_copy_ctor_and_assignment?%>
   <%struct:name%>(const <%struct:name%>& src);
@@ -214,16 +221,21 @@ class <%struct:name%> <%!
 <% > module_types_h/alloc_extended_ctors%>
 <%/struct:cpp_allocator%>
 
-<%#struct:cpp_noexcept_move%>
-  <%struct:name%>& operator=(<%struct:name%>&&) noexcept = default;
-<%/struct:cpp_noexcept_move%>
-<%^struct:cpp_noexcept_move%>
+<%#struct:is_eligible_for_constexpr?%>
   <%struct:name%>& operator=(<%struct:name%>&&) = default;
-<%/struct:cpp_noexcept_move%>
+<%/struct:is_eligible_for_constexpr?%>
+<%^struct:is_eligible_for_constexpr?%>
+  <%struct:name%>& operator=(<%struct:name%>&&) noexcept;
+<%/struct:is_eligible_for_constexpr?%>
 <%^struct:cpp_noncopyable%>
 <%^struct:nondefault_copy_ctor_and_assignment?%>
+<%#struct:is_eligible_for_constexpr?%>
 
   <%struct:name%>& operator=(const <%struct:name%>&) = default;
+<%/struct:is_eligible_for_constexpr?%>
+<%^struct:is_eligible_for_constexpr?%>
+  <%struct:name%>& operator=(const <%struct:name%>& src);
+<%/struct:is_eligible_for_constexpr?%>
 <%/struct:nondefault_copy_ctor_and_assignment?%>
 <%#struct:nondefault_copy_ctor_and_assignment?%>
   <%struct:name%>& operator=(const <%struct:name%>& src);
@@ -233,7 +245,7 @@ class <%struct:name%> <%!
 <%^struct:virtual%>
 <%#struct:is_large?%>
 
-  ~<%struct:name%>();
+  ~<%struct:name%>()<%#struct:exception?%> override<%/struct:exception?%>;
 
 <%/struct:is_large?%>
 <%/struct:virtual%>
@@ -250,9 +262,12 @@ class <%struct:name%> <%!
 <%#struct:fields?%>
 <% > module_types_h/declare_members%>
 <%/struct:fields?%>
+
+ public:
 <%^struct:cpp_noncomparable%>
-<% > module_types_h/eq_overload%>
-<% > module_types_h/struct_operator_less%>
+
+  bool operator==(const <%struct:name%>&) const;
+  bool operator<(const <%struct:name%>&) const;
 <%/struct:cpp_noncomparable%>
 <%#struct:fields?%>
 <% > module_types_h/field_ref%>
@@ -291,7 +306,7 @@ class <%struct:name%> <%!
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< <%struct:name%> >;
+  friend class ::apache::thrift::Cpp2Ops<<%struct:name%>>;
   friend void swap(<%struct:name%>& a, <%struct:name%>& b);
   <%#program:tablebased?%>
   <%^struct:union?%>

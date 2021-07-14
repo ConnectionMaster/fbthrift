@@ -22,7 +22,7 @@ import org.apache.thrift.meta_data.FieldValueMetaData;
 
 @SwiftGenerated
 @com.facebook.swift.codec.ThriftStruct("ComplexFieldNames")
-public final class ComplexFieldNames extends java.lang.RuntimeException {
+public final class ComplexFieldNames extends java.lang.RuntimeException implements com.facebook.thrift.payload.ThriftSerializable {
     private static final long serialVersionUID = 1L;
 
 
@@ -99,6 +99,10 @@ public final class ComplexFieldNames extends java.lang.RuntimeException {
     @java.lang.Override
     public String getMessage() {
       return internalErrorMessage;
+    }
+    
+    public static com.facebook.thrift.payload.Reader<ComplexFieldNames> asReader() {
+      return ComplexFieldNames::read0;
     }
     
     public static ComplexFieldNames read0(TProtocol oprot) throws TException {

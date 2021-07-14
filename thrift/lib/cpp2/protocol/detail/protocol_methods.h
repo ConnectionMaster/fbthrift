@@ -20,6 +20,7 @@
 #include <bitset>
 #include <iostream>
 #include <iterator>
+#include <limits>
 #include <list>
 #include <memory>
 #include <type_traits>
@@ -244,9 +245,7 @@ deserialize_known_length_map(
 template <typename Set, typename ValDeserializer>
 typename std::enable_if<sorted_unique_constructible_v<Set>>::type
 deserialize_known_length_set(
-    Set& set,
-    std::uint32_t set_size,
-    ValDeserializer const& vr) {
+    Set& set, std::uint32_t set_size, ValDeserializer const& vr) {
   if (set_size == 0) {
     return;
   }
@@ -273,9 +272,7 @@ typename std::enable_if<
     !sorted_unique_constructible_v<Set> &&
     set_emplace_hint_is_invocable_v<Set>>::type
 deserialize_known_length_set(
-    Set& set,
-    std::uint32_t set_size,
-    ValDeserializer const& vr) {
+    Set& set, std::uint32_t set_size, ValDeserializer const& vr) {
   reserve_if_possible(&set, set_size);
 
   for (auto i = set_size; i--;) {
@@ -290,9 +287,7 @@ typename std::enable_if<
     !sorted_unique_constructible_v<Set> &&
     !set_emplace_hint_is_invocable_v<Set>>::type
 deserialize_known_length_set(
-    Set& set,
-    std::uint32_t set_size,
-    ValDeserializer const& vr) {
+    Set& set, std::uint32_t set_size, ValDeserializer const& vr) {
   reserve_if_possible(&set, set_size);
 
   for (auto i = set_size; i--;) {
@@ -300,6 +295,14 @@ deserialize_known_length_set(
     vr(value);
     set.insert(std::move(value));
   }
+}
+
+inline uint32_t checked_container_size(size_t size) {
+  const size_t limit = std::numeric_limits<int32_t>::max();
+  if (size > limit) {
+    TProtocolException::throwExceededSizeLimit(size, limit);
+  }
+  return size;
 }
 
 /*
@@ -322,7 +325,12 @@ struct protocol_methods;
   }                                                                          \
   template <typename Protocol>                                               \
   static std::size_t write(Protocol& protocol, Type const& in) {             \
-    return protocol.write##Method(in);                                       \
+    if (std::is_same<type_class::Class, type_class::binary>::value ||        \
+        std::is_same<type_class::Class, type_class::string>::value) {        \
+      return checked_container_size(protocol.write##Method(in));             \
+    } else {                                                                 \
+      return protocol.write##Method(in);                                     \
+    }                                                                        \
   }
 
 #define THRIFT_PROTOCOL_METHODS_REGISTER_SS_COMMON(Class, Type, Method)   \
@@ -424,14 +432,12 @@ struct protocol_methods<type_class::binary, Type> {
 
   template <bool ZeroCopy, typename Protocol>
   static typename std::enable_if<ZeroCopy, std::size_t>::type serializedSize(
-      Protocol& protocol,
-      Type const& in) {
+      Protocol& protocol, Type const& in) {
     return protocol.serializedSizeZCBinary(in);
   }
   template <bool ZeroCopy, typename Protocol>
   static typename std::enable_if<!ZeroCopy, std::size_t>::type serializedSize(
-      Protocol& protocol,
-      Type const& in) {
+      Protocol& protocol, Type const& in) {
     return protocol.serializedSizeBinary(in);
   }
 };
@@ -543,7 +549,8 @@ struct protocol_methods<type_class::list<ElemClass>, Type> {
     std::size_t xfer = 0;
 
     xfer += protocol.writeListBegin(
-        elem_ttype::value, folly::to_narrow(folly::to_unsigned(out.size())));
+        elem_ttype::value, checked_container_size(out.size()));
+
     for (auto const& elem : out) {
       xfer += elem_methods::write(protocol, elem);
     }
@@ -627,7 +634,7 @@ struct protocol_methods<type_class::set<ElemClass>, Type> {
     std::size_t xfer = 0;
 
     xfer += protocol.writeSetBegin(
-        elem_ttype::value, folly::to_narrow(folly::to_unsigned(out.size())));
+        elem_ttype::value, checked_container_size(out.size()));
 
     if (!folly::is_detected_v<detect_key_compare, Type> &&
         protocol.kSortKeys()) {
@@ -743,7 +750,9 @@ struct protocol_methods<type_class::map<KeyClass, MappedClass>, Type> {
     std::size_t xfer = 0;
 
     xfer += protocol.writeMapBegin(
-        key_ttype::value, mapped_ttype::value, out.size());
+        key_ttype::value,
+        mapped_ttype::value,
+        checked_container_size(out.size()));
 
     if (!folly::is_detected_v<detect_key_compare, Type> &&
         protocol.kSortKeys()) {

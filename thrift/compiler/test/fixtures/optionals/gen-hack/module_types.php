@@ -17,7 +17,20 @@ enum Animal: int {
 }
 
 class Animal_TEnumStaticMetadata implements \IThriftEnumStaticMetadata {
-  public static function getAllStructuredAnnotations(): \TEnumAnnotations {
+  public static function getEnumMetadata()[]: \tmeta_ThriftEnum {
+    return tmeta_ThriftEnum::fromShape(
+      shape(
+        "name" => "module.Animal",
+        "elements" => dict[
+          1 => "DOG",
+          2 => "CAT",
+          3 => "TARANTULA",
+        ],
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TEnumAnnotations {
     return shape(
       'enum' => dict[],
       'constants' => dict[
@@ -107,11 +120,66 @@ class Color implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Color';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Color",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_DOUBLE_TYPE,
+                )
+              ),
+              "name" => "red",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_DOUBLE_TYPE,
+                )
+              ),
+              "name" => "green",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_DOUBLE_TYPE,
+                )
+              ),
+              "name" => "blue",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 4,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_DOUBLE_TYPE,
+                )
+              ),
+              "name" => "alpha",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -216,11 +284,85 @@ class Vehicle implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Vehicle';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Vehicle",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Color",
+                    )
+                  ),
+                )
+              ),
+              "name" => "color",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "licensePlate",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "description",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 4,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "name",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 5,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_BOOL_TYPE,
+                )
+              ),
+              "name" => "hasAC",
+              "is_optional" => true,
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -412,11 +554,212 @@ class Person implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Person';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Person",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                    shape(
+                      "name" => "module.PersonID",
+                      "underlyingType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I64_TYPE,
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "id",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "name",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I16_TYPE,
+                )
+              ),
+              "name" => "age",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 4,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "address",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 5,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Color",
+                    )
+                  ),
+                )
+              ),
+              "name" => "favoriteColor",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 6,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_set" => tmeta_ThriftSetType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                            shape(
+                              "name" => "module.PersonID",
+                              "underlyingType" => tmeta_ThriftType::fromShape(
+                                shape(
+                                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I64_TYPE,
+                                )
+                              ),
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "friends",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 7,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                    shape(
+                      "name" => "module.PersonID",
+                      "underlyingType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I64_TYPE,
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "bestFriend",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 8,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_map" => tmeta_ThriftMapType::fromShape(
+                    shape(
+                      "keyType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_enum" => tmeta_ThriftEnumType::fromShape(
+                            shape(
+                              "name" => "module.Animal",
+                            )
+                          ),
+                        )
+                      ),
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "petNames",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 9,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_enum" => tmeta_ThriftEnumType::fromShape(
+                    shape(
+                      "name" => "module.Animal",
+                    )
+                  ),
+                )
+              ),
+              "name" => "afraidOfAnimal",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 10,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_list" => tmeta_ThriftListType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_struct" => tmeta_ThriftStructType::fromShape(
+                            shape(
+                              "name" => "module.Vehicle",
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "vehicles",
+              "is_optional" => true,
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[

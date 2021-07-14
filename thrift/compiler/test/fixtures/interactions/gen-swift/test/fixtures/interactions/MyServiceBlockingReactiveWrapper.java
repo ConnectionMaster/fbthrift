@@ -7,21 +7,20 @@
 
 package test.fixtures.interactions;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class MyServiceBlockingReactiveWrapper 
     implements MyService.Reactive {
     private final MyService _delegate;
-    private final reactor.core.scheduler.Scheduler _scheduler;
 
-    public MyServiceBlockingReactiveWrapper(MyService _delegate, reactor.core.scheduler.Scheduler _scheduler) {
+    public MyServiceBlockingReactiveWrapper(MyService _delegate) {
         
         this._delegate = _delegate;
-        this._scheduler = _scheduler;
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
@@ -33,7 +32,166 @@ public class MyServiceBlockingReactiveWrapper
                 } catch (Throwable _e) {
                     throw reactor.core.Exceptions.propagate(_e);
                 }
-            }).subscribeOn(_scheduler);
+            }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
     }
 
+    public class MyInteractionImpl implements MyInteraction {
+        private MyService.MyInteraction _delegateInteraction;
+
+        MyInteractionImpl(MyService.MyInteraction delegateInteraction) {
+            this._delegateInteraction = delegateInteraction;
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Integer> frobnicate() {
+            return reactor.core.publisher.Mono.fromSupplier(() -> {
+                    try {
+                        return _delegateInteraction.frobnicate();
+                    } catch (Throwable _e) {
+                        throw reactor.core.Exceptions.propagate(_e);
+                    }
+                }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Integer> frobnicate(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<ResponseWrapper<Integer>> frobnicateWrapper(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Void> ping() {
+            return reactor.core.publisher.Mono.<Void>fromRunnable(() -> {
+                    try {
+                        _delegateInteraction.ping();
+                    } catch (Throwable _e) {
+                        throw reactor.core.Exceptions.propagate(_e);
+                    }
+                }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Void> ping(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<ResponseWrapper<Void>> pingWrapper(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Flux<Boolean> truthify() {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public void dispose() {}
+    }
+
+    public MyInteraction createMyInteraction() {
+        return new MyInteractionImpl(_delegate.createMyInteraction());
+    }
+
+    public class MyInteractionFastImpl implements MyInteractionFast {
+        private MyService.MyInteractionFast _delegateInteraction;
+
+        MyInteractionFastImpl(MyService.MyInteractionFast delegateInteraction) {
+            this._delegateInteraction = delegateInteraction;
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Integer> frobnicate() {
+            return reactor.core.publisher.Mono.fromSupplier(() -> {
+                    try {
+                        return _delegateInteraction.frobnicate();
+                    } catch (Throwable _e) {
+                        throw reactor.core.Exceptions.propagate(_e);
+                    }
+                }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Integer> frobnicate(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<ResponseWrapper<Integer>> frobnicateWrapper(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Void> ping() {
+            return reactor.core.publisher.Mono.<Void>fromRunnable(() -> {
+                    try {
+                        _delegateInteraction.ping();
+                    } catch (Throwable _e) {
+                        throw reactor.core.Exceptions.propagate(_e);
+                    }
+                }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Void> ping(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<ResponseWrapper<Void>> pingWrapper(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Flux<Boolean> truthify() {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public void dispose() {}
+    }
+
+    public MyInteractionFast createMyInteractionFast() {
+        return new MyInteractionFastImpl(_delegate.createMyInteractionFast());
+    }
+
+    public class SerialInteractionImpl implements SerialInteraction {
+        private MyService.SerialInteraction _delegateInteraction;
+
+        SerialInteractionImpl(MyService.SerialInteraction delegateInteraction) {
+            this._delegateInteraction = delegateInteraction;
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Void> frobnicate() {
+            return reactor.core.publisher.Mono.<Void>fromRunnable(() -> {
+                    try {
+                        _delegateInteraction.frobnicate();
+                    } catch (Throwable _e) {
+                        throw reactor.core.Exceptions.propagate(_e);
+                    }
+                }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<Void> frobnicate(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public reactor.core.publisher.Mono<ResponseWrapper<Void>> frobnicateWrapper(RpcOptions rpcOptions) {
+            throw new UnsupportedOperationException();
+        }
+
+        @java.lang.Override
+        public void dispose() {}
+    }
+
+    public SerialInteraction createSerialInteraction() {
+        return new SerialInteractionImpl(_delegate.createSerialInteraction());
+    }
 }

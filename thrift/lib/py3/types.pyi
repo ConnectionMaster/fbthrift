@@ -15,6 +15,7 @@
 import enum
 from typing import (
     Any,
+    Iterable,
     Iterator,
     Mapping,
     Optional,
@@ -43,10 +44,14 @@ class HasIsSet(Protocol[_T]):
 class StructMeta(type):
     @staticmethod
     def isset(struct: HasIsSet[_T]) -> _T: ...
+    @staticmethod
+    def update_nested_field(obj: _T, path_to_values: Mapping[str, Any]) -> _T: ...
 
-class Struct(metaclass=StructMeta):
+class Struct(Iterable[Tuple[str, Any]], metaclass=StructMeta):
     def __copy__(self: _T) -> _T: ...
     def __repr__(self) -> str: ...
+    # pyre-ignore[3]: it can be anything
+    def __iter__(self) -> Iterator[Tuple[str, Any]]: ...
 
 class Union(Struct):
     # pyre-ignore[4]: it can be anything

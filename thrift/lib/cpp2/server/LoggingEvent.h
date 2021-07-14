@@ -49,22 +49,20 @@ class ThriftServer;
 class Cpp2Worker;
 class Cpp2ConnContext;
 
+namespace instrumentation {
+class ServerTracker;
+} // namespace instrumentation
+
 class LoggingSampler {
  public:
   using SamplingRate = int64_t;
   explicit LoggingSampler(SamplingRate samplingRate)
       : samplingRate_{samplingRate}, isSampled_{shouldSample(samplingRate)} {}
 
-  SamplingRate getSamplingRate() const {
-    return samplingRate_;
-  }
+  SamplingRate getSamplingRate() const { return samplingRate_; }
 
-  bool isSampled() const {
-    return isSampled_;
-  }
-  explicit operator bool() const {
-    return isSampled();
-  }
+  bool isSampled() const { return isSampled_; }
+  explicit operator bool() const { return isSampled(); }
 
   static bool shouldSample(SamplingRate);
 
@@ -93,8 +91,7 @@ class ConnectionEventHandler : public LoggingEventHandler {
   virtual ~ConnectionEventHandler() {}
 
   virtual void log(
-      const ConnectionLoggingContext&,
-      DynamicFieldsCallback = {}) {}
+      const ConnectionLoggingContext&, DynamicFieldsCallback = {}) {}
 
   virtual void logSampled(
       const ConnectionLoggingContext&,
@@ -116,6 +113,12 @@ class ApplicationEventHandler : public LoggingEventHandler {
   virtual ~ApplicationEventHandler() {}
 };
 
+class ServerTrackerHandler {
+ public:
+  virtual void log(const instrumentation::ServerTracker&) {}
+  virtual ~ServerTrackerHandler() {}
+};
+
 class LoggingEventRegistry {
  public:
   virtual ServerEventHandler& getServerEventHandler(
@@ -124,6 +127,9 @@ class LoggingEventRegistry {
       std::string_view eventKey) const = 0;
   virtual ApplicationEventHandler& getApplicationEventHandler(
       std::string_view eventKey) const = 0;
+  virtual ServerTrackerHandler& getServerTrackerHandler(
+      std::string_view trackerKey) const = 0;
+
   virtual ~LoggingEventRegistry() {}
 };
 

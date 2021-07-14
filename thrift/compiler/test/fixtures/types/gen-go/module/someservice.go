@@ -281,6 +281,11 @@ type someServiceProcessorBounceMap struct {
   handler SomeService
 }
 
+func (p *SomeServiceBounceMapResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *someServiceProcessorBounceMap) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := SomeServiceBounceMapArgs{}
   if err := args.Read(iprot); err != nil {
@@ -329,6 +334,11 @@ func (p *someServiceProcessorBounceMap) Run(argStruct thrift.Struct) (thrift.Wri
 
 type someServiceProcessorBinaryKeyedMap struct {
   handler SomeService
+}
+
+func (p *SomeServiceBinaryKeyedMapResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *someServiceProcessorBinaryKeyedMap) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -525,7 +535,7 @@ func (p *SomeServiceBounceMapArgs) String() string {
 //  - Success
 type SomeServiceBounceMapResult struct {
   thrift.IResponse
-  Success include0.SomeMap `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success include0.SomeMap `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewSomeServiceBounceMapResult() *SomeServiceBounceMapResult {
@@ -806,7 +816,7 @@ func (p *SomeServiceBinaryKeyedMapArgs) String() string {
 //  - Success
 type SomeServiceBinaryKeyedMapResult struct {
   thrift.IResponse
-  Success map[string]int64 `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success map[string]int64 `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewSomeServiceBinaryKeyedMapResult() *SomeServiceBinaryKeyedMapResult {

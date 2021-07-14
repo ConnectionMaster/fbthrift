@@ -54,6 +54,13 @@ class BasicTypes;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class BasicTypes final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -75,7 +82,8 @@ class BasicTypes final  {
       first(0),
       second(0),
       third(0),
-      isTrue(0) {}
+      isTrue(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   BasicTypes(apache::thrift::FragileConstructor, ::std::int32_t first__arg, ::std::int32_t second__arg, ::std::int64_t third__arg, bool isTrue__arg);
@@ -98,31 +106,18 @@ class BasicTypes final  {
  private:
   bool isTrue;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool second;
     bool third;
     bool isTrue;
   } __isset = {};
-  bool operator==(const BasicTypes& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const BasicTypes& __x, const BasicTypes& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const BasicTypes& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const BasicTypes& __x, const BasicTypes& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const BasicTypes& __x, const BasicTypes& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const BasicTypes& __x, const BasicTypes& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const BasicTypes&) const;
+  bool operator<(const BasicTypes&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::required_field_ref<const T&> first_ref() const& {
@@ -208,6 +203,7 @@ class BasicTypes final  {
     return first;
   }
 
+  [[deprecated("Use `FOO.first_ref() = BAR;` instead of `FOO.set_first(BAR);`")]]
   ::std::int32_t& set_first(::std::int32_t first_) {
     first = first_;
     return first;
@@ -222,6 +218,7 @@ class BasicTypes final  {
   }
   ::std::int32_t* get_second() && = delete;
 
+  [[deprecated("Use `FOO.second_ref() = BAR;` instead of `FOO.set_second(BAR);`")]]
   ::std::int32_t& set_second(::std::int32_t second_) {
     second = second_;
     __isset.second = true;
@@ -237,6 +234,7 @@ class BasicTypes final  {
   }
   ::std::int64_t* get_third() && = delete;
 
+  [[deprecated("Use `FOO.third_ref() = BAR;` instead of `FOO.set_third(BAR);`")]]
   ::std::int64_t& set_third(::std::int64_t third_) {
     third = third_;
     __isset.third = true;
@@ -247,6 +245,7 @@ class BasicTypes final  {
     return isTrue;
   }
 
+  [[deprecated("Use `FOO.isTrue_ref() = BAR;` instead of `FOO.set_isTrue(BAR);`")]]
   bool& set_isTrue(bool isTrue_) {
     isTrue = isTrue_;
     __isset.isTrue = true;
@@ -266,7 +265,7 @@ class BasicTypes final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< BasicTypes >;
+  friend class ::apache::thrift::Cpp2Ops<BasicTypes>;
   friend void swap(BasicTypes& a, BasicTypes& b);
 };
 

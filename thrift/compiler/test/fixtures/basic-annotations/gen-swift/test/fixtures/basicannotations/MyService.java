@@ -10,7 +10,7 @@ package test.fixtures.basicannotations;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.codec.ThriftField.Requiredness;
 import com.facebook.swift.service.*;
-import com.facebook.swift.transport.client.*;
+import com.facebook.thrift.client.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.util.*;
@@ -245,9 +245,8 @@ public interface MyService extends java.io.Closeable {
     }
 
     @com.facebook.swift.service.ThriftService("MyService")
-    interface Reactive extends Closeable {
-        @java.lang.Override void close();
-
+    interface Reactive extends reactor.core.Disposable {
+        @ThriftMethod(value = "ping")
         reactor.core.publisher.Mono<Void> ping();
 
         default reactor.core.publisher.Mono<Void> ping(RpcOptions rpcOptions) {
@@ -258,6 +257,7 @@ public interface MyService extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "getRandomData")
         reactor.core.publisher.Mono<String> getRandomData();
 
         default reactor.core.publisher.Mono<String> getRandomData(RpcOptions rpcOptions) {
@@ -268,6 +268,7 @@ public interface MyService extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "hasDataById")
         reactor.core.publisher.Mono<Boolean> hasDataById(final long id);
 
         default reactor.core.publisher.Mono<Boolean> hasDataById(final long id, RpcOptions rpcOptions) {
@@ -278,6 +279,7 @@ public interface MyService extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "getDataById")
         reactor.core.publisher.Mono<String> getDataById(final long id);
 
         default reactor.core.publisher.Mono<String> getDataById(final long id, RpcOptions rpcOptions) {
@@ -288,6 +290,7 @@ public interface MyService extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "putDataById")
         reactor.core.publisher.Mono<Void> putDataById(final long id, final String data);
 
         default reactor.core.publisher.Mono<Void> putDataById(final long id, final String data, RpcOptions rpcOptions) {
@@ -298,6 +301,8 @@ public interface MyService extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "lobDataById",
+                  oneway = true)
         reactor.core.publisher.Mono<Void> lobDataById(final long id, final String data);
 
         default reactor.core.publisher.Mono<Void> lobDataById(final long id, final String data, RpcOptions rpcOptions) {
@@ -308,6 +313,7 @@ public interface MyService extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "doNothing")
         reactor.core.publisher.Mono<Void> doNothing();
 
         default reactor.core.publisher.Mono<Void> doNothing(RpcOptions rpcOptions) {

@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -39,7 +39,7 @@ from thrift.py3.common cimport (
 )
 from folly.optional cimport cOptional as __cOptional
 
-cimport module.types_fields as __fbthrift_types_fields
+cimport module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -129,10 +129,6 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         const string& get_stringData() const
         string& set_stringData(const string&)
 
-    cdef cppclass cVal__isset "::cpp2::Val::__isset":
-        bint strVal
-        bint intVal
-        bint typedefValue
 
     cdef cppclass cVal "::cpp2::Val":
         cVal() except +
@@ -149,7 +145,6 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         string strVal
         cint32_t intVal
         cmap[cint16_t,string] typedefValue
-        cVal__isset __isset
 
     cdef enum cValUnion__type "::cpp2::ValUnion::Type":
         cValUnion__type___EMPTY__ "::cpp2::ValUnion::Type::__EMPTY__",
@@ -191,8 +186,6 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         const string& get_thingTwo() const
         string& set_thingTwo(const string&)
 
-    cdef cppclass cNonCopyableStruct__isset "::cpp2::NonCopyableStruct::__isset":
-        bint num
 
     cdef cppclass cNonCopyableStruct "::cpp2::NonCopyableStruct":
         cNonCopyableStruct() except +
@@ -204,7 +197,6 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         bint operator>=(cNonCopyableStruct&)
         __field_ref[cint64_t] num_ref()
         cint64_t num
-        cNonCopyableStruct__isset __isset
 
     cdef enum cNonCopyableUnion__type "::cpp2::NonCopyableUnion::Type":
         cNonCopyableUnion__type___EMPTY__ "::cpp2::NonCopyableUnion::Type::__EMPTY__",
@@ -297,7 +289,7 @@ cdef class DataUnion(thrift.py3.types.Union):
 
 cdef class Val(thrift.py3.types.Struct):
     cdef shared_ptr[cVal] _cpp_obj
-    cdef __fbthrift_types_fields.__Val_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Val_FieldsSetter _fields_setter
     cdef Map__i16_string __fbthrift_cached_typedefValue
 
     @staticmethod
@@ -351,7 +343,7 @@ cdef class VirtualComplexUnion(thrift.py3.types.Union):
 
 cdef class NonCopyableStruct(thrift.py3.types.Struct):
     cdef shared_ptr[cNonCopyableStruct] _cpp_obj
-    cdef __fbthrift_types_fields.__NonCopyableStruct_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__NonCopyableStruct_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cNonCopyableStruct])

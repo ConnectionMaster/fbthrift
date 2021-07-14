@@ -18,19 +18,55 @@ public class MyServiceReactiveAsyncWrapper
     this._delegate = _delegate;
   }
 
+  public MyServiceReactiveAsyncWrapper(org.apache.thrift.ProtocolId _protocolId, reactor.core.publisher.Mono<? extends com.facebook.thrift.client.RpcClient> _rpcClient, Map<String, String> _headers, Map<String, String> _persistentHeaders) {
+    this(new MyServiceReactiveClient(_protocolId, _rpcClient, _headers, _persistentHeaders));
+  }
+
   @java.lang.Override
   public void close() {
-    _delegate.close();
+    _delegate.dispose();
   }
 
   @java.lang.Override
   public com.google.common.util.concurrent.ListenableFuture<Void> query(final test.fixtures.includes.MyStruct s, final test.fixtures.includes.includes.Included i) {
-      return com.facebook.swift.transport.util.FutureUtil.toListenableFuture(_delegate.query(s, i));
+      return com.facebook.thrift.util.FutureUtil.toListenableFuture(_delegate.query(s, i));
+  }
+
+  @java.lang.Override
+  public com.google.common.util.concurrent.ListenableFuture<Void> query(
+    final test.fixtures.includes.MyStruct s,
+    final test.fixtures.includes.includes.Included i,
+    com.facebook.thrift.client.RpcOptions rpcOptions) {
+      return com.facebook.thrift.util.FutureUtil.toListenableFuture(_delegate.query(s,i, rpcOptions));
+  }
+
+  @java.lang.Override
+  public com.google.common.util.concurrent.ListenableFuture<com.facebook.thrift.client.ResponseWrapper<Void>> queryWrapper(
+    final test.fixtures.includes.MyStruct s,
+    final test.fixtures.includes.includes.Included i,
+    com.facebook.thrift.client.RpcOptions rpcOptions) {
+    return com.facebook.thrift.util.FutureUtil.toListenableFuture(_delegate.queryWrapper(s,i, rpcOptions));
   }
 
   @java.lang.Override
   public com.google.common.util.concurrent.ListenableFuture<Void> hasArgDocs(final test.fixtures.includes.MyStruct s, final test.fixtures.includes.includes.Included i) {
-      return com.facebook.swift.transport.util.FutureUtil.toListenableFuture(_delegate.hasArgDocs(s, i));
+      return com.facebook.thrift.util.FutureUtil.toListenableFuture(_delegate.hasArgDocs(s, i));
+  }
+
+  @java.lang.Override
+  public com.google.common.util.concurrent.ListenableFuture<Void> hasArgDocs(
+    final test.fixtures.includes.MyStruct s,
+    final test.fixtures.includes.includes.Included i,
+    com.facebook.thrift.client.RpcOptions rpcOptions) {
+      return com.facebook.thrift.util.FutureUtil.toListenableFuture(_delegate.hasArgDocs(s,i, rpcOptions));
+  }
+
+  @java.lang.Override
+  public com.google.common.util.concurrent.ListenableFuture<com.facebook.thrift.client.ResponseWrapper<Void>> hasArgDocsWrapper(
+    final test.fixtures.includes.MyStruct s,
+    final test.fixtures.includes.includes.Included i,
+    com.facebook.thrift.client.RpcOptions rpcOptions) {
+    return com.facebook.thrift.util.FutureUtil.toListenableFuture(_delegate.hasArgDocsWrapper(s,i, rpcOptions));
   }
 
 }

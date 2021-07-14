@@ -21,7 +21,7 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 
 @SwiftGenerated
 @ThriftUnion("MyUnion")
-public final class MyUnion {
+public final class MyUnion implements com.facebook.thrift.payload.ThriftSerializable {
     private static final TStruct STRUCT_DESC = new TStruct("MyUnion");
     private static final Map<String, Integer> NAMES_TO_IDS = new HashMap();
     private static final Map<Integer, TField> FIELD_METADATA = new HashMap<>();
@@ -162,10 +162,10 @@ public final class MyUnion {
     }
 
     public void write0(TProtocol oprot) throws TException {
-      oprot.writeStructBegin(STRUCT_DESC);
       if (this.id != 0 && this.value == null ){
-         throw new TProtocolException("Cannot write a Union with marked-as-set but null value!");
+         return;
       }
+      oprot.writeStructBegin(STRUCT_DESC);
       switch (this.id) {
       case _ANINTEGER: {
         oprot.writeFieldBegin(AN_INTEGER_FIELD_DESC);
@@ -186,6 +186,11 @@ public final class MyUnion {
       }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
+    }
+    
+    
+    public static com.facebook.thrift.payload.Reader<MyUnion> asReader() {
+      return MyUnion::read0;
     }
     
     public static MyUnion read0(TProtocol oprot) throws TException {

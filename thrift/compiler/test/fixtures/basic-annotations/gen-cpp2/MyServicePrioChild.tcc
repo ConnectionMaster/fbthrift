@@ -25,6 +25,10 @@ void MyServicePrioChildAsyncProcessor::setUpAndProcess_pang(apache::thrift::Resp
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void MyServicePrioChildAsyncProcessor::process_pang(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -34,12 +38,9 @@ void MyServicePrioChildAsyncProcessor::process_pang(apache::thrift::ResponseChan
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "pang");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "pang");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<void>>(std::move(req), std::move(ctxStack), return_pang<ProtocolIn_,ProtocolOut_>, throw_wrapped_pang<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -47,10 +48,10 @@ void MyServicePrioChildAsyncProcessor::process_pang(apache::thrift::ResponseChan
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue MyServicePrioChildAsyncProcessor::return_pang(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
+apache::thrift::LegacySerializedResponse MyServicePrioChildAsyncProcessor::return_pang(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
   ProtocolOut_ prot;
   MyServicePrioChild_pang_presult result;
-  return serializeResponse("pang", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("pang", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>

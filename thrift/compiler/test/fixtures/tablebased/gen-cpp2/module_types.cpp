@@ -122,7 +122,8 @@ THRIFT_IGNORE_ISSET_USE_WARNING_END
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset.fieldC = srcObj.__isset.fieldC;
 THRIFT_IGNORE_ISSET_USE_WARNING_END
-  if (srcObj.fieldD) fieldD = srcObj.fieldD->clone();
+  fieldD = ::apache::thrift::detail::st::copy_field<
+        ::apache::thrift::type_class::binary>(srcObj.fieldD);
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset.fieldD = srcObj.__isset.fieldD;
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -141,11 +142,32 @@ TrivialTypesStruct& TrivialTypesStruct::operator=(const TrivialTypesStruct& src)
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 TrivialTypesStruct::TrivialTypesStruct() :
       fieldA(0),
-      fieldE( ::test::fixtures::tablebased::ExampleEnum::ZERO) {}
+      fieldE( ::test::fixtures::tablebased::ExampleEnum::ZERO) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 TrivialTypesStruct::~TrivialTypesStruct() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+TrivialTypesStruct::TrivialTypesStruct(TrivialTypesStruct&& other) noexcept  :
+    fieldA(std::move(other.fieldA)),
+    fieldB(std::move(other.fieldB)),
+    fieldC(std::move(other.fieldC)),
+    fieldD(std::move(other.fieldD)),
+    fieldE(std::move(other.fieldE)),
+    __isset(other.__isset) {}
+TrivialTypesStruct& TrivialTypesStruct::operator=(FOLLY_MAYBE_UNUSED TrivialTypesStruct&& other) noexcept {
+    this->fieldA = std::move(other.fieldA);
+    this->fieldB = std::move(other.fieldB);
+    this->fieldC = std::move(other.fieldC);
+    this->fieldD = std::move(other.fieldD);
+    this->fieldE = std::move(other.fieldE);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 TrivialTypesStruct::TrivialTypesStruct(apache::thrift::FragileConstructor, ::std::int32_t fieldA__arg, ::std::string fieldB__arg, ::std::string fieldC__arg, ::test::fixtures::tablebased::IOBufPtr fieldD__arg, ::test::fixtures::tablebased::ExampleEnum fieldE__arg) :
@@ -161,13 +183,14 @@ TrivialTypesStruct::TrivialTypesStruct(apache::thrift::FragileConstructor, ::std
   __isset.fieldE = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void TrivialTypesStruct::__clear() {
   // clear all fields
-  fieldA = 0;
-  fieldB = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  fieldC = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  fieldD = apache::thrift::StringTraits< std::unique_ptr<folly::IOBuf>>::fromStringLiteral("");
-  fieldE =  ::test::fixtures::tablebased::ExampleEnum::ZERO;
+  this->fieldA = 0;
+  this->fieldB = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->fieldC = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->fieldD = apache::thrift::StringTraits<std::unique_ptr<folly::IOBuf>>::fromStringLiteral("");
+  this->fieldE =  ::test::fixtures::tablebased::ExampleEnum::ZERO;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -316,11 +339,42 @@ constexpr ::apache::thrift::detail::StructInfoN<5> __fbthrift_struct_info_Trivia
 namespace test { namespace fixtures { namespace tablebased {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
-ContainerStruct::ContainerStruct() {}
+ContainerStruct::ContainerStruct(const ContainerStruct&) = default;
+ContainerStruct& ContainerStruct::operator=(const ContainerStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+ContainerStruct::ContainerStruct() {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 ContainerStruct::~ContainerStruct() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+ContainerStruct::ContainerStruct(ContainerStruct&& other) noexcept  :
+    fieldA(std::move(other.fieldA)),
+    fieldB(std::move(other.fieldB)),
+    fieldC(std::move(other.fieldC)),
+    fieldD(std::move(other.fieldD)),
+    fieldE(std::move(other.fieldE)),
+    fieldF(std::move(other.fieldF)),
+    fieldG(std::move(other.fieldG)),
+    fieldH(std::move(other.fieldH)),
+    __isset(other.__isset) {}
+ContainerStruct& ContainerStruct::operator=(FOLLY_MAYBE_UNUSED ContainerStruct&& other) noexcept {
+    this->fieldA = std::move(other.fieldA);
+    this->fieldB = std::move(other.fieldB);
+    this->fieldC = std::move(other.fieldC);
+    this->fieldD = std::move(other.fieldD);
+    this->fieldE = std::move(other.fieldE);
+    this->fieldF = std::move(other.fieldF);
+    this->fieldG = std::move(other.fieldG);
+    this->fieldH = std::move(other.fieldH);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 ContainerStruct::ContainerStruct(apache::thrift::FragileConstructor, ::std::vector<::std::int32_t> fieldA__arg, std::list<::std::int32_t> fieldB__arg, std::deque<::std::int32_t> fieldC__arg, folly::fbvector<::std::int32_t> fieldD__arg, folly::small_vector<::std::int32_t> fieldE__arg, folly::sorted_vector_set<::std::int32_t> fieldF__arg, folly::sorted_vector_map<::std::int32_t, ::std::string> fieldG__arg, ::std::vector<::test::fixtures::tablebased::TrivialTypesStruct> fieldH__arg) :
@@ -342,16 +396,17 @@ ContainerStruct::ContainerStruct(apache::thrift::FragileConstructor, ::std::vect
   __isset.fieldH = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void ContainerStruct::__clear() {
   // clear all fields
-  fieldA.clear();
-  fieldB.clear();
-  fieldC.clear();
-  fieldD.clear();
-  fieldE.clear();
-  fieldF.clear();
-  fieldG.clear();
-  fieldH.clear();
+  this->fieldA.clear();
+  this->fieldB.clear();
+  this->fieldC.clear();
+  this->fieldD.clear();
+  this->fieldE.clear();
+  this->fieldF.clear();
+  this->fieldG.clear();
+  this->fieldH.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

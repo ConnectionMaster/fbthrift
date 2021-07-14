@@ -652,6 +652,13 @@ typedef ::std::map<::std::int32_t, ::std::int64_t> FMap;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStructFloatFieldThrowExp final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -672,19 +679,19 @@ class MyStructFloatFieldThrowExp final  {
   MyStructFloatFieldThrowExp() :
       myLongField(0),
       MyByteField(0),
-      myFloatField(0) {}
+      myFloatField(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStructFloatFieldThrowExp(apache::thrift::FragileConstructor, ::std::int64_t myLongField__arg, ::std::int8_t MyByteField__arg, ::std::string myStringField__arg, float myFloatField__arg);
 
-  MyStructFloatFieldThrowExp(MyStructFloatFieldThrowExp&&) = default;
+  MyStructFloatFieldThrowExp(MyStructFloatFieldThrowExp&&) noexcept;
 
-  MyStructFloatFieldThrowExp(const MyStructFloatFieldThrowExp&) = default;
+  MyStructFloatFieldThrowExp(const MyStructFloatFieldThrowExp& src);
 
 
-  MyStructFloatFieldThrowExp& operator=(MyStructFloatFieldThrowExp&&) = default;
-
-  MyStructFloatFieldThrowExp& operator=(const MyStructFloatFieldThrowExp&) = default;
+  MyStructFloatFieldThrowExp& operator=(MyStructFloatFieldThrowExp&&) noexcept;
+  MyStructFloatFieldThrowExp& operator=(const MyStructFloatFieldThrowExp& src);
   void __clear();
  private:
   ::std::int64_t myLongField;
@@ -695,7 +702,7 @@ class MyStructFloatFieldThrowExp final  {
  private:
   float myFloatField;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool myLongField;
@@ -703,24 +710,11 @@ class MyStructFloatFieldThrowExp final  {
     bool myStringField;
     bool myFloatField;
   } __isset = {};
-  bool operator==(const MyStructFloatFieldThrowExp& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStructFloatFieldThrowExp& __x, const MyStructFloatFieldThrowExp& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStructFloatFieldThrowExp& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStructFloatFieldThrowExp& __x, const MyStructFloatFieldThrowExp& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStructFloatFieldThrowExp& __x, const MyStructFloatFieldThrowExp& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStructFloatFieldThrowExp& __x, const MyStructFloatFieldThrowExp& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStructFloatFieldThrowExp&) const;
+  bool operator<(const MyStructFloatFieldThrowExp&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> myLongField_ref() const& {
@@ -806,6 +800,7 @@ class MyStructFloatFieldThrowExp final  {
     return myLongField;
   }
 
+  [[deprecated("Use `FOO.myLongField_ref() = BAR;` instead of `FOO.set_myLongField(BAR);`")]]
   ::std::int64_t& set_myLongField(::std::int64_t myLongField_) {
     myLongField = myLongField_;
     __isset.myLongField = true;
@@ -816,6 +811,7 @@ class MyStructFloatFieldThrowExp final  {
     return MyByteField;
   }
 
+  [[deprecated("Use `FOO.MyByteField_ref() = BAR;` instead of `FOO.set_MyByteField(BAR);`")]]
   ::std::int8_t& set_MyByteField(::std::int8_t MyByteField_) {
     MyByteField = MyByteField_;
     __isset.MyByteField = true;
@@ -831,6 +827,7 @@ class MyStructFloatFieldThrowExp final  {
   }
 
   template <typename T_MyStructFloatFieldThrowExp_myStringField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.myStringField_ref() = BAR;` instead of `FOO.set_myStringField(BAR);`")]]
   ::std::string& set_myStringField(T_MyStructFloatFieldThrowExp_myStringField_struct_setter&& myStringField_) {
     myStringField = std::forward<T_MyStructFloatFieldThrowExp_myStringField_struct_setter>(myStringField_);
     __isset.myStringField = true;
@@ -841,6 +838,7 @@ class MyStructFloatFieldThrowExp final  {
     return myFloatField;
   }
 
+  [[deprecated("Use `FOO.myFloatField_ref() = BAR;` instead of `FOO.set_myFloatField(BAR);`")]]
   float& set_myFloatField(float myFloatField_) {
     myFloatField = myFloatField_;
     __isset.myFloatField = true;
@@ -860,7 +858,7 @@ class MyStructFloatFieldThrowExp final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStructFloatFieldThrowExp >;
+  friend class ::apache::thrift::Cpp2Ops<MyStructFloatFieldThrowExp>;
   friend void swap(MyStructFloatFieldThrowExp& a, MyStructFloatFieldThrowExp& b);
 };
 
@@ -873,6 +871,13 @@ uint32_t MyStructFloatFieldThrowExp::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStructMapFloatThrowExp final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -891,49 +896,36 @@ class MyStructMapFloatThrowExp final  {
  public:
 
   MyStructMapFloatThrowExp() :
-      myLongField(0) {}
+      myLongField(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStructMapFloatThrowExp(apache::thrift::FragileConstructor, ::std::int64_t myLongField__arg, ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::floatTypedef>>> mapListOfFloats__arg);
 
-  MyStructMapFloatThrowExp(MyStructMapFloatThrowExp&&) = default;
+  MyStructMapFloatThrowExp(MyStructMapFloatThrowExp&&) noexcept;
 
-  MyStructMapFloatThrowExp(const MyStructMapFloatThrowExp&) = default;
+  MyStructMapFloatThrowExp(const MyStructMapFloatThrowExp& src);
 
 
-  MyStructMapFloatThrowExp& operator=(MyStructMapFloatThrowExp&&) = default;
-
-  MyStructMapFloatThrowExp& operator=(const MyStructMapFloatThrowExp&) = default;
+  MyStructMapFloatThrowExp& operator=(MyStructMapFloatThrowExp&&) noexcept;
+  MyStructMapFloatThrowExp& operator=(const MyStructMapFloatThrowExp& src);
   void __clear();
  private:
   ::std::int64_t myLongField;
  private:
   ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::floatTypedef>>> mapListOfFloats;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool myLongField;
     bool mapListOfFloats;
   } __isset = {};
-  bool operator==(const MyStructMapFloatThrowExp& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStructMapFloatThrowExp& __x, const MyStructMapFloatThrowExp& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStructMapFloatThrowExp& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStructMapFloatThrowExp& __x, const MyStructMapFloatThrowExp& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStructMapFloatThrowExp& __x, const MyStructMapFloatThrowExp& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStructMapFloatThrowExp& __x, const MyStructMapFloatThrowExp& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStructMapFloatThrowExp&) const;
+  bool operator<(const MyStructMapFloatThrowExp&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> myLongField_ref() const& {
@@ -979,6 +971,7 @@ class MyStructMapFloatThrowExp final  {
     return myLongField;
   }
 
+  [[deprecated("Use `FOO.myLongField_ref() = BAR;` instead of `FOO.set_myLongField(BAR);`")]]
   ::std::int64_t& set_myLongField(::std::int64_t myLongField_) {
     myLongField = myLongField_;
     __isset.myLongField = true;
@@ -988,6 +981,7 @@ class MyStructMapFloatThrowExp final  {
   ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::floatTypedef>>> get_mapListOfFloats() &&;
 
   template <typename T_MyStructMapFloatThrowExp_mapListOfFloats_struct_setter = ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::floatTypedef>>>>
+  [[deprecated("Use `FOO.mapListOfFloats_ref() = BAR;` instead of `FOO.set_mapListOfFloats(BAR);`")]]
   ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::floatTypedef>>>& set_mapListOfFloats(T_MyStructMapFloatThrowExp_mapListOfFloats_struct_setter&& mapListOfFloats_) {
     mapListOfFloats = std::forward<T_MyStructMapFloatThrowExp_mapListOfFloats_struct_setter>(mapListOfFloats_);
     __isset.mapListOfFloats = true;
@@ -1007,7 +1001,7 @@ class MyStructMapFloatThrowExp final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStructMapFloatThrowExp >;
+  friend class ::apache::thrift::Cpp2Ops<MyStructMapFloatThrowExp>;
   friend void swap(MyStructMapFloatThrowExp& a, MyStructMapFloatThrowExp& b);
 };
 
@@ -1020,6 +1014,13 @@ uint32_t MyStructMapFloatThrowExp::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyDataItem final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1037,7 +1038,8 @@ class MyDataItem final  {
 
  public:
 
-  MyDataItem() {}
+  MyDataItem() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyDataItem(apache::thrift::FragileConstructor);
@@ -1051,24 +1053,11 @@ class MyDataItem final  {
 
   MyDataItem& operator=(const MyDataItem&) = default;
   void __clear();
-  bool operator==(const MyDataItem& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyDataItem& __x, const MyDataItem& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyDataItem& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyDataItem& __x, const MyDataItem& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyDataItem& __x, const MyDataItem& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyDataItem& __x, const MyDataItem& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyDataItem&) const;
+  bool operator<(const MyDataItem&) const;
 
   template <class Protocol_>
   uint32_t read(Protocol_* iprot);
@@ -1083,7 +1072,7 @@ class MyDataItem final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyDataItem >;
+  friend class ::apache::thrift::Cpp2Ops<MyDataItem>;
   friend void swap(MyDataItem& a, MyDataItem& b);
 };
 
@@ -1096,6 +1085,13 @@ uint32_t MyDataItem::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1119,14 +1115,13 @@ class MyStruct final  {
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg, ::std::string MyStringField__arg, ::cpp2::MyDataItem MyDataField__arg, ::cpp2::MyEnum myEnum__arg, bool MyBoolField__arg, ::std::int8_t MyByteField__arg, ::std::int16_t MyShortField__arg, ::std::int64_t MyLongField__arg, double MyDoubleField__arg, ::std::vector<double> lDouble__arg, ::std::vector<::std::int16_t> lShort__arg, ::std::vector<::std::int32_t> lInteger__arg, ::std::vector<::std::int64_t> lLong__arg, ::std::vector<::std::string> lString__arg, ::std::vector<bool> lBool__arg, ::std::vector<::std::int8_t> lByte__arg, ::std::map<::std::int16_t, ::std::string> mShortString__arg, ::std::map<::std::int32_t, ::std::string> mIntegerString__arg, ::std::map<::std::string, ::cpp2::MyStruct> mStringMyStruct__arg, ::std::map<::std::string, bool> mStringBool__arg, ::std::map<::std::int32_t, ::std::int32_t> mIntegerInteger__arg, ::std::map<::std::int32_t, bool> mIntegerBool__arg, ::std::set<::std::int16_t> sShort__arg, ::std::set<::cpp2::MyStruct> sMyStruct__arg, ::std::set<::std::int64_t> sLong__arg, ::std::set<::std::string> sString__arg, ::std::set<::std::int8_t> sByte__arg, ::std::map<::std::vector<::std::int32_t>, ::std::vector<::std::int32_t>> mListList__arg);
 
-  MyStruct(MyStruct&&) = default;
+  MyStruct(MyStruct&&) noexcept;
 
-  MyStruct(const MyStruct&) = default;
+  MyStruct(const MyStruct& src);
 
 
-  MyStruct& operator=(MyStruct&&) = default;
-
-  MyStruct& operator=(const MyStruct&) = default;
+  MyStruct& operator=(MyStruct&&) noexcept;
+  MyStruct& operator=(const MyStruct& src);
   void __clear();
 
   ~MyStruct();
@@ -1188,7 +1183,7 @@ class MyStruct final  {
  private:
   ::std::map<::std::vector<::std::int32_t>, ::std::vector<::std::int32_t>> mListList;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool MyIntField;
@@ -1220,24 +1215,11 @@ class MyStruct final  {
     bool sByte;
     bool mListList;
   } __isset = {};
-  bool operator==(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStruct& __x, const MyStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStruct&) const;
+  bool operator<(const MyStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> MyIntField_ref() const& {
@@ -1803,6 +1785,7 @@ class MyStruct final  {
     return MyIntField;
   }
 
+  [[deprecated("Use `FOO.MyIntField_ref() = BAR;` instead of `FOO.set_MyIntField(BAR);`")]]
   ::std::int64_t& set_MyIntField(::std::int64_t MyIntField_) {
     MyIntField = MyIntField_;
     __isset.MyIntField = true;
@@ -1818,6 +1801,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_MyStringField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.MyStringField_ref() = BAR;` instead of `FOO.set_MyStringField(BAR);`")]]
   ::std::string& set_MyStringField(T_MyStruct_MyStringField_struct_setter&& MyStringField_) {
     MyStringField = std::forward<T_MyStruct_MyStringField_struct_setter>(MyStringField_);
     __isset.MyStringField = true;
@@ -1827,6 +1811,7 @@ class MyStruct final  {
   ::cpp2::MyDataItem get_MyDataField() &&;
 
   template <typename T_MyStruct_MyDataField_struct_setter = ::cpp2::MyDataItem>
+  [[deprecated("Use `FOO.MyDataField_ref() = BAR;` instead of `FOO.set_MyDataField(BAR);`")]]
   ::cpp2::MyDataItem& set_MyDataField(T_MyStruct_MyDataField_struct_setter&& MyDataField_) {
     MyDataField = std::forward<T_MyStruct_MyDataField_struct_setter>(MyDataField_);
     __isset.MyDataField = true;
@@ -1837,6 +1822,7 @@ class MyStruct final  {
     return myEnum;
   }
 
+  [[deprecated("Use `FOO.myEnum_ref() = BAR;` instead of `FOO.set_myEnum(BAR);`")]]
   ::cpp2::MyEnum& set_myEnum(::cpp2::MyEnum myEnum_) {
     myEnum = myEnum_;
     __isset.myEnum = true;
@@ -1847,6 +1833,7 @@ class MyStruct final  {
     return MyBoolField;
   }
 
+  [[deprecated("Use `FOO.MyBoolField_ref() = BAR;` instead of `FOO.set_MyBoolField(BAR);`")]]
   bool& set_MyBoolField(bool MyBoolField_) {
     MyBoolField = MyBoolField_;
     __isset.MyBoolField = true;
@@ -1857,6 +1844,7 @@ class MyStruct final  {
     return MyByteField;
   }
 
+  [[deprecated("Use `FOO.MyByteField_ref() = BAR;` instead of `FOO.set_MyByteField(BAR);`")]]
   ::std::int8_t& set_MyByteField(::std::int8_t MyByteField_) {
     MyByteField = MyByteField_;
     __isset.MyByteField = true;
@@ -1867,6 +1855,7 @@ class MyStruct final  {
     return MyShortField;
   }
 
+  [[deprecated("Use `FOO.MyShortField_ref() = BAR;` instead of `FOO.set_MyShortField(BAR);`")]]
   ::std::int16_t& set_MyShortField(::std::int16_t MyShortField_) {
     MyShortField = MyShortField_;
     __isset.MyShortField = true;
@@ -1877,6 +1866,7 @@ class MyStruct final  {
     return MyLongField;
   }
 
+  [[deprecated("Use `FOO.MyLongField_ref() = BAR;` instead of `FOO.set_MyLongField(BAR);`")]]
   ::std::int64_t& set_MyLongField(::std::int64_t MyLongField_) {
     MyLongField = MyLongField_;
     __isset.MyLongField = true;
@@ -1887,6 +1877,7 @@ class MyStruct final  {
     return MyDoubleField;
   }
 
+  [[deprecated("Use `FOO.MyDoubleField_ref() = BAR;` instead of `FOO.set_MyDoubleField(BAR);`")]]
   double& set_MyDoubleField(double MyDoubleField_) {
     MyDoubleField = MyDoubleField_;
     __isset.MyDoubleField = true;
@@ -1896,6 +1887,7 @@ class MyStruct final  {
   ::std::vector<double> get_lDouble() &&;
 
   template <typename T_MyStruct_lDouble_struct_setter = ::std::vector<double>>
+  [[deprecated("Use `FOO.lDouble_ref() = BAR;` instead of `FOO.set_lDouble(BAR);`")]]
   ::std::vector<double>& set_lDouble(T_MyStruct_lDouble_struct_setter&& lDouble_) {
     lDouble = std::forward<T_MyStruct_lDouble_struct_setter>(lDouble_);
     __isset.lDouble = true;
@@ -1905,6 +1897,7 @@ class MyStruct final  {
   ::std::vector<::std::int16_t> get_lShort() &&;
 
   template <typename T_MyStruct_lShort_struct_setter = ::std::vector<::std::int16_t>>
+  [[deprecated("Use `FOO.lShort_ref() = BAR;` instead of `FOO.set_lShort(BAR);`")]]
   ::std::vector<::std::int16_t>& set_lShort(T_MyStruct_lShort_struct_setter&& lShort_) {
     lShort = std::forward<T_MyStruct_lShort_struct_setter>(lShort_);
     __isset.lShort = true;
@@ -1914,6 +1907,7 @@ class MyStruct final  {
   ::std::vector<::std::int32_t> get_lInteger() &&;
 
   template <typename T_MyStruct_lInteger_struct_setter = ::std::vector<::std::int32_t>>
+  [[deprecated("Use `FOO.lInteger_ref() = BAR;` instead of `FOO.set_lInteger(BAR);`")]]
   ::std::vector<::std::int32_t>& set_lInteger(T_MyStruct_lInteger_struct_setter&& lInteger_) {
     lInteger = std::forward<T_MyStruct_lInteger_struct_setter>(lInteger_);
     __isset.lInteger = true;
@@ -1923,6 +1917,7 @@ class MyStruct final  {
   ::std::vector<::std::int64_t> get_lLong() &&;
 
   template <typename T_MyStruct_lLong_struct_setter = ::std::vector<::std::int64_t>>
+  [[deprecated("Use `FOO.lLong_ref() = BAR;` instead of `FOO.set_lLong(BAR);`")]]
   ::std::vector<::std::int64_t>& set_lLong(T_MyStruct_lLong_struct_setter&& lLong_) {
     lLong = std::forward<T_MyStruct_lLong_struct_setter>(lLong_);
     __isset.lLong = true;
@@ -1932,6 +1927,7 @@ class MyStruct final  {
   ::std::vector<::std::string> get_lString() &&;
 
   template <typename T_MyStruct_lString_struct_setter = ::std::vector<::std::string>>
+  [[deprecated("Use `FOO.lString_ref() = BAR;` instead of `FOO.set_lString(BAR);`")]]
   ::std::vector<::std::string>& set_lString(T_MyStruct_lString_struct_setter&& lString_) {
     lString = std::forward<T_MyStruct_lString_struct_setter>(lString_);
     __isset.lString = true;
@@ -1941,6 +1937,7 @@ class MyStruct final  {
   ::std::vector<bool> get_lBool() &&;
 
   template <typename T_MyStruct_lBool_struct_setter = ::std::vector<bool>>
+  [[deprecated("Use `FOO.lBool_ref() = BAR;` instead of `FOO.set_lBool(BAR);`")]]
   ::std::vector<bool>& set_lBool(T_MyStruct_lBool_struct_setter&& lBool_) {
     lBool = std::forward<T_MyStruct_lBool_struct_setter>(lBool_);
     __isset.lBool = true;
@@ -1950,6 +1947,7 @@ class MyStruct final  {
   ::std::vector<::std::int8_t> get_lByte() &&;
 
   template <typename T_MyStruct_lByte_struct_setter = ::std::vector<::std::int8_t>>
+  [[deprecated("Use `FOO.lByte_ref() = BAR;` instead of `FOO.set_lByte(BAR);`")]]
   ::std::vector<::std::int8_t>& set_lByte(T_MyStruct_lByte_struct_setter&& lByte_) {
     lByte = std::forward<T_MyStruct_lByte_struct_setter>(lByte_);
     __isset.lByte = true;
@@ -1959,6 +1957,7 @@ class MyStruct final  {
   ::std::map<::std::int16_t, ::std::string> get_mShortString() &&;
 
   template <typename T_MyStruct_mShortString_struct_setter = ::std::map<::std::int16_t, ::std::string>>
+  [[deprecated("Use `FOO.mShortString_ref() = BAR;` instead of `FOO.set_mShortString(BAR);`")]]
   ::std::map<::std::int16_t, ::std::string>& set_mShortString(T_MyStruct_mShortString_struct_setter&& mShortString_) {
     mShortString = std::forward<T_MyStruct_mShortString_struct_setter>(mShortString_);
     __isset.mShortString = true;
@@ -1968,6 +1967,7 @@ class MyStruct final  {
   ::std::map<::std::int32_t, ::std::string> get_mIntegerString() &&;
 
   template <typename T_MyStruct_mIntegerString_struct_setter = ::std::map<::std::int32_t, ::std::string>>
+  [[deprecated("Use `FOO.mIntegerString_ref() = BAR;` instead of `FOO.set_mIntegerString(BAR);`")]]
   ::std::map<::std::int32_t, ::std::string>& set_mIntegerString(T_MyStruct_mIntegerString_struct_setter&& mIntegerString_) {
     mIntegerString = std::forward<T_MyStruct_mIntegerString_struct_setter>(mIntegerString_);
     __isset.mIntegerString = true;
@@ -1977,6 +1977,7 @@ class MyStruct final  {
   ::std::map<::std::string, ::cpp2::MyStruct> get_mStringMyStruct() &&;
 
   template <typename T_MyStruct_mStringMyStruct_struct_setter = ::std::map<::std::string, ::cpp2::MyStruct>>
+  [[deprecated("Use `FOO.mStringMyStruct_ref() = BAR;` instead of `FOO.set_mStringMyStruct(BAR);`")]]
   ::std::map<::std::string, ::cpp2::MyStruct>& set_mStringMyStruct(T_MyStruct_mStringMyStruct_struct_setter&& mStringMyStruct_) {
     mStringMyStruct = std::forward<T_MyStruct_mStringMyStruct_struct_setter>(mStringMyStruct_);
     __isset.mStringMyStruct = true;
@@ -1986,6 +1987,7 @@ class MyStruct final  {
   ::std::map<::std::string, bool> get_mStringBool() &&;
 
   template <typename T_MyStruct_mStringBool_struct_setter = ::std::map<::std::string, bool>>
+  [[deprecated("Use `FOO.mStringBool_ref() = BAR;` instead of `FOO.set_mStringBool(BAR);`")]]
   ::std::map<::std::string, bool>& set_mStringBool(T_MyStruct_mStringBool_struct_setter&& mStringBool_) {
     mStringBool = std::forward<T_MyStruct_mStringBool_struct_setter>(mStringBool_);
     __isset.mStringBool = true;
@@ -1995,6 +1997,7 @@ class MyStruct final  {
   ::std::map<::std::int32_t, ::std::int32_t> get_mIntegerInteger() &&;
 
   template <typename T_MyStruct_mIntegerInteger_struct_setter = ::std::map<::std::int32_t, ::std::int32_t>>
+  [[deprecated("Use `FOO.mIntegerInteger_ref() = BAR;` instead of `FOO.set_mIntegerInteger(BAR);`")]]
   ::std::map<::std::int32_t, ::std::int32_t>& set_mIntegerInteger(T_MyStruct_mIntegerInteger_struct_setter&& mIntegerInteger_) {
     mIntegerInteger = std::forward<T_MyStruct_mIntegerInteger_struct_setter>(mIntegerInteger_);
     __isset.mIntegerInteger = true;
@@ -2004,6 +2007,7 @@ class MyStruct final  {
   ::std::map<::std::int32_t, bool> get_mIntegerBool() &&;
 
   template <typename T_MyStruct_mIntegerBool_struct_setter = ::std::map<::std::int32_t, bool>>
+  [[deprecated("Use `FOO.mIntegerBool_ref() = BAR;` instead of `FOO.set_mIntegerBool(BAR);`")]]
   ::std::map<::std::int32_t, bool>& set_mIntegerBool(T_MyStruct_mIntegerBool_struct_setter&& mIntegerBool_) {
     mIntegerBool = std::forward<T_MyStruct_mIntegerBool_struct_setter>(mIntegerBool_);
     __isset.mIntegerBool = true;
@@ -2013,6 +2017,7 @@ class MyStruct final  {
   ::std::set<::std::int16_t> get_sShort() &&;
 
   template <typename T_MyStruct_sShort_struct_setter = ::std::set<::std::int16_t>>
+  [[deprecated("Use `FOO.sShort_ref() = BAR;` instead of `FOO.set_sShort(BAR);`")]]
   ::std::set<::std::int16_t>& set_sShort(T_MyStruct_sShort_struct_setter&& sShort_) {
     sShort = std::forward<T_MyStruct_sShort_struct_setter>(sShort_);
     __isset.sShort = true;
@@ -2022,6 +2027,7 @@ class MyStruct final  {
   ::std::set<::cpp2::MyStruct> get_sMyStruct() &&;
 
   template <typename T_MyStruct_sMyStruct_struct_setter = ::std::set<::cpp2::MyStruct>>
+  [[deprecated("Use `FOO.sMyStruct_ref() = BAR;` instead of `FOO.set_sMyStruct(BAR);`")]]
   ::std::set<::cpp2::MyStruct>& set_sMyStruct(T_MyStruct_sMyStruct_struct_setter&& sMyStruct_) {
     sMyStruct = std::forward<T_MyStruct_sMyStruct_struct_setter>(sMyStruct_);
     __isset.sMyStruct = true;
@@ -2031,6 +2037,7 @@ class MyStruct final  {
   ::std::set<::std::int64_t> get_sLong() &&;
 
   template <typename T_MyStruct_sLong_struct_setter = ::std::set<::std::int64_t>>
+  [[deprecated("Use `FOO.sLong_ref() = BAR;` instead of `FOO.set_sLong(BAR);`")]]
   ::std::set<::std::int64_t>& set_sLong(T_MyStruct_sLong_struct_setter&& sLong_) {
     sLong = std::forward<T_MyStruct_sLong_struct_setter>(sLong_);
     __isset.sLong = true;
@@ -2040,6 +2047,7 @@ class MyStruct final  {
   ::std::set<::std::string> get_sString() &&;
 
   template <typename T_MyStruct_sString_struct_setter = ::std::set<::std::string>>
+  [[deprecated("Use `FOO.sString_ref() = BAR;` instead of `FOO.set_sString(BAR);`")]]
   ::std::set<::std::string>& set_sString(T_MyStruct_sString_struct_setter&& sString_) {
     sString = std::forward<T_MyStruct_sString_struct_setter>(sString_);
     __isset.sString = true;
@@ -2049,6 +2057,7 @@ class MyStruct final  {
   ::std::set<::std::int8_t> get_sByte() &&;
 
   template <typename T_MyStruct_sByte_struct_setter = ::std::set<::std::int8_t>>
+  [[deprecated("Use `FOO.sByte_ref() = BAR;` instead of `FOO.set_sByte(BAR);`")]]
   ::std::set<::std::int8_t>& set_sByte(T_MyStruct_sByte_struct_setter&& sByte_) {
     sByte = std::forward<T_MyStruct_sByte_struct_setter>(sByte_);
     __isset.sByte = true;
@@ -2058,6 +2067,7 @@ class MyStruct final  {
   ::std::map<::std::vector<::std::int32_t>, ::std::vector<::std::int32_t>> get_mListList() &&;
 
   template <typename T_MyStruct_mListList_struct_setter = ::std::map<::std::vector<::std::int32_t>, ::std::vector<::std::int32_t>>>
+  [[deprecated("Use `FOO.mListList_ref() = BAR;` instead of `FOO.set_mListList(BAR);`")]]
   ::std::map<::std::vector<::std::int32_t>, ::std::vector<::std::int32_t>>& set_mListList(T_MyStruct_mListList_struct_setter&& mListList_) {
     mListList = std::forward<T_MyStruct_mListList_struct_setter>(mListList_);
     __isset.mListList = true;
@@ -2077,7 +2087,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 
@@ -2090,6 +2100,13 @@ uint32_t MyStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class SimpleStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2109,49 +2126,36 @@ class SimpleStruct final  {
 
   SimpleStruct() :
       age(60LL),
-      name(apache::thrift::StringTraits< std::string>::fromStringLiteral("Batman")) {}
+      name(apache::thrift::StringTraits<std::string>::fromStringLiteral("Batman")) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   SimpleStruct(apache::thrift::FragileConstructor, ::std::int64_t age__arg, ::std::string name__arg);
 
-  SimpleStruct(SimpleStruct&&) = default;
+  SimpleStruct(SimpleStruct&&) noexcept;
 
-  SimpleStruct(const SimpleStruct&) = default;
+  SimpleStruct(const SimpleStruct& src);
 
 
-  SimpleStruct& operator=(SimpleStruct&&) = default;
-
-  SimpleStruct& operator=(const SimpleStruct&) = default;
+  SimpleStruct& operator=(SimpleStruct&&) noexcept;
+  SimpleStruct& operator=(const SimpleStruct& src);
   void __clear();
  private:
   ::std::int64_t age;
  private:
   ::std::string name;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool age;
     bool name;
   } __isset = {};
-  bool operator==(const SimpleStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const SimpleStruct& __x, const SimpleStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const SimpleStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const SimpleStruct& __x, const SimpleStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const SimpleStruct& __x, const SimpleStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const SimpleStruct& __x, const SimpleStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const SimpleStruct&) const;
+  bool operator<(const SimpleStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> age_ref() const& {
@@ -2197,6 +2201,7 @@ class SimpleStruct final  {
     return age;
   }
 
+  [[deprecated("Use `FOO.age_ref() = BAR;` instead of `FOO.set_age(BAR);`")]]
   ::std::int64_t& set_age(::std::int64_t age_) {
     age = age_;
     __isset.age = true;
@@ -2212,6 +2217,7 @@ class SimpleStruct final  {
   }
 
   template <typename T_SimpleStruct_name_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.name_ref() = BAR;` instead of `FOO.set_name(BAR);`")]]
   ::std::string& set_name(T_SimpleStruct_name_struct_setter&& name_) {
     name = std::forward<T_SimpleStruct_name_struct_setter>(name_);
     __isset.name = true;
@@ -2231,7 +2237,7 @@ class SimpleStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< SimpleStruct >;
+  friend class ::apache::thrift::Cpp2Ops<SimpleStruct>;
   friend void swap(SimpleStruct& a, SimpleStruct& b);
 };
 
@@ -2244,6 +2250,13 @@ uint32_t SimpleStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ComplexNestedStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2267,14 +2280,13 @@ class ComplexNestedStruct final  {
   [[deprecated("This constructor is deprecated")]]
   ComplexNestedStruct(apache::thrift::FragileConstructor, ::std::set<::std::set<::std::int32_t>> setOfSetOfInt__arg, ::std::vector<::std::vector<::std::vector<::std::vector<::cpp2::MyEnum>>>> listofListOfListOfListOfEnum__arg, ::std::vector<::std::vector<::cpp2::MyStruct>> listOfListOfMyStruct__arg, ::std::set<::std::vector<::std::vector<::std::int64_t>>> setOfListOfListOfLong__arg, ::std::set<::std::set<::std::set<::std::int64_t>>> setOfSetOfsetOfLong__arg, ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::MyStruct>>> mapStructListOfListOfLong__arg, ::std::map<::cpp2::MyStruct, ::std::int32_t> mKeyStructValInt__arg, ::std::vector<::std::map<::std::int32_t, ::std::int32_t>> listOfMapKeyIntValInt__arg, ::std::vector<::std::map<::std::string, ::std::vector<::cpp2::MyStruct>>> listOfMapKeyStrValList__arg, ::std::map<::std::set<::std::int32_t>, ::std::int64_t> mapKeySetValLong__arg, ::std::map<::std::vector<::std::string>, ::std::int32_t> mapKeyListValLong__arg, ::std::map<::std::map<::std::int32_t, ::std::string>, ::std::map<::std::int32_t, ::std::string>> mapKeyMapValMap__arg, ::std::map<::std::set<::std::vector<::std::int32_t>>, ::std::map<::std::vector<::std::set<::std::string>>, ::std::string>> mapKeySetValMap__arg, ::std::map<::std::map<::std::map<::std::int32_t, ::std::string>, ::std::string>, ::std::map<::std::int32_t, ::std::string>> NestedMaps__arg, ::std::map<::std::int32_t, ::std::vector<::cpp2::MyStruct>> mapKeyIntValList__arg, ::std::map<::std::int32_t, ::std::set<bool>> mapKeyIntValSet__arg, ::std::map<::std::set<bool>, ::cpp2::MyEnum> mapKeySetValInt__arg, ::std::map<::std::vector<::std::int32_t>, ::std::set<::std::map<double, ::std::string>>> mapKeyListValSet__arg);
 
-  ComplexNestedStruct(ComplexNestedStruct&&) = default;
+  ComplexNestedStruct(ComplexNestedStruct&&) noexcept;
 
-  ComplexNestedStruct(const ComplexNestedStruct&) = default;
+  ComplexNestedStruct(const ComplexNestedStruct& src);
 
 
-  ComplexNestedStruct& operator=(ComplexNestedStruct&&) = default;
-
-  ComplexNestedStruct& operator=(const ComplexNestedStruct&) = default;
+  ComplexNestedStruct& operator=(ComplexNestedStruct&&) noexcept;
+  ComplexNestedStruct& operator=(const ComplexNestedStruct& src);
   void __clear();
 
   ~ComplexNestedStruct();
@@ -2316,7 +2328,7 @@ class ComplexNestedStruct final  {
  private:
   ::std::map<::std::vector<::std::int32_t>, ::std::set<::std::map<double, ::std::string>>> mapKeyListValSet;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool setOfSetOfInt;
@@ -2338,24 +2350,11 @@ class ComplexNestedStruct final  {
     bool mapKeySetValInt;
     bool mapKeyListValSet;
   } __isset = {};
-  bool operator==(const ComplexNestedStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ComplexNestedStruct& __x, const ComplexNestedStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ComplexNestedStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ComplexNestedStruct& __x, const ComplexNestedStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ComplexNestedStruct& __x, const ComplexNestedStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ComplexNestedStruct& __x, const ComplexNestedStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ComplexNestedStruct&) const;
+  bool operator<(const ComplexNestedStruct&) const;
 
   template <typename..., typename T = ::std::set<::std::set<::std::int32_t>>>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> setOfSetOfInt_ref() const& {
@@ -2720,6 +2719,7 @@ class ComplexNestedStruct final  {
   ::std::set<::std::set<::std::int32_t>> get_setOfSetOfInt() &&;
 
   template <typename T_ComplexNestedStruct_setOfSetOfInt_struct_setter = ::std::set<::std::set<::std::int32_t>>>
+  [[deprecated("Use `FOO.setOfSetOfInt_ref() = BAR;` instead of `FOO.set_setOfSetOfInt(BAR);`")]]
   ::std::set<::std::set<::std::int32_t>>& set_setOfSetOfInt(T_ComplexNestedStruct_setOfSetOfInt_struct_setter&& setOfSetOfInt_) {
     setOfSetOfInt = std::forward<T_ComplexNestedStruct_setOfSetOfInt_struct_setter>(setOfSetOfInt_);
     __isset.setOfSetOfInt = true;
@@ -2729,6 +2729,7 @@ class ComplexNestedStruct final  {
   ::std::vector<::std::vector<::std::vector<::std::vector<::cpp2::MyEnum>>>> get_listofListOfListOfListOfEnum() &&;
 
   template <typename T_ComplexNestedStruct_listofListOfListOfListOfEnum_struct_setter = ::std::vector<::std::vector<::std::vector<::std::vector<::cpp2::MyEnum>>>>>
+  [[deprecated("Use `FOO.listofListOfListOfListOfEnum_ref() = BAR;` instead of `FOO.set_listofListOfListOfListOfEnum(BAR);`")]]
   ::std::vector<::std::vector<::std::vector<::std::vector<::cpp2::MyEnum>>>>& set_listofListOfListOfListOfEnum(T_ComplexNestedStruct_listofListOfListOfListOfEnum_struct_setter&& listofListOfListOfListOfEnum_) {
     listofListOfListOfListOfEnum = std::forward<T_ComplexNestedStruct_listofListOfListOfListOfEnum_struct_setter>(listofListOfListOfListOfEnum_);
     __isset.listofListOfListOfListOfEnum = true;
@@ -2738,6 +2739,7 @@ class ComplexNestedStruct final  {
   ::std::vector<::std::vector<::cpp2::MyStruct>> get_listOfListOfMyStruct() &&;
 
   template <typename T_ComplexNestedStruct_listOfListOfMyStruct_struct_setter = ::std::vector<::std::vector<::cpp2::MyStruct>>>
+  [[deprecated("Use `FOO.listOfListOfMyStruct_ref() = BAR;` instead of `FOO.set_listOfListOfMyStruct(BAR);`")]]
   ::std::vector<::std::vector<::cpp2::MyStruct>>& set_listOfListOfMyStruct(T_ComplexNestedStruct_listOfListOfMyStruct_struct_setter&& listOfListOfMyStruct_) {
     listOfListOfMyStruct = std::forward<T_ComplexNestedStruct_listOfListOfMyStruct_struct_setter>(listOfListOfMyStruct_);
     __isset.listOfListOfMyStruct = true;
@@ -2747,6 +2749,7 @@ class ComplexNestedStruct final  {
   ::std::set<::std::vector<::std::vector<::std::int64_t>>> get_setOfListOfListOfLong() &&;
 
   template <typename T_ComplexNestedStruct_setOfListOfListOfLong_struct_setter = ::std::set<::std::vector<::std::vector<::std::int64_t>>>>
+  [[deprecated("Use `FOO.setOfListOfListOfLong_ref() = BAR;` instead of `FOO.set_setOfListOfListOfLong(BAR);`")]]
   ::std::set<::std::vector<::std::vector<::std::int64_t>>>& set_setOfListOfListOfLong(T_ComplexNestedStruct_setOfListOfListOfLong_struct_setter&& setOfListOfListOfLong_) {
     setOfListOfListOfLong = std::forward<T_ComplexNestedStruct_setOfListOfListOfLong_struct_setter>(setOfListOfListOfLong_);
     __isset.setOfListOfListOfLong = true;
@@ -2756,6 +2759,7 @@ class ComplexNestedStruct final  {
   ::std::set<::std::set<::std::set<::std::int64_t>>> get_setOfSetOfsetOfLong() &&;
 
   template <typename T_ComplexNestedStruct_setOfSetOfsetOfLong_struct_setter = ::std::set<::std::set<::std::set<::std::int64_t>>>>
+  [[deprecated("Use `FOO.setOfSetOfsetOfLong_ref() = BAR;` instead of `FOO.set_setOfSetOfsetOfLong(BAR);`")]]
   ::std::set<::std::set<::std::set<::std::int64_t>>>& set_setOfSetOfsetOfLong(T_ComplexNestedStruct_setOfSetOfsetOfLong_struct_setter&& setOfSetOfsetOfLong_) {
     setOfSetOfsetOfLong = std::forward<T_ComplexNestedStruct_setOfSetOfsetOfLong_struct_setter>(setOfSetOfsetOfLong_);
     __isset.setOfSetOfsetOfLong = true;
@@ -2765,6 +2769,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::MyStruct>>> get_mapStructListOfListOfLong() &&;
 
   template <typename T_ComplexNestedStruct_mapStructListOfListOfLong_struct_setter = ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::MyStruct>>>>
+  [[deprecated("Use `FOO.mapStructListOfListOfLong_ref() = BAR;` instead of `FOO.set_mapStructListOfListOfLong(BAR);`")]]
   ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::MyStruct>>>& set_mapStructListOfListOfLong(T_ComplexNestedStruct_mapStructListOfListOfLong_struct_setter&& mapStructListOfListOfLong_) {
     mapStructListOfListOfLong = std::forward<T_ComplexNestedStruct_mapStructListOfListOfLong_struct_setter>(mapStructListOfListOfLong_);
     __isset.mapStructListOfListOfLong = true;
@@ -2774,6 +2779,7 @@ class ComplexNestedStruct final  {
   ::std::map<::cpp2::MyStruct, ::std::int32_t> get_mKeyStructValInt() &&;
 
   template <typename T_ComplexNestedStruct_mKeyStructValInt_struct_setter = ::std::map<::cpp2::MyStruct, ::std::int32_t>>
+  [[deprecated("Use `FOO.mKeyStructValInt_ref() = BAR;` instead of `FOO.set_mKeyStructValInt(BAR);`")]]
   ::std::map<::cpp2::MyStruct, ::std::int32_t>& set_mKeyStructValInt(T_ComplexNestedStruct_mKeyStructValInt_struct_setter&& mKeyStructValInt_) {
     mKeyStructValInt = std::forward<T_ComplexNestedStruct_mKeyStructValInt_struct_setter>(mKeyStructValInt_);
     __isset.mKeyStructValInt = true;
@@ -2783,6 +2789,7 @@ class ComplexNestedStruct final  {
   ::std::vector<::std::map<::std::int32_t, ::std::int32_t>> get_listOfMapKeyIntValInt() &&;
 
   template <typename T_ComplexNestedStruct_listOfMapKeyIntValInt_struct_setter = ::std::vector<::std::map<::std::int32_t, ::std::int32_t>>>
+  [[deprecated("Use `FOO.listOfMapKeyIntValInt_ref() = BAR;` instead of `FOO.set_listOfMapKeyIntValInt(BAR);`")]]
   ::std::vector<::std::map<::std::int32_t, ::std::int32_t>>& set_listOfMapKeyIntValInt(T_ComplexNestedStruct_listOfMapKeyIntValInt_struct_setter&& listOfMapKeyIntValInt_) {
     listOfMapKeyIntValInt = std::forward<T_ComplexNestedStruct_listOfMapKeyIntValInt_struct_setter>(listOfMapKeyIntValInt_);
     __isset.listOfMapKeyIntValInt = true;
@@ -2792,6 +2799,7 @@ class ComplexNestedStruct final  {
   ::std::vector<::std::map<::std::string, ::std::vector<::cpp2::MyStruct>>> get_listOfMapKeyStrValList() &&;
 
   template <typename T_ComplexNestedStruct_listOfMapKeyStrValList_struct_setter = ::std::vector<::std::map<::std::string, ::std::vector<::cpp2::MyStruct>>>>
+  [[deprecated("Use `FOO.listOfMapKeyStrValList_ref() = BAR;` instead of `FOO.set_listOfMapKeyStrValList(BAR);`")]]
   ::std::vector<::std::map<::std::string, ::std::vector<::cpp2::MyStruct>>>& set_listOfMapKeyStrValList(T_ComplexNestedStruct_listOfMapKeyStrValList_struct_setter&& listOfMapKeyStrValList_) {
     listOfMapKeyStrValList = std::forward<T_ComplexNestedStruct_listOfMapKeyStrValList_struct_setter>(listOfMapKeyStrValList_);
     __isset.listOfMapKeyStrValList = true;
@@ -2801,6 +2809,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::set<::std::int32_t>, ::std::int64_t> get_mapKeySetValLong() &&;
 
   template <typename T_ComplexNestedStruct_mapKeySetValLong_struct_setter = ::std::map<::std::set<::std::int32_t>, ::std::int64_t>>
+  [[deprecated("Use `FOO.mapKeySetValLong_ref() = BAR;` instead of `FOO.set_mapKeySetValLong(BAR);`")]]
   ::std::map<::std::set<::std::int32_t>, ::std::int64_t>& set_mapKeySetValLong(T_ComplexNestedStruct_mapKeySetValLong_struct_setter&& mapKeySetValLong_) {
     mapKeySetValLong = std::forward<T_ComplexNestedStruct_mapKeySetValLong_struct_setter>(mapKeySetValLong_);
     __isset.mapKeySetValLong = true;
@@ -2810,6 +2819,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::vector<::std::string>, ::std::int32_t> get_mapKeyListValLong() &&;
 
   template <typename T_ComplexNestedStruct_mapKeyListValLong_struct_setter = ::std::map<::std::vector<::std::string>, ::std::int32_t>>
+  [[deprecated("Use `FOO.mapKeyListValLong_ref() = BAR;` instead of `FOO.set_mapKeyListValLong(BAR);`")]]
   ::std::map<::std::vector<::std::string>, ::std::int32_t>& set_mapKeyListValLong(T_ComplexNestedStruct_mapKeyListValLong_struct_setter&& mapKeyListValLong_) {
     mapKeyListValLong = std::forward<T_ComplexNestedStruct_mapKeyListValLong_struct_setter>(mapKeyListValLong_);
     __isset.mapKeyListValLong = true;
@@ -2819,6 +2829,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::map<::std::int32_t, ::std::string>, ::std::map<::std::int32_t, ::std::string>> get_mapKeyMapValMap() &&;
 
   template <typename T_ComplexNestedStruct_mapKeyMapValMap_struct_setter = ::std::map<::std::map<::std::int32_t, ::std::string>, ::std::map<::std::int32_t, ::std::string>>>
+  [[deprecated("Use `FOO.mapKeyMapValMap_ref() = BAR;` instead of `FOO.set_mapKeyMapValMap(BAR);`")]]
   ::std::map<::std::map<::std::int32_t, ::std::string>, ::std::map<::std::int32_t, ::std::string>>& set_mapKeyMapValMap(T_ComplexNestedStruct_mapKeyMapValMap_struct_setter&& mapKeyMapValMap_) {
     mapKeyMapValMap = std::forward<T_ComplexNestedStruct_mapKeyMapValMap_struct_setter>(mapKeyMapValMap_);
     __isset.mapKeyMapValMap = true;
@@ -2828,6 +2839,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::set<::std::vector<::std::int32_t>>, ::std::map<::std::vector<::std::set<::std::string>>, ::std::string>> get_mapKeySetValMap() &&;
 
   template <typename T_ComplexNestedStruct_mapKeySetValMap_struct_setter = ::std::map<::std::set<::std::vector<::std::int32_t>>, ::std::map<::std::vector<::std::set<::std::string>>, ::std::string>>>
+  [[deprecated("Use `FOO.mapKeySetValMap_ref() = BAR;` instead of `FOO.set_mapKeySetValMap(BAR);`")]]
   ::std::map<::std::set<::std::vector<::std::int32_t>>, ::std::map<::std::vector<::std::set<::std::string>>, ::std::string>>& set_mapKeySetValMap(T_ComplexNestedStruct_mapKeySetValMap_struct_setter&& mapKeySetValMap_) {
     mapKeySetValMap = std::forward<T_ComplexNestedStruct_mapKeySetValMap_struct_setter>(mapKeySetValMap_);
     __isset.mapKeySetValMap = true;
@@ -2837,6 +2849,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::map<::std::map<::std::int32_t, ::std::string>, ::std::string>, ::std::map<::std::int32_t, ::std::string>> get_NestedMaps() &&;
 
   template <typename T_ComplexNestedStruct_NestedMaps_struct_setter = ::std::map<::std::map<::std::map<::std::int32_t, ::std::string>, ::std::string>, ::std::map<::std::int32_t, ::std::string>>>
+  [[deprecated("Use `FOO.NestedMaps_ref() = BAR;` instead of `FOO.set_NestedMaps(BAR);`")]]
   ::std::map<::std::map<::std::map<::std::int32_t, ::std::string>, ::std::string>, ::std::map<::std::int32_t, ::std::string>>& set_NestedMaps(T_ComplexNestedStruct_NestedMaps_struct_setter&& NestedMaps_) {
     NestedMaps = std::forward<T_ComplexNestedStruct_NestedMaps_struct_setter>(NestedMaps_);
     __isset.NestedMaps = true;
@@ -2846,6 +2859,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::int32_t, ::std::vector<::cpp2::MyStruct>> get_mapKeyIntValList() &&;
 
   template <typename T_ComplexNestedStruct_mapKeyIntValList_struct_setter = ::std::map<::std::int32_t, ::std::vector<::cpp2::MyStruct>>>
+  [[deprecated("Use `FOO.mapKeyIntValList_ref() = BAR;` instead of `FOO.set_mapKeyIntValList(BAR);`")]]
   ::std::map<::std::int32_t, ::std::vector<::cpp2::MyStruct>>& set_mapKeyIntValList(T_ComplexNestedStruct_mapKeyIntValList_struct_setter&& mapKeyIntValList_) {
     mapKeyIntValList = std::forward<T_ComplexNestedStruct_mapKeyIntValList_struct_setter>(mapKeyIntValList_);
     __isset.mapKeyIntValList = true;
@@ -2855,6 +2869,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::int32_t, ::std::set<bool>> get_mapKeyIntValSet() &&;
 
   template <typename T_ComplexNestedStruct_mapKeyIntValSet_struct_setter = ::std::map<::std::int32_t, ::std::set<bool>>>
+  [[deprecated("Use `FOO.mapKeyIntValSet_ref() = BAR;` instead of `FOO.set_mapKeyIntValSet(BAR);`")]]
   ::std::map<::std::int32_t, ::std::set<bool>>& set_mapKeyIntValSet(T_ComplexNestedStruct_mapKeyIntValSet_struct_setter&& mapKeyIntValSet_) {
     mapKeyIntValSet = std::forward<T_ComplexNestedStruct_mapKeyIntValSet_struct_setter>(mapKeyIntValSet_);
     __isset.mapKeyIntValSet = true;
@@ -2864,6 +2879,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::set<bool>, ::cpp2::MyEnum> get_mapKeySetValInt() &&;
 
   template <typename T_ComplexNestedStruct_mapKeySetValInt_struct_setter = ::std::map<::std::set<bool>, ::cpp2::MyEnum>>
+  [[deprecated("Use `FOO.mapKeySetValInt_ref() = BAR;` instead of `FOO.set_mapKeySetValInt(BAR);`")]]
   ::std::map<::std::set<bool>, ::cpp2::MyEnum>& set_mapKeySetValInt(T_ComplexNestedStruct_mapKeySetValInt_struct_setter&& mapKeySetValInt_) {
     mapKeySetValInt = std::forward<T_ComplexNestedStruct_mapKeySetValInt_struct_setter>(mapKeySetValInt_);
     __isset.mapKeySetValInt = true;
@@ -2873,6 +2889,7 @@ class ComplexNestedStruct final  {
   ::std::map<::std::vector<::std::int32_t>, ::std::set<::std::map<double, ::std::string>>> get_mapKeyListValSet() &&;
 
   template <typename T_ComplexNestedStruct_mapKeyListValSet_struct_setter = ::std::map<::std::vector<::std::int32_t>, ::std::set<::std::map<double, ::std::string>>>>
+  [[deprecated("Use `FOO.mapKeyListValSet_ref() = BAR;` instead of `FOO.set_mapKeyListValSet(BAR);`")]]
   ::std::map<::std::vector<::std::int32_t>, ::std::set<::std::map<double, ::std::string>>>& set_mapKeyListValSet(T_ComplexNestedStruct_mapKeyListValSet_struct_setter&& mapKeyListValSet_) {
     mapKeyListValSet = std::forward<T_ComplexNestedStruct_mapKeyListValSet_struct_setter>(mapKeyListValSet_);
     __isset.mapKeyListValSet = true;
@@ -2892,7 +2909,7 @@ class ComplexNestedStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ComplexNestedStruct >;
+  friend class ::apache::thrift::Cpp2Ops<ComplexNestedStruct>;
   friend void swap(ComplexNestedStruct& a, ComplexNestedStruct& b);
 };
 
@@ -2905,6 +2922,13 @@ uint32_t ComplexNestedStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2934,7 +2958,7 @@ class MyUnion final  {
   MyUnion()
       : type_(Type::__EMPTY__) {}
 
-  MyUnion(MyUnion&& rhs)
+  MyUnion(MyUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -3021,7 +3045,7 @@ class MyUnion final  {
     }
   }
 
-  MyUnion& operator=(MyUnion&& rhs) {
+  MyUnion& operator=(MyUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -3125,24 +3149,9 @@ class MyUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const MyUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyUnion& __x, const MyUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const MyUnion&) const;
+  bool operator<(const MyUnion&) const;
 
   ::cpp2::MyEnum& set_myEnum(::cpp2::MyEnum t = ::cpp2::MyEnum()) {
     __clear();
@@ -3228,62 +3237,74 @@ class MyUnion final  {
     return value_.intValue;
   }
 
-  ::cpp2::MyEnum const & get_myEnum() const {
-    assert(type_ == Type::myEnum);
+  ::cpp2::MyEnum const& get_myEnum() const {
+    if (type_ != Type::myEnum) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myEnum;
   }
 
-  ::cpp2::MyStruct const & get_myStruct() const {
-    assert(type_ == Type::myStruct);
+  ::cpp2::MyStruct const& get_myStruct() const {
+    if (type_ != Type::myStruct) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myStruct;
   }
 
-  ::cpp2::MyDataItem const & get_myDataItem() const {
-    assert(type_ == Type::myDataItem);
+  ::cpp2::MyDataItem const& get_myDataItem() const {
+    if (type_ != Type::myDataItem) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myDataItem;
   }
 
-  ::cpp2::ComplexNestedStruct const & get_complexNestedStruct() const {
-    assert(type_ == Type::complexNestedStruct);
+  ::cpp2::ComplexNestedStruct const& get_complexNestedStruct() const {
+    if (type_ != Type::complexNestedStruct) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.complexNestedStruct;
   }
 
-  ::std::int64_t const & get_longValue() const {
-    assert(type_ == Type::longValue);
+  ::std::int64_t const& get_longValue() const {
+    if (type_ != Type::longValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.longValue;
   }
 
-  ::std::int32_t const & get_intValue() const {
-    assert(type_ == Type::intValue);
+  ::std::int32_t const& get_intValue() const {
+    if (type_ != Type::intValue) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.intValue;
   }
 
-  ::cpp2::MyEnum & mutable_myEnum() {
+  ::cpp2::MyEnum& mutable_myEnum() {
     assert(type_ == Type::myEnum);
     return value_.myEnum;
   }
 
-  ::cpp2::MyStruct & mutable_myStruct() {
+  ::cpp2::MyStruct& mutable_myStruct() {
     assert(type_ == Type::myStruct);
     return value_.myStruct;
   }
 
-  ::cpp2::MyDataItem & mutable_myDataItem() {
+  ::cpp2::MyDataItem& mutable_myDataItem() {
     assert(type_ == Type::myDataItem);
     return value_.myDataItem;
   }
 
-  ::cpp2::ComplexNestedStruct & mutable_complexNestedStruct() {
+  ::cpp2::ComplexNestedStruct& mutable_complexNestedStruct() {
     assert(type_ == Type::complexNestedStruct);
     return value_.complexNestedStruct;
   }
 
-  ::std::int64_t & mutable_longValue() {
+  ::std::int64_t& mutable_longValue() {
     assert(type_ == Type::longValue);
     return value_.longValue;
   }
 
-  ::std::int32_t & mutable_intValue() {
+  ::std::int32_t& mutable_intValue() {
     assert(type_ == Type::intValue);
     return value_.intValue;
   }
@@ -3455,7 +3476,7 @@ class MyUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyUnion >;
+  friend class ::apache::thrift::Cpp2Ops<MyUnion>;
   friend void swap(MyUnion& a, MyUnion& b);
 };
 
@@ -3468,6 +3489,13 @@ uint32_t MyUnion::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class defaultStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -3491,14 +3519,13 @@ class defaultStruct final  {
   [[deprecated("This constructor is deprecated")]]
   defaultStruct(apache::thrift::FragileConstructor, ::std::int64_t myLongDFset__arg, ::std::int64_t myLongDF__arg, ::std::int32_t portDFset__arg, ::std::int32_t portNum__arg, ::std::string myBinaryDFset__arg, ::std::string myBinary__arg, ::std::int8_t myByteDFSet__arg, ::std::int8_t myByte__arg, double myDoubleDFset__arg, double myDoubleDFZero__arg, double myDouble__arg, ::std::map<::std::int32_t, ::std::string> field3__arg, ::std::vector<::cpp2::MyEnum> myList__arg, ::std::set<::std::string> mySet__arg, ::cpp2::SimpleStruct simpleStruct__arg, ::std::vector<::cpp2::SimpleStruct> listStructDFset__arg, ::cpp2::MyUnion myUnion__arg, ::std::vector<::cpp2::MyUnion> listUnionDFset__arg, ::std::map<::std::int32_t, ::std::vector<::cpp2::SimpleStruct>> mapNestlistStructDfSet__arg, ::std::map<::std::int64_t, ::std::string> mapJavaTypeDFset__arg, ::std::map<::std::int64_t, ::std::int32_t> emptyMap__arg, ::std::map<::std::string, ::std::map<::std::int32_t, ::cpp2::MyEnum>> enumMapDFset__arg);
 
-  defaultStruct(defaultStruct&&) = default;
+  defaultStruct(defaultStruct&&) noexcept;
 
-  defaultStruct(const defaultStruct&) = default;
+  defaultStruct(const defaultStruct& src);
 
 
-  defaultStruct& operator=(defaultStruct&&) = default;
-
-  defaultStruct& operator=(const defaultStruct&) = default;
+  defaultStruct& operator=(defaultStruct&&) noexcept;
+  defaultStruct& operator=(const defaultStruct& src);
   void __clear();
 
   ~defaultStruct();
@@ -3548,7 +3575,7 @@ class defaultStruct final  {
  private:
   ::std::map<::std::string, ::std::map<::std::int32_t, ::cpp2::MyEnum>> enumMapDFset;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool myLongDFset;
@@ -3574,24 +3601,11 @@ class defaultStruct final  {
     bool emptyMap;
     bool enumMapDFset;
   } __isset = {};
-  bool operator==(const defaultStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const defaultStruct& __x, const defaultStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const defaultStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const defaultStruct& __x, const defaultStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const defaultStruct& __x, const defaultStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const defaultStruct& __x, const defaultStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const defaultStruct&) const;
+  bool operator<(const defaultStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> myLongDFset_ref() const& {
@@ -4037,6 +4051,7 @@ class defaultStruct final  {
     return myLongDFset;
   }
 
+  [[deprecated("Use `FOO.myLongDFset_ref() = BAR;` instead of `FOO.set_myLongDFset(BAR);`")]]
   ::std::int64_t& set_myLongDFset(::std::int64_t myLongDFset_) {
     myLongDFset = myLongDFset_;
     __isset.myLongDFset = true;
@@ -4047,6 +4062,7 @@ class defaultStruct final  {
     return myLongDF;
   }
 
+  [[deprecated("Use `FOO.myLongDF_ref() = BAR;` instead of `FOO.set_myLongDF(BAR);`")]]
   ::std::int64_t& set_myLongDF(::std::int64_t myLongDF_) {
     myLongDF = myLongDF_;
     __isset.myLongDF = true;
@@ -4057,6 +4073,7 @@ class defaultStruct final  {
     return portDFset;
   }
 
+  [[deprecated("Use `FOO.portDFset_ref() = BAR;` instead of `FOO.set_portDFset(BAR);`")]]
   ::std::int32_t& set_portDFset(::std::int32_t portDFset_) {
     portDFset = portDFset_;
     __isset.portDFset = true;
@@ -4067,6 +4084,7 @@ class defaultStruct final  {
     return portNum;
   }
 
+  [[deprecated("Use `FOO.portNum_ref() = BAR;` instead of `FOO.set_portNum(BAR);`")]]
   ::std::int32_t& set_portNum(::std::int32_t portNum_) {
     portNum = portNum_;
     __isset.portNum = true;
@@ -4082,6 +4100,7 @@ class defaultStruct final  {
   }
 
   template <typename T_defaultStruct_myBinaryDFset_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.myBinaryDFset_ref() = BAR;` instead of `FOO.set_myBinaryDFset(BAR);`")]]
   ::std::string& set_myBinaryDFset(T_defaultStruct_myBinaryDFset_struct_setter&& myBinaryDFset_) {
     myBinaryDFset = std::forward<T_defaultStruct_myBinaryDFset_struct_setter>(myBinaryDFset_);
     __isset.myBinaryDFset = true;
@@ -4097,6 +4116,7 @@ class defaultStruct final  {
   }
 
   template <typename T_defaultStruct_myBinary_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.myBinary_ref() = BAR;` instead of `FOO.set_myBinary(BAR);`")]]
   ::std::string& set_myBinary(T_defaultStruct_myBinary_struct_setter&& myBinary_) {
     myBinary = std::forward<T_defaultStruct_myBinary_struct_setter>(myBinary_);
     __isset.myBinary = true;
@@ -4107,6 +4127,7 @@ class defaultStruct final  {
     return myByteDFSet;
   }
 
+  [[deprecated("Use `FOO.myByteDFSet_ref() = BAR;` instead of `FOO.set_myByteDFSet(BAR);`")]]
   ::std::int8_t& set_myByteDFSet(::std::int8_t myByteDFSet_) {
     myByteDFSet = myByteDFSet_;
     __isset.myByteDFSet = true;
@@ -4117,6 +4138,7 @@ class defaultStruct final  {
     return myByte;
   }
 
+  [[deprecated("Use `FOO.myByte_ref() = BAR;` instead of `FOO.set_myByte(BAR);`")]]
   ::std::int8_t& set_myByte(::std::int8_t myByte_) {
     myByte = myByte_;
     __isset.myByte = true;
@@ -4127,6 +4149,7 @@ class defaultStruct final  {
     return myDoubleDFset;
   }
 
+  [[deprecated("Use `FOO.myDoubleDFset_ref() = BAR;` instead of `FOO.set_myDoubleDFset(BAR);`")]]
   double& set_myDoubleDFset(double myDoubleDFset_) {
     myDoubleDFset = myDoubleDFset_;
     __isset.myDoubleDFset = true;
@@ -4137,6 +4160,7 @@ class defaultStruct final  {
     return myDoubleDFZero;
   }
 
+  [[deprecated("Use `FOO.myDoubleDFZero_ref() = BAR;` instead of `FOO.set_myDoubleDFZero(BAR);`")]]
   double& set_myDoubleDFZero(double myDoubleDFZero_) {
     myDoubleDFZero = myDoubleDFZero_;
     __isset.myDoubleDFZero = true;
@@ -4147,6 +4171,7 @@ class defaultStruct final  {
     return myDouble;
   }
 
+  [[deprecated("Use `FOO.myDouble_ref() = BAR;` instead of `FOO.set_myDouble(BAR);`")]]
   double& set_myDouble(double myDouble_) {
     myDouble = myDouble_;
     __isset.myDouble = true;
@@ -4156,6 +4181,7 @@ class defaultStruct final  {
   ::std::map<::std::int32_t, ::std::string> get_field3() &&;
 
   template <typename T_defaultStruct_field3_struct_setter = ::std::map<::std::int32_t, ::std::string>>
+  [[deprecated("Use `FOO.field3_ref() = BAR;` instead of `FOO.set_field3(BAR);`")]]
   ::std::map<::std::int32_t, ::std::string>& set_field3(T_defaultStruct_field3_struct_setter&& field3_) {
     field3 = std::forward<T_defaultStruct_field3_struct_setter>(field3_);
     __isset.field3 = true;
@@ -4165,6 +4191,7 @@ class defaultStruct final  {
   ::std::vector<::cpp2::MyEnum> get_myList() &&;
 
   template <typename T_defaultStruct_myList_struct_setter = ::std::vector<::cpp2::MyEnum>>
+  [[deprecated("Use `FOO.myList_ref() = BAR;` instead of `FOO.set_myList(BAR);`")]]
   ::std::vector<::cpp2::MyEnum>& set_myList(T_defaultStruct_myList_struct_setter&& myList_) {
     myList = std::forward<T_defaultStruct_myList_struct_setter>(myList_);
     __isset.myList = true;
@@ -4174,6 +4201,7 @@ class defaultStruct final  {
   ::std::set<::std::string> get_mySet() &&;
 
   template <typename T_defaultStruct_mySet_struct_setter = ::std::set<::std::string>>
+  [[deprecated("Use `FOO.mySet_ref() = BAR;` instead of `FOO.set_mySet(BAR);`")]]
   ::std::set<::std::string>& set_mySet(T_defaultStruct_mySet_struct_setter&& mySet_) {
     mySet = std::forward<T_defaultStruct_mySet_struct_setter>(mySet_);
     __isset.mySet = true;
@@ -4183,6 +4211,7 @@ class defaultStruct final  {
   ::cpp2::SimpleStruct get_simpleStruct() &&;
 
   template <typename T_defaultStruct_simpleStruct_struct_setter = ::cpp2::SimpleStruct>
+  [[deprecated("Use `FOO.simpleStruct_ref() = BAR;` instead of `FOO.set_simpleStruct(BAR);`")]]
   ::cpp2::SimpleStruct& set_simpleStruct(T_defaultStruct_simpleStruct_struct_setter&& simpleStruct_) {
     simpleStruct = std::forward<T_defaultStruct_simpleStruct_struct_setter>(simpleStruct_);
     __isset.simpleStruct = true;
@@ -4192,6 +4221,7 @@ class defaultStruct final  {
   ::std::vector<::cpp2::SimpleStruct> get_listStructDFset() &&;
 
   template <typename T_defaultStruct_listStructDFset_struct_setter = ::std::vector<::cpp2::SimpleStruct>>
+  [[deprecated("Use `FOO.listStructDFset_ref() = BAR;` instead of `FOO.set_listStructDFset(BAR);`")]]
   ::std::vector<::cpp2::SimpleStruct>& set_listStructDFset(T_defaultStruct_listStructDFset_struct_setter&& listStructDFset_) {
     listStructDFset = std::forward<T_defaultStruct_listStructDFset_struct_setter>(listStructDFset_);
     __isset.listStructDFset = true;
@@ -4201,6 +4231,7 @@ class defaultStruct final  {
   ::cpp2::MyUnion get_myUnion() &&;
 
   template <typename T_defaultStruct_myUnion_struct_setter = ::cpp2::MyUnion>
+  [[deprecated("Use `FOO.myUnion_ref() = BAR;` instead of `FOO.set_myUnion(BAR);`")]]
   ::cpp2::MyUnion& set_myUnion(T_defaultStruct_myUnion_struct_setter&& myUnion_) {
     myUnion = std::forward<T_defaultStruct_myUnion_struct_setter>(myUnion_);
     __isset.myUnion = true;
@@ -4210,6 +4241,7 @@ class defaultStruct final  {
   ::std::vector<::cpp2::MyUnion> get_listUnionDFset() &&;
 
   template <typename T_defaultStruct_listUnionDFset_struct_setter = ::std::vector<::cpp2::MyUnion>>
+  [[deprecated("Use `FOO.listUnionDFset_ref() = BAR;` instead of `FOO.set_listUnionDFset(BAR);`")]]
   ::std::vector<::cpp2::MyUnion>& set_listUnionDFset(T_defaultStruct_listUnionDFset_struct_setter&& listUnionDFset_) {
     listUnionDFset = std::forward<T_defaultStruct_listUnionDFset_struct_setter>(listUnionDFset_);
     __isset.listUnionDFset = true;
@@ -4219,6 +4251,7 @@ class defaultStruct final  {
   ::std::map<::std::int32_t, ::std::vector<::cpp2::SimpleStruct>> get_mapNestlistStructDfSet() &&;
 
   template <typename T_defaultStruct_mapNestlistStructDfSet_struct_setter = ::std::map<::std::int32_t, ::std::vector<::cpp2::SimpleStruct>>>
+  [[deprecated("Use `FOO.mapNestlistStructDfSet_ref() = BAR;` instead of `FOO.set_mapNestlistStructDfSet(BAR);`")]]
   ::std::map<::std::int32_t, ::std::vector<::cpp2::SimpleStruct>>& set_mapNestlistStructDfSet(T_defaultStruct_mapNestlistStructDfSet_struct_setter&& mapNestlistStructDfSet_) {
     mapNestlistStructDfSet = std::forward<T_defaultStruct_mapNestlistStructDfSet_struct_setter>(mapNestlistStructDfSet_);
     __isset.mapNestlistStructDfSet = true;
@@ -4228,6 +4261,7 @@ class defaultStruct final  {
   ::std::map<::std::int64_t, ::std::string> get_mapJavaTypeDFset() &&;
 
   template <typename T_defaultStruct_mapJavaTypeDFset_struct_setter = ::std::map<::std::int64_t, ::std::string>>
+  [[deprecated("Use `FOO.mapJavaTypeDFset_ref() = BAR;` instead of `FOO.set_mapJavaTypeDFset(BAR);`")]]
   ::std::map<::std::int64_t, ::std::string>& set_mapJavaTypeDFset(T_defaultStruct_mapJavaTypeDFset_struct_setter&& mapJavaTypeDFset_) {
     mapJavaTypeDFset = std::forward<T_defaultStruct_mapJavaTypeDFset_struct_setter>(mapJavaTypeDFset_);
     __isset.mapJavaTypeDFset = true;
@@ -4237,6 +4271,7 @@ class defaultStruct final  {
   ::std::map<::std::int64_t, ::std::int32_t> get_emptyMap() &&;
 
   template <typename T_defaultStruct_emptyMap_struct_setter = ::std::map<::std::int64_t, ::std::int32_t>>
+  [[deprecated("Use `FOO.emptyMap_ref() = BAR;` instead of `FOO.set_emptyMap(BAR);`")]]
   ::std::map<::std::int64_t, ::std::int32_t>& set_emptyMap(T_defaultStruct_emptyMap_struct_setter&& emptyMap_) {
     emptyMap = std::forward<T_defaultStruct_emptyMap_struct_setter>(emptyMap_);
     __isset.emptyMap = true;
@@ -4246,6 +4281,7 @@ class defaultStruct final  {
   ::std::map<::std::string, ::std::map<::std::int32_t, ::cpp2::MyEnum>> get_enumMapDFset() &&;
 
   template <typename T_defaultStruct_enumMapDFset_struct_setter = ::std::map<::std::string, ::std::map<::std::int32_t, ::cpp2::MyEnum>>>
+  [[deprecated("Use `FOO.enumMapDFset_ref() = BAR;` instead of `FOO.set_enumMapDFset(BAR);`")]]
   ::std::map<::std::string, ::std::map<::std::int32_t, ::cpp2::MyEnum>>& set_enumMapDFset(T_defaultStruct_enumMapDFset_struct_setter&& enumMapDFset_) {
     enumMapDFset = std::forward<T_defaultStruct_enumMapDFset_struct_setter>(enumMapDFset_);
     __isset.enumMapDFset = true;
@@ -4265,7 +4301,7 @@ class defaultStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< defaultStruct >;
+  friend class ::apache::thrift::Cpp2Ops<defaultStruct>;
   friend void swap(defaultStruct& a, defaultStruct& b);
 };
 
@@ -4278,6 +4314,13 @@ uint32_t defaultStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStructTypeDef final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -4301,14 +4344,13 @@ class MyStructTypeDef final  {
   [[deprecated("This constructor is deprecated")]]
   MyStructTypeDef(apache::thrift::FragileConstructor, ::std::int64_t myLongField__arg, ::cpp2::longTypeDef myLongTypeDef__arg, ::std::string myStringField__arg, ::cpp2::stringTypedef myStringTypedef__arg, ::std::map<::std::int16_t, ::std::string> myMapField__arg, ::cpp2::mapTypedef myMapTypedef__arg, ::std::vector<double> myListField__arg, ::cpp2::listTypedef myListTypedef__arg, ::std::map<::std::int16_t, ::std::vector<::cpp2::listTypedef>> myMapListOfTypeDef__arg);
 
-  MyStructTypeDef(MyStructTypeDef&&) = default;
+  MyStructTypeDef(MyStructTypeDef&&) noexcept;
 
-  MyStructTypeDef(const MyStructTypeDef&) = default;
+  MyStructTypeDef(const MyStructTypeDef& src);
 
 
-  MyStructTypeDef& operator=(MyStructTypeDef&&) = default;
-
-  MyStructTypeDef& operator=(const MyStructTypeDef&) = default;
+  MyStructTypeDef& operator=(MyStructTypeDef&&) noexcept;
+  MyStructTypeDef& operator=(const MyStructTypeDef& src);
   void __clear();
 
   ~MyStructTypeDef();
@@ -4332,7 +4374,7 @@ class MyStructTypeDef final  {
  private:
   ::std::map<::std::int16_t, ::std::vector<::cpp2::listTypedef>> myMapListOfTypeDef;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool myLongField;
@@ -4345,24 +4387,11 @@ class MyStructTypeDef final  {
     bool myListTypedef;
     bool myMapListOfTypeDef;
   } __isset = {};
-  bool operator==(const MyStructTypeDef& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStructTypeDef& __x, const MyStructTypeDef& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStructTypeDef& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStructTypeDef& __x, const MyStructTypeDef& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStructTypeDef& __x, const MyStructTypeDef& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStructTypeDef& __x, const MyStructTypeDef& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStructTypeDef&) const;
+  bool operator<(const MyStructTypeDef&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> myLongField_ref() const& {
@@ -4548,6 +4577,7 @@ class MyStructTypeDef final  {
     return myLongField;
   }
 
+  [[deprecated("Use `FOO.myLongField_ref() = BAR;` instead of `FOO.set_myLongField(BAR);`")]]
   ::std::int64_t& set_myLongField(::std::int64_t myLongField_) {
     myLongField = myLongField_;
     __isset.myLongField = true;
@@ -4558,6 +4588,7 @@ class MyStructTypeDef final  {
     return myLongTypeDef;
   }
 
+  [[deprecated("Use `FOO.myLongTypeDef_ref() = BAR;` instead of `FOO.set_myLongTypeDef(BAR);`")]]
   ::cpp2::longTypeDef& set_myLongTypeDef(::cpp2::longTypeDef myLongTypeDef_) {
     myLongTypeDef = myLongTypeDef_;
     __isset.myLongTypeDef = true;
@@ -4573,6 +4604,7 @@ class MyStructTypeDef final  {
   }
 
   template <typename T_MyStructTypeDef_myStringField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.myStringField_ref() = BAR;` instead of `FOO.set_myStringField(BAR);`")]]
   ::std::string& set_myStringField(T_MyStructTypeDef_myStringField_struct_setter&& myStringField_) {
     myStringField = std::forward<T_MyStructTypeDef_myStringField_struct_setter>(myStringField_);
     __isset.myStringField = true;
@@ -4588,6 +4620,7 @@ class MyStructTypeDef final  {
   }
 
   template <typename T_MyStructTypeDef_myStringTypedef_struct_setter = ::cpp2::stringTypedef>
+  [[deprecated("Use `FOO.myStringTypedef_ref() = BAR;` instead of `FOO.set_myStringTypedef(BAR);`")]]
   ::cpp2::stringTypedef& set_myStringTypedef(T_MyStructTypeDef_myStringTypedef_struct_setter&& myStringTypedef_) {
     myStringTypedef = std::forward<T_MyStructTypeDef_myStringTypedef_struct_setter>(myStringTypedef_);
     __isset.myStringTypedef = true;
@@ -4597,6 +4630,7 @@ class MyStructTypeDef final  {
   ::std::map<::std::int16_t, ::std::string> get_myMapField() &&;
 
   template <typename T_MyStructTypeDef_myMapField_struct_setter = ::std::map<::std::int16_t, ::std::string>>
+  [[deprecated("Use `FOO.myMapField_ref() = BAR;` instead of `FOO.set_myMapField(BAR);`")]]
   ::std::map<::std::int16_t, ::std::string>& set_myMapField(T_MyStructTypeDef_myMapField_struct_setter&& myMapField_) {
     myMapField = std::forward<T_MyStructTypeDef_myMapField_struct_setter>(myMapField_);
     __isset.myMapField = true;
@@ -4606,6 +4640,7 @@ class MyStructTypeDef final  {
   ::cpp2::mapTypedef get_myMapTypedef() &&;
 
   template <typename T_MyStructTypeDef_myMapTypedef_struct_setter = ::cpp2::mapTypedef>
+  [[deprecated("Use `FOO.myMapTypedef_ref() = BAR;` instead of `FOO.set_myMapTypedef(BAR);`")]]
   ::cpp2::mapTypedef& set_myMapTypedef(T_MyStructTypeDef_myMapTypedef_struct_setter&& myMapTypedef_) {
     myMapTypedef = std::forward<T_MyStructTypeDef_myMapTypedef_struct_setter>(myMapTypedef_);
     __isset.myMapTypedef = true;
@@ -4615,6 +4650,7 @@ class MyStructTypeDef final  {
   ::std::vector<double> get_myListField() &&;
 
   template <typename T_MyStructTypeDef_myListField_struct_setter = ::std::vector<double>>
+  [[deprecated("Use `FOO.myListField_ref() = BAR;` instead of `FOO.set_myListField(BAR);`")]]
   ::std::vector<double>& set_myListField(T_MyStructTypeDef_myListField_struct_setter&& myListField_) {
     myListField = std::forward<T_MyStructTypeDef_myListField_struct_setter>(myListField_);
     __isset.myListField = true;
@@ -4624,6 +4660,7 @@ class MyStructTypeDef final  {
   ::cpp2::listTypedef get_myListTypedef() &&;
 
   template <typename T_MyStructTypeDef_myListTypedef_struct_setter = ::cpp2::listTypedef>
+  [[deprecated("Use `FOO.myListTypedef_ref() = BAR;` instead of `FOO.set_myListTypedef(BAR);`")]]
   ::cpp2::listTypedef& set_myListTypedef(T_MyStructTypeDef_myListTypedef_struct_setter&& myListTypedef_) {
     myListTypedef = std::forward<T_MyStructTypeDef_myListTypedef_struct_setter>(myListTypedef_);
     __isset.myListTypedef = true;
@@ -4633,6 +4670,7 @@ class MyStructTypeDef final  {
   ::std::map<::std::int16_t, ::std::vector<::cpp2::listTypedef>> get_myMapListOfTypeDef() &&;
 
   template <typename T_MyStructTypeDef_myMapListOfTypeDef_struct_setter = ::std::map<::std::int16_t, ::std::vector<::cpp2::listTypedef>>>
+  [[deprecated("Use `FOO.myMapListOfTypeDef_ref() = BAR;` instead of `FOO.set_myMapListOfTypeDef(BAR);`")]]
   ::std::map<::std::int16_t, ::std::vector<::cpp2::listTypedef>>& set_myMapListOfTypeDef(T_MyStructTypeDef_myMapListOfTypeDef_struct_setter&& myMapListOfTypeDef_) {
     myMapListOfTypeDef = std::forward<T_MyStructTypeDef_myMapListOfTypeDef_struct_setter>(myMapListOfTypeDef_);
     __isset.myMapListOfTypeDef = true;
@@ -4652,7 +4690,7 @@ class MyStructTypeDef final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStructTypeDef >;
+  friend class ::apache::thrift::Cpp2Ops<MyStructTypeDef>;
   friend void swap(MyStructTypeDef& a, MyStructTypeDef& b);
 };
 
@@ -4665,6 +4703,13 @@ uint32_t MyStructTypeDef::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyUnionFloatFieldThrowExp final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -4692,7 +4737,7 @@ class MyUnionFloatFieldThrowExp final  {
   MyUnionFloatFieldThrowExp()
       : type_(Type::__EMPTY__) {}
 
-  MyUnionFloatFieldThrowExp(MyUnionFloatFieldThrowExp&& rhs)
+  MyUnionFloatFieldThrowExp(MyUnionFloatFieldThrowExp&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -4759,7 +4804,7 @@ class MyUnionFloatFieldThrowExp final  {
     }
   }
 
-  MyUnionFloatFieldThrowExp& operator=(MyUnionFloatFieldThrowExp&& rhs) {
+  MyUnionFloatFieldThrowExp& operator=(MyUnionFloatFieldThrowExp&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -4841,24 +4886,9 @@ class MyUnionFloatFieldThrowExp final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const MyUnionFloatFieldThrowExp& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyUnionFloatFieldThrowExp& __x, const MyUnionFloatFieldThrowExp& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyUnionFloatFieldThrowExp& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyUnionFloatFieldThrowExp& __x, const MyUnionFloatFieldThrowExp& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyUnionFloatFieldThrowExp& __x, const MyUnionFloatFieldThrowExp& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyUnionFloatFieldThrowExp& __x, const MyUnionFloatFieldThrowExp& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const MyUnionFloatFieldThrowExp&) const;
+  bool operator<(const MyUnionFloatFieldThrowExp&) const;
 
   ::cpp2::MyEnum& set_myEnum(::cpp2::MyEnum t = ::cpp2::MyEnum()) {
     __clear();
@@ -4930,42 +4960,50 @@ class MyUnionFloatFieldThrowExp final  {
     return value_.complexNestedStruct;
   }
 
-  ::cpp2::MyEnum const & get_myEnum() const {
-    assert(type_ == Type::myEnum);
+  ::cpp2::MyEnum const& get_myEnum() const {
+    if (type_ != Type::myEnum) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myEnum;
   }
 
-  ::std::vector<::std::vector<float>> const & get_setFloat() const {
-    assert(type_ == Type::setFloat);
+  ::std::vector<::std::vector<float>> const& get_setFloat() const {
+    if (type_ != Type::setFloat) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.setFloat;
   }
 
-  ::cpp2::MyDataItem const & get_myDataItem() const {
-    assert(type_ == Type::myDataItem);
+  ::cpp2::MyDataItem const& get_myDataItem() const {
+    if (type_ != Type::myDataItem) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myDataItem;
   }
 
-  ::cpp2::ComplexNestedStruct const & get_complexNestedStruct() const {
-    assert(type_ == Type::complexNestedStruct);
+  ::cpp2::ComplexNestedStruct const& get_complexNestedStruct() const {
+    if (type_ != Type::complexNestedStruct) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.complexNestedStruct;
   }
 
-  ::cpp2::MyEnum & mutable_myEnum() {
+  ::cpp2::MyEnum& mutable_myEnum() {
     assert(type_ == Type::myEnum);
     return value_.myEnum;
   }
 
-  ::std::vector<::std::vector<float>> & mutable_setFloat() {
+  ::std::vector<::std::vector<float>>& mutable_setFloat() {
     assert(type_ == Type::setFloat);
     return value_.setFloat;
   }
 
-  ::cpp2::MyDataItem & mutable_myDataItem() {
+  ::cpp2::MyDataItem& mutable_myDataItem() {
     assert(type_ == Type::myDataItem);
     return value_.myDataItem;
   }
 
-  ::cpp2::ComplexNestedStruct & mutable_complexNestedStruct() {
+  ::cpp2::ComplexNestedStruct& mutable_complexNestedStruct() {
     assert(type_ == Type::complexNestedStruct);
     return value_.complexNestedStruct;
   }
@@ -5089,7 +5127,7 @@ class MyUnionFloatFieldThrowExp final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyUnionFloatFieldThrowExp >;
+  friend class ::apache::thrift::Cpp2Ops<MyUnionFloatFieldThrowExp>;
   friend void swap(MyUnionFloatFieldThrowExp& a, MyUnionFloatFieldThrowExp& b);
 };
 
@@ -5102,6 +5140,13 @@ uint32_t MyUnionFloatFieldThrowExp::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class TypeRemapped final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -5120,19 +5165,19 @@ class TypeRemapped final  {
  public:
 
   TypeRemapped() :
-      BigInteger(0) {}
+      BigInteger(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   TypeRemapped(apache::thrift::FragileConstructor, ::std::map<::std::int64_t, ::std::string> lsMap__arg, ::std::map<::std::int32_t, ::cpp2::FMap> ioMap__arg, ::std::int32_t BigInteger__arg, ::std::string binaryTestBuffer__arg);
 
-  TypeRemapped(TypeRemapped&&) = default;
+  TypeRemapped(TypeRemapped&&) noexcept;
 
-  TypeRemapped(const TypeRemapped&) = default;
+  TypeRemapped(const TypeRemapped& src);
 
 
-  TypeRemapped& operator=(TypeRemapped&&) = default;
-
-  TypeRemapped& operator=(const TypeRemapped&) = default;
+  TypeRemapped& operator=(TypeRemapped&&) noexcept;
+  TypeRemapped& operator=(const TypeRemapped& src);
   void __clear();
  private:
   ::std::map<::std::int64_t, ::std::string> lsMap;
@@ -5143,7 +5188,7 @@ class TypeRemapped final  {
  private:
   ::std::string binaryTestBuffer;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool lsMap;
@@ -5151,24 +5196,11 @@ class TypeRemapped final  {
     bool BigInteger;
     bool binaryTestBuffer;
   } __isset = {};
-  bool operator==(const TypeRemapped& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const TypeRemapped& __x, const TypeRemapped& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const TypeRemapped& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const TypeRemapped& __x, const TypeRemapped& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const TypeRemapped& __x, const TypeRemapped& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const TypeRemapped& __x, const TypeRemapped& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const TypeRemapped&) const;
+  bool operator<(const TypeRemapped&) const;
 
   template <typename..., typename T = ::std::map<::std::int64_t, ::std::string>>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> lsMap_ref() const& {
@@ -5253,6 +5285,7 @@ class TypeRemapped final  {
   ::std::map<::std::int64_t, ::std::string> get_lsMap() &&;
 
   template <typename T_TypeRemapped_lsMap_struct_setter = ::std::map<::std::int64_t, ::std::string>>
+  [[deprecated("Use `FOO.lsMap_ref() = BAR;` instead of `FOO.set_lsMap(BAR);`")]]
   ::std::map<::std::int64_t, ::std::string>& set_lsMap(T_TypeRemapped_lsMap_struct_setter&& lsMap_) {
     lsMap = std::forward<T_TypeRemapped_lsMap_struct_setter>(lsMap_);
     __isset.lsMap = true;
@@ -5262,6 +5295,7 @@ class TypeRemapped final  {
   ::std::map<::std::int32_t, ::cpp2::FMap> get_ioMap() &&;
 
   template <typename T_TypeRemapped_ioMap_struct_setter = ::std::map<::std::int32_t, ::cpp2::FMap>>
+  [[deprecated("Use `FOO.ioMap_ref() = BAR;` instead of `FOO.set_ioMap(BAR);`")]]
   ::std::map<::std::int32_t, ::cpp2::FMap>& set_ioMap(T_TypeRemapped_ioMap_struct_setter&& ioMap_) {
     ioMap = std::forward<T_TypeRemapped_ioMap_struct_setter>(ioMap_);
     __isset.ioMap = true;
@@ -5272,6 +5306,7 @@ class TypeRemapped final  {
     return BigInteger;
   }
 
+  [[deprecated("Use `FOO.BigInteger_ref() = BAR;` instead of `FOO.set_BigInteger(BAR);`")]]
   ::std::int32_t& set_BigInteger(::std::int32_t BigInteger_) {
     BigInteger = BigInteger_;
     __isset.BigInteger = true;
@@ -5287,6 +5322,7 @@ class TypeRemapped final  {
   }
 
   template <typename T_TypeRemapped_binaryTestBuffer_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.binaryTestBuffer_ref() = BAR;` instead of `FOO.set_binaryTestBuffer(BAR);`")]]
   ::std::string& set_binaryTestBuffer(T_TypeRemapped_binaryTestBuffer_struct_setter&& binaryTestBuffer_) {
     binaryTestBuffer = std::forward<T_TypeRemapped_binaryTestBuffer_struct_setter>(binaryTestBuffer_);
     __isset.binaryTestBuffer = true;
@@ -5306,7 +5342,7 @@ class TypeRemapped final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< TypeRemapped >;
+  friend class ::apache::thrift::Cpp2Ops<TypeRemapped>;
   friend void swap(TypeRemapped& a, TypeRemapped& b);
 };
 
@@ -5319,7 +5355,14 @@ uint32_t TypeRemapped::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class emptyXcep final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT emptyXcep final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -5327,6 +5370,12 @@ class emptyXcep final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = emptyXcep;
@@ -5336,38 +5385,28 @@ class emptyXcep final : public apache::thrift::TException {
 
  public:
 
-  emptyXcep() {}
+  emptyXcep();
+
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   emptyXcep(apache::thrift::FragileConstructor);
 
-  emptyXcep(emptyXcep&&) = default;
+  emptyXcep(emptyXcep&&) noexcept;
 
-  emptyXcep(const emptyXcep&) = default;
+  emptyXcep(const emptyXcep& src);
 
 
-  emptyXcep& operator=(emptyXcep&&) = default;
-
-  emptyXcep& operator=(const emptyXcep&) = default;
+  emptyXcep& operator=(emptyXcep&&) noexcept;
+  emptyXcep& operator=(const emptyXcep& src);
   void __clear();
-  bool operator==(const emptyXcep& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const emptyXcep& __x, const emptyXcep& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const emptyXcep& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const emptyXcep& __x, const emptyXcep& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const emptyXcep& __x, const emptyXcep& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const emptyXcep& __x, const emptyXcep& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  ~emptyXcep() override;
+
+
+ public:
+
+  bool operator==(const emptyXcep&) const;
+  bool operator<(const emptyXcep&) const;
 
   template <class Protocol_>
   uint32_t read(Protocol_* iprot);
@@ -5386,7 +5425,7 @@ class emptyXcep final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< emptyXcep >;
+  friend class ::apache::thrift::Cpp2Ops<emptyXcep>;
   friend void swap(emptyXcep& a, emptyXcep& b);
 };
 
@@ -5399,7 +5438,14 @@ uint32_t emptyXcep::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class reqXcep final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT reqXcep final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -5407,6 +5453,12 @@ class reqXcep final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = reqXcep;
@@ -5416,45 +5468,34 @@ class reqXcep final : public apache::thrift::TException {
 
  public:
 
-  reqXcep() :
-      errorCode(0) {}
+  reqXcep();
+
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   reqXcep(apache::thrift::FragileConstructor, ::std::string message__arg, ::std::int32_t errorCode__arg);
 
-  reqXcep(reqXcep&&) = default;
+  reqXcep(reqXcep&&) noexcept;
 
-  reqXcep(const reqXcep&) = default;
+  reqXcep(const reqXcep& src);
 
 
-  reqXcep& operator=(reqXcep&&) = default;
-
-  reqXcep& operator=(const reqXcep&) = default;
+  reqXcep& operator=(reqXcep&&) noexcept;
+  reqXcep& operator=(const reqXcep& src);
   void __clear();
+
+  ~reqXcep() override;
+
  public:
   ::std::string message;
  public:
   ::std::int32_t errorCode;
 
+ private:
+
  public:
-  bool operator==(const reqXcep& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const reqXcep& __x, const reqXcep& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const reqXcep& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const reqXcep& __x, const reqXcep& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const reqXcep& __x, const reqXcep& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const reqXcep& __x, const reqXcep& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const reqXcep&) const;
+  bool operator<(const reqXcep&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::required_field_ref<const T&> message_ref() const& {
@@ -5505,6 +5546,7 @@ class reqXcep final : public apache::thrift::TException {
   }
 
   template <typename T_reqXcep_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.message_ref() = BAR;` instead of `FOO.set_message(BAR);`")]]
   ::std::string& set_message(T_reqXcep_message_struct_setter&& message_) {
     message = std::forward<T_reqXcep_message_struct_setter>(message_);
     return message;
@@ -5514,6 +5556,7 @@ class reqXcep final : public apache::thrift::TException {
     return errorCode;
   }
 
+  [[deprecated("Use `FOO.errorCode_ref() = BAR;` instead of `FOO.set_errorCode(BAR);`")]]
   ::std::int32_t& set_errorCode(::std::int32_t errorCode_) {
     errorCode = errorCode_;
     return errorCode;
@@ -5536,7 +5579,7 @@ class reqXcep final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< reqXcep >;
+  friend class ::apache::thrift::Cpp2Ops<reqXcep>;
   friend void swap(reqXcep& a, reqXcep& b);
 };
 
@@ -5549,7 +5592,14 @@ uint32_t reqXcep::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class optXcep final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT optXcep final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -5557,6 +5607,12 @@ class optXcep final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = optXcep;
@@ -5566,50 +5622,39 @@ class optXcep final : public apache::thrift::TException {
 
  public:
 
-  optXcep() :
-      errorCode(0) {}
+  optXcep();
+
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   optXcep(apache::thrift::FragileConstructor, ::std::string message__arg, ::std::int32_t errorCode__arg);
 
-  optXcep(optXcep&&) = default;
+  optXcep(optXcep&&) noexcept;
 
-  optXcep(const optXcep&) = default;
+  optXcep(const optXcep& src);
 
 
-  optXcep& operator=(optXcep&&) = default;
-
-  optXcep& operator=(const optXcep&) = default;
+  optXcep& operator=(optXcep&&) noexcept;
+  optXcep& operator=(const optXcep& src);
   void __clear();
+
+  ~optXcep() override;
+
  private:
   ::std::string message;
  private:
   ::std::int32_t errorCode;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool message;
     bool errorCode;
   } __isset = {};
-  bool operator==(const optXcep& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const optXcep& __x, const optXcep& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const optXcep& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const optXcep& __x, const optXcep& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const optXcep& __x, const optXcep& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const optXcep& __x, const optXcep& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const optXcep&) const;
+  bool operator<(const optXcep&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::optional_field_ref<const T&> message_ref() const& {
@@ -5661,6 +5706,7 @@ class optXcep final : public apache::thrift::TException {
   ::std::string* get_message() && = delete;
 
   template <typename T_optXcep_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.message_ref() = BAR;` instead of `FOO.set_message(BAR);`")]]
   ::std::string& set_message(T_optXcep_message_struct_setter&& message_) {
     message = std::forward<T_optXcep_message_struct_setter>(message_);
     __isset.message = true;
@@ -5676,6 +5722,7 @@ class optXcep final : public apache::thrift::TException {
   }
   ::std::int32_t* get_errorCode() && = delete;
 
+  [[deprecated("Use `FOO.errorCode_ref() = BAR;` instead of `FOO.set_errorCode(BAR);`")]]
   ::std::int32_t& set_errorCode(::std::int32_t errorCode_) {
     errorCode = errorCode_;
     __isset.errorCode = true;
@@ -5699,7 +5746,7 @@ class optXcep final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< optXcep >;
+  friend class ::apache::thrift::Cpp2Ops<optXcep>;
   friend void swap(optXcep& a, optXcep& b);
 };
 
@@ -5712,7 +5759,14 @@ uint32_t optXcep::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class complexException final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT complexException final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -5720,6 +5774,12 @@ class complexException final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = complexException;
@@ -5735,17 +5795,16 @@ class complexException final : public apache::thrift::TException {
   [[deprecated("This constructor is deprecated")]]
   complexException(apache::thrift::FragileConstructor, ::std::string message__arg, ::std::vector<::std::string> listStrings__arg, ::cpp2::MyEnum errorEnum__arg, ::cpp2::MyUnion unionError__arg, ::cpp2::MyStruct structError__arg, ::std::map<::std::int64_t, ::std::string> lsMap__arg);
 
-  complexException(complexException&&) = default;
+  complexException(complexException&&) noexcept;
 
-  complexException(const complexException&) = default;
+  complexException(const complexException& src);
 
 
-  complexException& operator=(complexException&&) = default;
-
-  complexException& operator=(const complexException&) = default;
+  complexException& operator=(complexException&&) noexcept;
+  complexException& operator=(const complexException& src);
   void __clear();
 
-  ~complexException();
+  ~complexException() override;
 
  private:
   ::std::string message;
@@ -5760,7 +5819,7 @@ class complexException final : public apache::thrift::TException {
  private:
   ::std::map<::std::int64_t, ::std::string> lsMap;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool message;
@@ -5770,24 +5829,11 @@ class complexException final : public apache::thrift::TException {
     bool structError;
     bool lsMap;
   } __isset = {};
-  bool operator==(const complexException& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const complexException& __x, const complexException& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const complexException& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const complexException& __x, const complexException& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const complexException& __x, const complexException& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const complexException& __x, const complexException& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const complexException&) const;
+  bool operator<(const complexException&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> message_ref() const& {
@@ -5918,6 +5964,7 @@ class complexException final : public apache::thrift::TException {
   }
 
   template <typename T_complexException_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.message_ref() = BAR;` instead of `FOO.set_message(BAR);`")]]
   ::std::string& set_message(T_complexException_message_struct_setter&& message_) {
     message = std::forward<T_complexException_message_struct_setter>(message_);
     __isset.message = true;
@@ -5927,6 +5974,7 @@ class complexException final : public apache::thrift::TException {
   ::std::vector<::std::string> get_listStrings() &&;
 
   template <typename T_complexException_listStrings_struct_setter = ::std::vector<::std::string>>
+  [[deprecated("Use `FOO.listStrings_ref() = BAR;` instead of `FOO.set_listStrings(BAR);`")]]
   ::std::vector<::std::string>& set_listStrings(T_complexException_listStrings_struct_setter&& listStrings_) {
     listStrings = std::forward<T_complexException_listStrings_struct_setter>(listStrings_);
     __isset.listStrings = true;
@@ -5937,6 +5985,7 @@ class complexException final : public apache::thrift::TException {
     return errorEnum;
   }
 
+  [[deprecated("Use `FOO.errorEnum_ref() = BAR;` instead of `FOO.set_errorEnum(BAR);`")]]
   ::cpp2::MyEnum& set_errorEnum(::cpp2::MyEnum errorEnum_) {
     errorEnum = errorEnum_;
     __isset.errorEnum = true;
@@ -5947,6 +5996,7 @@ class complexException final : public apache::thrift::TException {
   ::cpp2::MyUnion* get_unionError() && = delete;
 
   template <typename T_complexException_unionError_struct_setter = ::cpp2::MyUnion>
+  [[deprecated("Use `FOO.unionError_ref() = BAR;` instead of `FOO.set_unionError(BAR);`")]]
   ::cpp2::MyUnion& set_unionError(T_complexException_unionError_struct_setter&& unionError_) {
     unionError = std::forward<T_complexException_unionError_struct_setter>(unionError_);
     __isset.unionError = true;
@@ -5956,6 +6006,7 @@ class complexException final : public apache::thrift::TException {
   ::cpp2::MyStruct get_structError() &&;
 
   template <typename T_complexException_structError_struct_setter = ::cpp2::MyStruct>
+  [[deprecated("Use `FOO.structError_ref() = BAR;` instead of `FOO.set_structError(BAR);`")]]
   ::cpp2::MyStruct& set_structError(T_complexException_structError_struct_setter&& structError_) {
     structError = std::forward<T_complexException_structError_struct_setter>(structError_);
     __isset.structError = true;
@@ -5965,6 +6016,7 @@ class complexException final : public apache::thrift::TException {
   ::std::map<::std::int64_t, ::std::string> get_lsMap() &&;
 
   template <typename T_complexException_lsMap_struct_setter = ::std::map<::std::int64_t, ::std::string>>
+  [[deprecated("Use `FOO.lsMap_ref() = BAR;` instead of `FOO.set_lsMap(BAR);`")]]
   ::std::map<::std::int64_t, ::std::string>& set_lsMap(T_complexException_lsMap_struct_setter&& lsMap_) {
     lsMap = std::forward<T_complexException_lsMap_struct_setter>(lsMap_);
     __isset.lsMap = true;
@@ -5988,7 +6040,7 @@ class complexException final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< complexException >;
+  friend class ::apache::thrift::Cpp2Ops<complexException>;
   friend void swap(complexException& a, complexException& b);
 };
 

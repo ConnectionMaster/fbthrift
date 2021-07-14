@@ -16,19 +16,22 @@
 
 #pragma once
 
+#include <thrift/compiler/ast/t_field.h>
 #include <thrift/compiler/ast/t_struct.h>
 
 namespace apache {
 namespace thrift {
 namespace compiler {
 
+class t_program;
+
+// TODO(afuller): Inherit from t_structured instead.
 class t_paramlist : public t_struct {
  public:
-  using t_struct::t_struct;
-
-  bool is_paramlist() const override {
-    return true;
-  }
+  // Param lists are unnamed.
+  // TODO(afuller): The program should always be null, because this is an
+  // 'unnamed' t_type (or more accurately, not a type at all).
+  explicit t_paramlist(t_program* program) : t_struct(program, "") {}
 
   t_field* get_stream_field() {
     return has_stream_field_ ? fields_[0].get() : nullptr;
@@ -41,8 +44,13 @@ class t_paramlist : public t_struct {
   // field into the pargs struct
   bool has_stream_field_ = false;
 
-  friend class t_struct;
+  friend class t_structured;
   t_paramlist* clone_DO_NOT_USE() const override;
+
+  // TODO(afuller): Remove everything below this comment. It is only provided
+  // for backwards compatibility.
+ public:
+  bool is_paramlist() const override { return true; }
 };
 
 } // namespace compiler

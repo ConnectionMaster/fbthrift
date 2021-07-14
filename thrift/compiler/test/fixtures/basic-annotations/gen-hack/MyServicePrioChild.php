@@ -124,7 +124,7 @@ trait MyServicePrioChildClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -133,7 +133,7 @@ trait MyServicePrioChildClientBase {
         $result = MyServicePrioChild_pang_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("pang failed: sequence id is out of order");
         }
       }
@@ -309,6 +309,41 @@ abstract class MyServicePrioChildAsyncProcessorBase extends MyServicePrioParentA
     }
     $this->eventHandler_->postWrite($handler_ctx, 'pang', $result);
   }
+  protected async function process_getThriftServiceMetadata(int $seqid, \TProtocol $input, \TProtocol $output): Awaitable<void> {
+    $reply_type = \TMessageType::REPLY;
+
+    if ($input is \TBinaryProtocolAccelerated) {
+      $args = \thrift_protocol_read_binary_struct($input, '\tmeta_ThriftMetadataService_getThriftServiceMetadata_args');
+    } else if ($input is \TCompactProtocolAccelerated) {
+      $args = \thrift_protocol_read_compact_struct($input, '\tmeta_ThriftMetadataService_getThriftServiceMetadata_args');
+    } else {
+      $args = \tmeta_ThriftMetadataService_getThriftServiceMetadata_args::withDefaultValues();
+      $args->read($input);
+    }
+    $input->readMessageEnd();
+    $result = \tmeta_ThriftMetadataService_getThriftServiceMetadata_result::withDefaultValues();
+    try {
+      $result->success = MyServicePrioChildStaticMetadata::getServiceMetadataResponse();
+    } catch (\Exception $ex) {
+      $reply_type = \TMessageType::EXCEPTION;
+      $result = new \TApplicationException($ex->getMessage()."\n".$ex->getTraceAsString());
+    }
+    if ($output is \TBinaryProtocolAccelerated)
+    {
+      \thrift_protocol_write_binary($output, 'getThriftServiceMetadata', $reply_type, $result, $seqid, $output->isStrictWrite());
+    }
+    else if ($output is \TCompactProtocolAccelerated)
+    {
+      \thrift_protocol_write_compact($output, 'getThriftServiceMetadata', $reply_type, $result, $seqid);
+    }
+    else
+    {
+      $output->writeMessageBegin("getThriftServiceMetadata", $reply_type, $seqid);
+      $result->write($output);
+      $output->writeMessageEnd();
+      $output->getTransport()->flush();
+    }
+  }
 }
 class MyServicePrioChildAsyncProcessor extends MyServicePrioChildAsyncProcessorBase {
   const type TThriftIf = MyServicePrioChildAsyncIf;
@@ -360,6 +395,41 @@ abstract class MyServicePrioChildSyncProcessorBase extends MyServicePrioParentSy
     }
     $this->eventHandler_->postWrite($handler_ctx, 'pang', $result);
   }
+  protected function process_getThriftServiceMetadata(int $seqid, \TProtocol $input, \TProtocol $output): void {
+    $reply_type = \TMessageType::REPLY;
+
+    if ($input is \TBinaryProtocolAccelerated) {
+      $args = \thrift_protocol_read_binary_struct($input, '\tmeta_ThriftMetadataService_getThriftServiceMetadata_args');
+    } else if ($input is \TCompactProtocolAccelerated) {
+      $args = \thrift_protocol_read_compact_struct($input, '\tmeta_ThriftMetadataService_getThriftServiceMetadata_args');
+    } else {
+      $args = \tmeta_ThriftMetadataService_getThriftServiceMetadata_args::withDefaultValues();
+      $args->read($input);
+    }
+    $input->readMessageEnd();
+    $result = \tmeta_ThriftMetadataService_getThriftServiceMetadata_result::withDefaultValues();
+    try {
+      $result->success = MyServicePrioChildStaticMetadata::getServiceMetadataResponse();
+    } catch (\Exception $ex) {
+      $reply_type = \TMessageType::EXCEPTION;
+      $result = new \TApplicationException($ex->getMessage()."\n".$ex->getTraceAsString());
+    }
+    if ($output is \TBinaryProtocolAccelerated)
+    {
+      \thrift_protocol_write_binary($output, 'getThriftServiceMetadata', $reply_type, $result, $seqid, $output->isStrictWrite());
+    }
+    else if ($output is \TCompactProtocolAccelerated)
+    {
+      \thrift_protocol_write_compact($output, 'getThriftServiceMetadata', $reply_type, $result, $seqid);
+    }
+    else
+    {
+      $output->writeMessageBegin("getThriftServiceMetadata", $reply_type, $seqid);
+      $result->write($output);
+      $output->writeMessageEnd();
+      $output->getTransport()->flush();
+    }
+  }
 }
 class MyServicePrioChildSyncProcessor extends MyServicePrioChildSyncProcessorBase {
   const type TThriftIf = MyServicePrioChildIf;
@@ -397,11 +467,20 @@ class MyServicePrioChild_pang_args implements \IThriftStruct, \IThriftShapishStr
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyServicePrioChild_pang_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.pang_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -454,11 +533,20 @@ class MyServicePrioChild_pang_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyServicePrioChild_pang_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.MyServicePrioChild_pang_result",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -478,10 +566,10 @@ class MyServicePrioChild_pang_result implements \IThriftStruct {
 }
 
 class MyServicePrioChildStaticMetadata implements \IThriftServiceStaticMetadata {
-  public static function getServiceMetadata(): \tmeta_ThriftService {
+  public static function getServiceMetadata()[]: \tmeta_ThriftService {
     return tmeta_ThriftService::fromShape(
       shape(
-        "name" => "MyServicePrioChild",
+        "name" => "module.MyServicePrioChild",
         "functions" => vec[
           tmeta_ThriftFunction::fromShape(
             shape(
@@ -494,11 +582,42 @@ class MyServicePrioChildStaticMetadata implements \IThriftServiceStaticMetadata 
             )
           ),
         ],
-        "parent" => "MyServicePrioParent",
+        "parent" => "module.MyServicePrioParent",
       )
     );
   }
-  public static function getAllStructuredAnnotations(): \TServiceAnnotations {
+
+  public static function getServiceMetadataResponse()[]: \tmeta_ThriftServiceMetadataResponse {
+    return \tmeta_ThriftServiceMetadataResponse::fromShape(
+      shape(
+        'context' => \tmeta_ThriftServiceContext::fromShape(
+          shape(
+            'service_info' => self::getServiceMetadata(),
+            'module' => \tmeta_ThriftModuleContext::fromShape(
+              shape(
+                'name' => 'module',
+              )
+            ),
+          )
+        ),
+        'metadata' => \tmeta_ThriftMetadata::fromShape(
+          shape(
+            'enums' => dict[
+            ],
+            'structs' => dict[
+            ],
+            'exceptions' => dict[
+            ],
+            'services' => dict[
+              'module.MyServicePrioParent' => MyServicePrioParentStaticMetadata::getServiceMetadata(),
+            ],
+          )
+        ),
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TServiceAnnotations {
     return shape(
       'service' => dict[],
       'functions' => dict[

@@ -392,6 +392,11 @@ type raiserProcessorDoBland struct {
   handler Raiser
 }
 
+func (p *RaiserDoBlandResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *raiserProcessorDoBland) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := RaiserDoBlandArgs{}
   if err := args.Read(iprot); err != nil {
@@ -437,6 +442,20 @@ func (p *raiserProcessorDoBland) Run(argStruct thrift.Struct) (thrift.WritableSt
 
 type raiserProcessorDoRaise struct {
   handler Raiser
+}
+
+func (p *RaiserDoRaiseResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  if p.B != nil {
+    return p.B
+  }
+  if p.F != nil {
+    return p.F
+  }
+  if p.S != nil {
+    return p.S
+  }
+  return nil
 }
 
 func (p *raiserProcessorDoRaise) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -501,6 +520,11 @@ type raiserProcessorGet200 struct {
   handler Raiser
 }
 
+func (p *RaiserGet200Result) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *raiserProcessorGet200) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := RaiserGet200Args{}
   if err := args.Read(iprot); err != nil {
@@ -548,6 +572,20 @@ func (p *raiserProcessorGet200) Run(argStruct thrift.Struct) (thrift.WritableStr
 
 type raiserProcessorGet500 struct {
   handler Raiser
+}
+
+func (p *RaiserGet500Result) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  if p.F != nil {
+    return p.F
+  }
+  if p.B != nil {
+    return p.B
+  }
+  if p.S != nil {
+    return p.S
+  }
+  return nil
 }
 
 func (p *raiserProcessorGet500) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -817,9 +855,9 @@ func (p *RaiserDoRaiseArgs) String() string {
 //  - S
 type RaiserDoRaiseResult struct {
   thrift.IResponse
-  B *Banal `thrift:"b,1" db:"b" json:"b,omitempty"`
-  F *Fiery `thrift:"f,2" db:"f" json:"f,omitempty"`
-  S *Serious `thrift:"s,3" db:"s" json:"s,omitempty"`
+  B *Banal `thrift:"b,1,optional" db:"b" json:"b,omitempty"`
+  F *Fiery `thrift:"f,2,optional" db:"f" json:"f,omitempty"`
+  S *Serious `thrift:"s,3,optional" db:"s" json:"s,omitempty"`
 }
 
 func NewRaiserDoRaiseResult() *RaiserDoRaiseResult {
@@ -1119,7 +1157,7 @@ func (p *RaiserGet200Args) String() string {
 //  - Success
 type RaiserGet200Result struct {
   thrift.IResponse
-  Success *string `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *string `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewRaiserGet200Result() *RaiserGet200Result {
@@ -1314,10 +1352,10 @@ func (p *RaiserGet500Args) String() string {
 //  - S
 type RaiserGet500Result struct {
   thrift.IResponse
-  Success *string `thrift:"success,0" db:"success" json:"success,omitempty"`
-  F *Fiery `thrift:"f,1" db:"f" json:"f,omitempty"`
-  B *Banal `thrift:"b,2" db:"b" json:"b,omitempty"`
-  S *Serious `thrift:"s,3" db:"s" json:"s,omitempty"`
+  Success *string `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
+  F *Fiery `thrift:"f,1,optional" db:"f" json:"f,omitempty"`
+  B *Banal `thrift:"b,2,optional" db:"b" json:"b,omitempty"`
+  S *Serious `thrift:"s,3,optional" db:"s" json:"s,omitempty"`
 }
 
 func NewRaiserGet500Result() *RaiserGet500Result {

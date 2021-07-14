@@ -35,6 +35,10 @@ void service3AsyncProcessor::setUpAndProcess_methodA(apache::thrift::ResponseCha
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void service3AsyncProcessor::process_methodA(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -44,12 +48,9 @@ void service3AsyncProcessor::process_methodA(apache::thrift::ResponseChannelRequ
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "methodA");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "methodA");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<void>>(std::move(req), std::move(ctxStack), return_methodA<ProtocolIn_,ProtocolOut_>, throw_wrapped_methodA<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -57,10 +58,10 @@ void service3AsyncProcessor::process_methodA(apache::thrift::ResponseChannelRequ
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue service3AsyncProcessor::return_methodA(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
+apache::thrift::LegacySerializedResponse service3AsyncProcessor::return_methodA(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
   ProtocolOut_ prot;
   service3_methodA_presult result;
-  return serializeResponse("methodA", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("methodA", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -88,6 +89,10 @@ void service3AsyncProcessor::setUpAndProcess_methodB(apache::thrift::ResponseCha
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void service3AsyncProcessor::process_methodB(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -103,12 +108,9 @@ void service3AsyncProcessor::process_methodB(apache::thrift::ResponseChannelRequ
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "methodB");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "methodB");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<void>>(std::move(req), std::move(ctxStack), return_methodB<ProtocolIn_,ProtocolOut_>, throw_wrapped_methodB<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -116,10 +118,10 @@ void service3AsyncProcessor::process_methodB(apache::thrift::ResponseChannelRequ
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue service3AsyncProcessor::return_methodB(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
+apache::thrift::LegacySerializedResponse service3AsyncProcessor::return_methodB(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
   ProtocolOut_ prot;
   service3_methodB_presult result;
-  return serializeResponse("methodB", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("methodB", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -147,6 +149,10 @@ void service3AsyncProcessor::setUpAndProcess_methodC(apache::thrift::ResponseCha
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void service3AsyncProcessor::process_methodC(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -156,12 +162,9 @@ void service3AsyncProcessor::process_methodC(apache::thrift::ResponseChannelRequ
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "methodC");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "methodC");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<::std::int32_t>>(std::move(req), std::move(ctxStack), return_methodC<ProtocolIn_,ProtocolOut_>, throw_wrapped_methodC<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -169,12 +172,12 @@ void service3AsyncProcessor::process_methodC(apache::thrift::ResponseChannelRequ
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue service3AsyncProcessor::return_methodC(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::std::int32_t const& _return) {
+apache::thrift::LegacySerializedResponse service3AsyncProcessor::return_methodC(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::std::int32_t const& _return) {
   ProtocolOut_ prot;
   service3_methodC_presult result;
   result.get<0>().value = const_cast<::std::int32_t*>(&_return);
   result.setIsSet(0, true);
-  return serializeResponse("methodC", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("methodC", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -202,6 +205,10 @@ void service3AsyncProcessor::setUpAndProcess_methodD(apache::thrift::ResponseCha
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void service3AsyncProcessor::process_methodD(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -217,12 +224,9 @@ void service3AsyncProcessor::process_methodD(apache::thrift::ResponseChannelRequ
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "methodD");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "methodD");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<::std::int32_t>>(std::move(req), std::move(ctxStack), return_methodD<ProtocolIn_,ProtocolOut_>, throw_wrapped_methodD<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -230,12 +234,12 @@ void service3AsyncProcessor::process_methodD(apache::thrift::ResponseChannelRequ
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue service3AsyncProcessor::return_methodD(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::std::int32_t const& _return) {
+apache::thrift::LegacySerializedResponse service3AsyncProcessor::return_methodD(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::std::int32_t const& _return) {
   ProtocolOut_ prot;
   service3_methodD_presult result;
   result.get<0>().value = const_cast<::std::int32_t*>(&_return);
   result.setIsSet(0, true);
-  return serializeResponse("methodD", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("methodD", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -263,6 +267,10 @@ void service3AsyncProcessor::setUpAndProcess_methodE(apache::thrift::ResponseCha
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void service3AsyncProcessor::process_methodE(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -272,12 +280,9 @@ void service3AsyncProcessor::process_methodE(apache::thrift::ResponseChannelRequ
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "methodE");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "methodE");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<std::unique_ptr<::test_cpp2::cpp_reflection::struct2>>>(std::move(req), std::move(ctxStack), return_methodE<ProtocolIn_,ProtocolOut_>, throw_wrapped_methodE<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -285,12 +290,12 @@ void service3AsyncProcessor::process_methodE(apache::thrift::ResponseChannelRequ
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue service3AsyncProcessor::return_methodE(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::test_cpp2::cpp_reflection::struct2 const& _return) {
+apache::thrift::LegacySerializedResponse service3AsyncProcessor::return_methodE(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::test_cpp2::cpp_reflection::struct2 const& _return) {
   ProtocolOut_ prot;
   service3_methodE_presult result;
   result.get<0>().value = const_cast<::test_cpp2::cpp_reflection::struct2*>(&_return);
   result.setIsSet(0, true);
-  return serializeResponse("methodE", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("methodE", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -318,6 +323,10 @@ void service3AsyncProcessor::setUpAndProcess_methodF(apache::thrift::ResponseCha
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void service3AsyncProcessor::process_methodF(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -333,12 +342,9 @@ void service3AsyncProcessor::process_methodF(apache::thrift::ResponseChannelRequ
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "methodF");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "methodF");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<std::unique_ptr<::test_cpp2::cpp_reflection::struct3>>>(std::move(req), std::move(ctxStack), return_methodF<ProtocolIn_,ProtocolOut_>, throw_wrapped_methodF<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -346,12 +352,12 @@ void service3AsyncProcessor::process_methodF(apache::thrift::ResponseChannelRequ
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue service3AsyncProcessor::return_methodF(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::test_cpp2::cpp_reflection::struct3 const& _return) {
+apache::thrift::LegacySerializedResponse service3AsyncProcessor::return_methodF(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::test_cpp2::cpp_reflection::struct3 const& _return) {
   ProtocolOut_ prot;
   service3_methodF_presult result;
   result.get<0>().value = const_cast<::test_cpp2::cpp_reflection::struct3*>(&_return);
   result.setIsSet(0, true);
-  return serializeResponse("methodF", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("methodF", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>

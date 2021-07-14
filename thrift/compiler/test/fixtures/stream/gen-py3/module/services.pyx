@@ -6,6 +6,7 @@
 #
 
 cimport cython
+from typing import AsyncIterator
 from cpython.version cimport PY_VERSION_HEX
 from libc.stdint cimport (
     int8_t as cint8_t,
@@ -21,6 +22,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap
 from libcpp.utility cimport move as cmove
+from libcpp.pair cimport pair
 from cython.operator cimport dereference as deref
 from cpython.ref cimport PyObject
 from thrift.py3.exceptions cimport (
@@ -47,12 +49,13 @@ if PY_VERSION_HEX >= 0x030702F0:  # 3.7.2 Final
 
 cimport folly.futures
 from folly.executor cimport get_executor
-cimport folly.iobuf as __iobuf
-import folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
+import folly.iobuf as _fbthrift_iobuf
 from folly.iobuf cimport move as move_iobuf
 from folly.memory cimport to_shared_ptr as __to_shared_ptr
 
-from thrift.py3.stream cimport cServerStream, cResponseAndServerStream, createEmptyResponseAndServerStream
+from thrift.py3.std_libcpp cimport optional
+from thrift.py3.stream cimport cServerStream, cServerStreamPublisher, cResponseAndServerStream, createResponseAndServerStream, createAsyncIteratorFromPyIterator, pythonFuncToCppFunc, ServerStream, ServerPublisher
 cimport module.types as _module_types
 import module.types as _module_types
 
@@ -65,7 +68,183 @@ import traceback
 import types as _py_types
 
 from module.services_wrapper cimport cPubSubStreamingServiceInterface
+cdef class ServerPublisher_cint32_t(ServerPublisher):
+    cdef unique_ptr[cServerStreamPublisher[cint32_t]] cPublisher
 
+    def complete(ServerPublisher self):
+        cmove(deref(self.cPublisher)).complete()
+
+    # Calling this send instead of the wrapped method name of next because next is
+    # a python keyword and makes the linter complain
+    def send(ServerPublisher self, cint32_t item):
+        deref(self.cPublisher).next(<cint32_t?>item)
+
+    @staticmethod
+    cdef create(cServerStreamPublisher[cint32_t] cPublisher):
+        cdef ServerPublisher_cint32_t inst = ServerPublisher_cint32_t.__new__(ServerPublisher_cint32_t)
+        inst.cPublisher = make_unique[cServerStreamPublisher[cint32_t]](cmove(cPublisher))
+        return inst
+
+cdef class ServerStream_cint32_t(ServerStream):
+    cdef unique_ptr[cServerStream[cint32_t]] cStream
+
+    @staticmethod
+    cdef create(cServerStream[cint32_t] cStream):
+        cdef ServerStream_cint32_t inst = ServerStream_cint32_t.__new__(ServerStream_cint32_t)
+        inst.cStream = make_unique[cServerStream[cint32_t]](cmove(cStream))
+        return inst
+
+async def runGenerator_PubSubStreamingService_returnstream(object generator, Promise_cint32_t_Stream promise):
+    try:
+        item = await generator.asend(None)
+    except StopAsyncIteration:
+        promise.cPromise.setValue(optional[cint32_t]())
+    except __ApplicationError as ex:
+        # If the handler raised an ApplicationError convert it to a C++ one
+        promise.cPromise.setException(cTApplicationException(
+            ex.type.value, ex.message.encode('UTF-8')
+        ))
+    except Exception as ex:
+        print(
+            "Unexpected error in [TODO template this properly]:",
+            file=sys.stderr)
+        traceback.print_exc()
+        promise.cPromise.setException(cTApplicationException(
+            cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
+        ))
+    else:
+        promise.cPromise.setValue(optional[cint32_t](<cint32_t?>item))
+
+cdef void getNextGenerator_PubSubStreamingService_returnstream(object generator, cFollyPromise[optional[cint32_t]] cPromise):
+    cdef Promise_cint32_t_Stream __promise = Promise_cint32_t_Stream.create(cmove(cPromise))
+    asyncio.get_event_loop().create_task(
+        runGenerator_PubSubStreamingService_returnstream(
+            generator,
+            __promise
+        )
+    )
+async def runGenerator_PubSubStreamingService_streamthrows(object generator, Promise_cint32_t_Stream promise):
+    try:
+        item = await generator.asend(None)
+    except StopAsyncIteration:
+        promise.cPromise.setValue(optional[cint32_t]())
+    except _module_types.FooEx as ex:
+        promise.cPromise.setException(deref((<_module_types.FooEx> ex)._cpp_obj))
+    except __ApplicationError as ex:
+        # If the handler raised an ApplicationError convert it to a C++ one
+        promise.cPromise.setException(cTApplicationException(
+            ex.type.value, ex.message.encode('UTF-8')
+        ))
+    except Exception as ex:
+        print(
+            "Unexpected error in [TODO template this properly]:",
+            file=sys.stderr)
+        traceback.print_exc()
+        promise.cPromise.setException(cTApplicationException(
+            cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
+        ))
+    else:
+        promise.cPromise.setValue(optional[cint32_t](<cint32_t?>item))
+
+cdef void getNextGenerator_PubSubStreamingService_streamthrows(object generator, cFollyPromise[optional[cint32_t]] cPromise):
+    cdef Promise_cint32_t_Stream __promise = Promise_cint32_t_Stream.create(cmove(cPromise))
+    asyncio.get_event_loop().create_task(
+        runGenerator_PubSubStreamingService_streamthrows(
+            generator,
+            __promise
+        )
+    )
+async def runGenerator_PubSubStreamingService_boththrows(object generator, Promise_cint32_t_Stream promise):
+    try:
+        item = await generator.asend(None)
+    except StopAsyncIteration:
+        promise.cPromise.setValue(optional[cint32_t]())
+    except _module_types.FooEx as ex:
+        promise.cPromise.setException(deref((<_module_types.FooEx> ex)._cpp_obj))
+    except __ApplicationError as ex:
+        # If the handler raised an ApplicationError convert it to a C++ one
+        promise.cPromise.setException(cTApplicationException(
+            ex.type.value, ex.message.encode('UTF-8')
+        ))
+    except Exception as ex:
+        print(
+            "Unexpected error in [TODO template this properly]:",
+            file=sys.stderr)
+        traceback.print_exc()
+        promise.cPromise.setException(cTApplicationException(
+            cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
+        ))
+    else:
+        promise.cPromise.setValue(optional[cint32_t](<cint32_t?>item))
+
+cdef void getNextGenerator_PubSubStreamingService_boththrows(object generator, cFollyPromise[optional[cint32_t]] cPromise):
+    cdef Promise_cint32_t_Stream __promise = Promise_cint32_t_Stream.create(cmove(cPromise))
+    asyncio.get_event_loop().create_task(
+        runGenerator_PubSubStreamingService_boththrows(
+            generator,
+            __promise
+        )
+    )
+async def runGenerator_PubSubStreamingService_responseandstreamthrows(object generator, Promise_cint32_t_Stream promise):
+    try:
+        item = await generator.asend(None)
+    except StopAsyncIteration:
+        promise.cPromise.setValue(optional[cint32_t]())
+    except _module_types.FooEx as ex:
+        promise.cPromise.setException(deref((<_module_types.FooEx> ex)._cpp_obj))
+    except __ApplicationError as ex:
+        # If the handler raised an ApplicationError convert it to a C++ one
+        promise.cPromise.setException(cTApplicationException(
+            ex.type.value, ex.message.encode('UTF-8')
+        ))
+    except Exception as ex:
+        print(
+            "Unexpected error in [TODO template this properly]:",
+            file=sys.stderr)
+        traceback.print_exc()
+        promise.cPromise.setException(cTApplicationException(
+            cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
+        ))
+    else:
+        promise.cPromise.setValue(optional[cint32_t](<cint32_t?>item))
+
+cdef void getNextGenerator_PubSubStreamingService_responseandstreamthrows(object generator, cFollyPromise[optional[cint32_t]] cPromise):
+    cdef Promise_cint32_t_Stream __promise = Promise_cint32_t_Stream.create(cmove(cPromise))
+    asyncio.get_event_loop().create_task(
+        runGenerator_PubSubStreamingService_responseandstreamthrows(
+            generator,
+            __promise
+        )
+    )
+async def runGenerator_PubSubStreamingService_returnstreamFast(object generator, Promise_cint32_t_Stream promise):
+    try:
+        item = await generator.asend(None)
+    except StopAsyncIteration:
+        promise.cPromise.setValue(optional[cint32_t]())
+    except __ApplicationError as ex:
+        # If the handler raised an ApplicationError convert it to a C++ one
+        promise.cPromise.setException(cTApplicationException(
+            ex.type.value, ex.message.encode('UTF-8')
+        ))
+    except Exception as ex:
+        print(
+            "Unexpected error in [TODO template this properly]:",
+            file=sys.stderr)
+        traceback.print_exc()
+        promise.cPromise.setException(cTApplicationException(
+            cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
+        ))
+    else:
+        promise.cPromise.setValue(optional[cint32_t](<cint32_t?>item))
+
+cdef void getNextGenerator_PubSubStreamingService_returnstreamFast(object generator, cFollyPromise[optional[cint32_t]] cPromise):
+    cdef Promise_cint32_t_Stream __promise = Promise_cint32_t_Stream.create(cmove(cPromise))
+    asyncio.get_event_loop().create_task(
+        runGenerator_PubSubStreamingService_returnstreamFast(
+            generator,
+            __promise
+        )
+    )
 
 
 @cython.auto_pickle(False)
@@ -85,6 +264,16 @@ cdef class Promise_cServerStream__cint32_t:
     @staticmethod
     cdef create(cFollyPromise[cServerStream[cint32_t]] cPromise):
         cdef Promise_cServerStream__cint32_t inst = Promise_cServerStream__cint32_t.__new__(Promise_cServerStream__cint32_t)
+        inst.cPromise = cmove(cPromise)
+        return inst
+
+@cython.auto_pickle(False)
+cdef class Promise_cint32_t_Stream:
+    cdef cFollyPromise[optional[cint32_t]] cPromise
+
+    @staticmethod
+    cdef create(cFollyPromise[optional[cint32_t]] cPromise):
+        cdef Promise_cint32_t_Stream inst = Promise_cint32_t_Stream.__new__(Promise_cint32_t_Stream)
         inst.cPromise = cmove(cPromise)
         return inst
 
@@ -115,6 +304,12 @@ cdef class PubSubStreamingServiceInterface(
         raise NotImplementedError("async def returnstream is not implemented")
 
     @staticmethod
+    def createPublisher_returnstream(callback=None):
+        cdef unique_ptr[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]] streams = make_unique[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]](cServerStream[cint32_t].createPublisher(pythonFuncToCppFunc(callback)))
+
+        return (ServerStream_cint32_t.create(cmove(deref(streams).first)), ServerPublisher_cint32_t.create(cmove(deref(streams).second)))
+
+    @staticmethod
     def pass_context_streamthrows(fn):
         return pass_context(fn)
 
@@ -122,6 +317,12 @@ cdef class PubSubStreamingServiceInterface(
             self,
             foo):
         raise NotImplementedError("async def streamthrows is not implemented")
+
+    @staticmethod
+    def createPublisher_streamthrows(callback=None):
+        cdef unique_ptr[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]] streams = make_unique[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]](cServerStream[cint32_t].createPublisher(pythonFuncToCppFunc(callback)))
+
+        return (ServerStream_cint32_t.create(cmove(deref(streams).first)), ServerPublisher_cint32_t.create(cmove(deref(streams).second)))
 
     @staticmethod
     def pass_context_boththrows(fn):
@@ -133,6 +334,12 @@ cdef class PubSubStreamingServiceInterface(
         raise NotImplementedError("async def boththrows is not implemented")
 
     @staticmethod
+    def createPublisher_boththrows(callback=None):
+        cdef unique_ptr[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]] streams = make_unique[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]](cServerStream[cint32_t].createPublisher(pythonFuncToCppFunc(callback)))
+
+        return (ServerStream_cint32_t.create(cmove(deref(streams).first)), ServerPublisher_cint32_t.create(cmove(deref(streams).second)))
+
+    @staticmethod
     def pass_context_responseandstreamthrows(fn):
         return pass_context(fn)
 
@@ -140,6 +347,12 @@ cdef class PubSubStreamingServiceInterface(
             self,
             foo):
         raise NotImplementedError("async def responseandstreamthrows is not implemented")
+
+    @staticmethod
+    def createPublisher_responseandstreamthrows(callback=None):
+        cdef unique_ptr[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]] streams = make_unique[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]](cServerStream[cint32_t].createPublisher(pythonFuncToCppFunc(callback)))
+
+        return (ServerStream_cint32_t.create(cmove(deref(streams).first)), ServerPublisher_cint32_t.create(cmove(deref(streams).second)))
 
     @staticmethod
     def pass_context_returnstreamFast(fn):
@@ -150,6 +363,12 @@ cdef class PubSubStreamingServiceInterface(
             i32_from,
             i32_to):
         raise NotImplementedError("async def returnstreamFast is not implemented")
+
+    @staticmethod
+    def createPublisher_returnstreamFast(callback=None):
+        cdef unique_ptr[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]] streams = make_unique[pair[cServerStream[cint32_t], cServerStreamPublisher[cint32_t]]](cServerStream[cint32_t].createPublisher(pythonFuncToCppFunc(callback)))
+
+        return (ServerStream_cint32_t.create(cmove(deref(streams).first)), ServerPublisher_cint32_t.create(cmove(deref(streams).second)))
 
     @classmethod
     def __get_reflection__(cls):
@@ -204,13 +423,17 @@ async def PubSubStreamingService_returnstream_coro(
 ):
     try:
         if ctx and getattr(self.returnstream, "pass_context", False):
-            result = await self.returnstream(ctx,
+            result = self.returnstream(ctx,
                       i32_from,
                       i32_to)
         else:
-            result = await self.returnstream(
+            result = self.returnstream(
                       i32_from,
                       i32_to)
+        if not isinstance(result, (ServerStream, AsyncIterator)):
+            result = await result
+        if isinstance(result, AsyncIterator):
+            result = ServerStream_cint32_t.create(cmove(createAsyncIteratorFromPyIterator[cint32_t](result, get_executor(), &getNextGenerator_PubSubStreamingService_returnstream)))
     except __ApplicationError as ex:
         # If the handler raised an ApplicationError convert it to a C++ one
         promise.cPromise.setException(cTApplicationException(
@@ -225,8 +448,7 @@ async def PubSubStreamingService_returnstream_coro(
             cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
         ))
     else:
-        promise.cPromise.setValue(cServerStream[cint32_t].createEmpty() # server streaming support is not implemented yet
-)
+        promise.cPromise.setValue(cmove(deref((<ServerStream_cint32_t?>result).cStream)))
 
 cdef api void call_cy_PubSubStreamingService_streamthrows(
     object self,
@@ -259,11 +481,15 @@ async def PubSubStreamingService_streamthrows_coro(
 ):
     try:
         if ctx and getattr(self.streamthrows, "pass_context", False):
-            result = await self.streamthrows(ctx,
+            result = self.streamthrows(ctx,
                       foo)
         else:
-            result = await self.streamthrows(
+            result = self.streamthrows(
                       foo)
+        if not isinstance(result, (ServerStream, AsyncIterator)):
+            result = await result
+        if isinstance(result, AsyncIterator):
+            result = ServerStream_cint32_t.create(cmove(createAsyncIteratorFromPyIterator[cint32_t](result, get_executor(), &getNextGenerator_PubSubStreamingService_streamthrows)))
     except __ApplicationError as ex:
         # If the handler raised an ApplicationError convert it to a C++ one
         promise.cPromise.setException(cTApplicationException(
@@ -278,8 +504,7 @@ async def PubSubStreamingService_streamthrows_coro(
             cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
         ))
     else:
-        promise.cPromise.setValue(cServerStream[cint32_t].createEmpty() # server streaming support is not implemented yet
-)
+        promise.cPromise.setValue(cmove(deref((<ServerStream_cint32_t?>result).cStream)))
 
 cdef api void call_cy_PubSubStreamingService_boththrows(
     object self,
@@ -312,11 +537,15 @@ async def PubSubStreamingService_boththrows_coro(
 ):
     try:
         if ctx and getattr(self.boththrows, "pass_context", False):
-            result = await self.boththrows(ctx,
+            result = self.boththrows(ctx,
                       foo)
         else:
-            result = await self.boththrows(
+            result = self.boththrows(
                       foo)
+        if not isinstance(result, (ServerStream, AsyncIterator)):
+            result = await result
+        if isinstance(result, AsyncIterator):
+            result = ServerStream_cint32_t.create(cmove(createAsyncIteratorFromPyIterator[cint32_t](result, get_executor(), &getNextGenerator_PubSubStreamingService_boththrows)))
     except _module_types.FooEx as ex:
         promise.cPromise.setException(deref((<_module_types.FooEx> ex)._cpp_obj))
     except __ApplicationError as ex:
@@ -333,8 +562,7 @@ async def PubSubStreamingService_boththrows_coro(
             cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
         ))
     else:
-        promise.cPromise.setValue(cServerStream[cint32_t].createEmpty() # server streaming support is not implemented yet
-)
+        promise.cPromise.setValue(cmove(deref((<ServerStream_cint32_t?>result).cStream)))
 
 cdef api void call_cy_PubSubStreamingService_responseandstreamthrows(
     object self,
@@ -367,11 +595,17 @@ async def PubSubStreamingService_responseandstreamthrows_coro(
 ):
     try:
         if ctx and getattr(self.responseandstreamthrows, "pass_context", False):
-            result = await self.responseandstreamthrows(ctx,
+            result = self.responseandstreamthrows(ctx,
                       foo)
         else:
-            result = await self.responseandstreamthrows(
+            result = self.responseandstreamthrows(
                       foo)
+        result = await result
+        item, result = result
+        if not isinstance(result, (ServerStream, AsyncIterator)):
+            result = await result
+        if isinstance(result, AsyncIterator):
+            result = ServerStream_cint32_t.create(cmove(createAsyncIteratorFromPyIterator[cint32_t](result, get_executor(), &getNextGenerator_PubSubStreamingService_responseandstreamthrows)))
     except _module_types.FooEx as ex:
         promise.cPromise.setException(deref((<_module_types.FooEx> ex)._cpp_obj))
     except __ApplicationError as ex:
@@ -388,8 +622,7 @@ async def PubSubStreamingService_responseandstreamthrows_coro(
             cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
         ))
     else:
-        promise.cPromise.setValue(createEmptyResponseAndServerStream[cint32_t,cint32_t]() # server streaming support is not implemented yet
-)
+        promise.cPromise.setValue(createResponseAndServerStream[cint32_t,cint32_t]((<cint32_t?> item), cmove(deref((<ServerStream_cint32_t?>result).cStream))))
 
 cdef api void call_cy_PubSubStreamingService_returnstreamFast(
     object self,
@@ -426,13 +659,17 @@ async def PubSubStreamingService_returnstreamFast_coro(
 ):
     try:
         if ctx and getattr(self.returnstreamFast, "pass_context", False):
-            result = await self.returnstreamFast(ctx,
+            result = self.returnstreamFast(ctx,
                       i32_from,
                       i32_to)
         else:
-            result = await self.returnstreamFast(
+            result = self.returnstreamFast(
                       i32_from,
                       i32_to)
+        if not isinstance(result, (ServerStream, AsyncIterator)):
+            result = await result
+        if isinstance(result, AsyncIterator):
+            result = ServerStream_cint32_t.create(cmove(createAsyncIteratorFromPyIterator[cint32_t](result, get_executor(), &getNextGenerator_PubSubStreamingService_returnstreamFast)))
     except __ApplicationError as ex:
         # If the handler raised an ApplicationError convert it to a C++ one
         promise.cPromise.setException(cTApplicationException(
@@ -447,6 +684,5 @@ async def PubSubStreamingService_returnstreamFast_coro(
             cTApplicationExceptionType__UNKNOWN, repr(ex).encode('UTF-8')
         ))
     else:
-        promise.cPromise.setValue(cServerStream[cint32_t].createEmpty() # server streaming support is not implemented yet
-)
+        promise.cPromise.setValue(cmove(deref((<ServerStream_cint32_t?>result).cStream)))
 

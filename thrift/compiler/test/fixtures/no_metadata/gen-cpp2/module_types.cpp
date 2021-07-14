@@ -68,9 +68,11 @@ void TccStructTraits<::cpp2::MyDataItem>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyDataItem::MyDataItem(apache::thrift::FragileConstructor) {}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyDataItem::__clear() {
   // clear all fields
 }
@@ -133,6 +135,28 @@ void TccStructTraits<::cpp2::MyStruct>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(const MyStruct&) = default;
+MyStruct& MyStruct::operator=(const MyStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(MyStruct&& other) noexcept  :
+    MyIntField(std::move(other.MyIntField)),
+    MyStringField(std::move(other.MyStringField)),
+    MyDataField(std::move(other.MyDataField)),
+    myEnum(std::move(other.myEnum)),
+    __isset(other.__isset) {}
+MyStruct& MyStruct::operator=(FOLLY_MAYBE_UNUSED MyStruct&& other) noexcept {
+    this->MyIntField = std::move(other.MyIntField);
+    this->MyStringField = std::move(other.MyStringField);
+    this->MyDataField = std::move(other.MyDataField);
+    this->myEnum = std::move(other.myEnum);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg, ::std::string MyStringField__arg, ::cpp2::MyDataItem MyDataField__arg, ::cpp2::MyEnum myEnum__arg) :
     MyIntField(std::move(MyIntField__arg)),
     MyStringField(std::move(MyStringField__arg)),
@@ -144,11 +168,12 @@ MyStruct::MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField
   __isset.myEnum = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyStruct::__clear() {
   // clear all fields
-  MyIntField = 0;
-  MyStringField = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  myEnum =  ::cpp2::MyEnum::MyValue1;
+  this->MyIntField = 0;
+  this->MyStringField = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->myEnum =  ::cpp2::MyEnum::MyValue1;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

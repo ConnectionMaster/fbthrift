@@ -32,7 +32,7 @@ ServerStreamFn<T> ServerGeneratorStream::fromAsyncGenerator(
                                    FirstResponsePayload&& payload,
                                    StreamClientCallback* callback,
                                    folly::EventBase* clientEb,
-                                   Tile* interaction) mutable {
+                                   TilePtr&& interaction) mutable {
       DCHECK(clientEb->isInEventBaseThread());
       auto stream = new ServerGeneratorStream(callback, clientEb);
       auto streamPtr = stream->copy();
@@ -40,33 +40,26 @@ ServerStreamFn<T> ServerGeneratorStream::fromAsyncGenerator(
           [stream = std::move(streamPtr),
            encode,
            gen = std::move(gen),
-           interaction]() mutable -> folly::coro::Task<void> {
+           interaction = TileStreamGuard::transferFrom(
+               std::move(interaction))]() mutable -> folly::coro::Task<void> {
+            bool pauseStream = false;
             int64_t credits = 0;
             class ReadyCallback
                 : public apache::thrift::detail::ServerStreamConsumer {
              public:
-              void consume() override {
-                baton.post();
-              }
+              void consume() override { baton.post(); }
 
-              void canceled() override {
-                std::terminate();
-              }
+              void canceled() override { std::terminate(); }
 
               folly::coro::Baton baton;
             };
-            SCOPE_EXIT {
-              if (interaction) {
-                stream->clientEventBase_->add(
-                    [interaction, eb = stream->clientEventBase_] {
-                      interaction->__fbthrift_releaseRef(*eb);
-                    });
-              }
-              stream->serverClose();
-            };
+            SCOPE_EXIT { stream->serverClose(); };
+
+            // Make sure the generator is destroyed before the interaction.
+            auto gen_ = std::move(gen);
 
             while (true) {
-              if (credits == 0) {
+              if (credits == 0 || pauseStream) {
                 ReadyCallback ready;
                 if (stream->wait(&ready)) {
                   co_await ready.baton;
@@ -78,16 +71,29 @@ ServerStreamFn<T> ServerGeneratorStream::fromAsyncGenerator(
                 while (!queue.empty()) {
                   auto next = queue.front();
                   queue.pop();
-                  if (next == -1) {
-                    co_return;
+                  switch (next) {
+                    case detail::StreamControl::CANCEL:
+                      co_return;
+                    case detail::StreamControl::PAUSE:
+                      pauseStream = true;
+                      break;
+                    case detail::StreamControl::RESUME:
+                      pauseStream = false;
+                      break;
+                    default:
+                      credits += next;
+                      break;
                   }
-                  credits += next;
                 }
+              }
+
+              if (UNLIKELY(pauseStream || credits == 0)) {
+                continue;
               }
 
               auto&& next = co_await folly::coro::co_awaitTry(
                   folly::coro::co_withCancellation(
-                      stream->cancelSource_.getToken(), gen.next()));
+                      stream->cancelSource_.getToken(), gen_.next()));
               if (next.hasValue()) {
                 if constexpr (WithHeader) {
                   if (!next->payload) {

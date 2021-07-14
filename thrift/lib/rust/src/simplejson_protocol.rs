@@ -28,8 +28,7 @@ use crate::ttype::TType;
 use crate::Result;
 use anyhow::{anyhow, bail};
 use bufsize::SizeCounter;
-use bytes::buf::ext::{BufMutExt as BytesBufMutExt, Writer};
-use bytes::{Buf, Bytes, BytesMut};
+use bytes::{buf::Writer, Buf, BufMut, Bytes, BytesMut};
 use ghost::phantom;
 use serde_json::ser::{CompactFormatter, Formatter};
 use std::io::Cursor;
@@ -372,8 +371,8 @@ impl<B: Buf> SimpleJsonProtocolDeserializer<B> {
     /// Returns a byte from the underly buffer if there is enough remaining
     pub fn peek(&self) -> Option<u8> {
         // fast path like https://docs.rs/bytes/1.0.1/src/bytes/buf/buf_impl.rs.html#18
-        if !self.buffer.bytes().is_empty() {
-            Some(self.buffer.bytes()[0])
+        if !self.buffer.chunk().is_empty() {
+            Some(self.buffer.chunk()[0])
         } else {
             None
         }
@@ -381,7 +380,7 @@ impl<B: Buf> SimpleJsonProtocolDeserializer<B> {
 
     /// Like peek but panics if there is none remaining
     fn peek_can_panic(&self) -> u8 {
-        self.buffer.bytes()[0]
+        self.buffer.chunk()[0]
     }
 
     fn strip_whitespace(&mut self) {
@@ -558,6 +557,7 @@ impl<B: Buf> SimpleJsonProtocolDeserializer<B> {
             Some(b'"') => Ok(TType::UTF8),
             Some(b'n') => Ok(TType::Void),
             Some(b't') | Some(b'f') => Ok(TType::Bool),
+            Some(b'-') => Ok(TType::Double),
             Some(b) if (b as char).is_ascii_digit() => Ok(TType::Double),
             ch => bail!(
                 "Expected [, {{, or \", or number after {:?}",
@@ -806,7 +806,7 @@ impl<B: Buf> ProtocolReader for SimpleJsonProtocolDeserializer<B> {
         }
     }
 
-    fn read_binary<V: CopyFromBuf + From<Vec<u8>>>(&mut self) -> Result<V> {
+    fn read_binary<V: CopyFromBuf>(&mut self) -> Result<V> {
         self.eat(b"\"")?;
         let mut ret = Vec::new();
         loop {
@@ -823,7 +823,7 @@ impl<B: Buf> ProtocolReader for SimpleJsonProtocolDeserializer<B> {
             }
         }
         let bin = base64::decode_config(&ret, base64::STANDARD_NO_PAD)?;
-        Ok(V::from(bin))
+        Ok(V::from_vec(bin))
     }
 
     /// Override the default skip impl to handle random JSON noise

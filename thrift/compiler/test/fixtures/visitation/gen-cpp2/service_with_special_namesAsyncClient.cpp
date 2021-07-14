@@ -68,339 +68,423 @@ typedef apache::thrift::ThriftPresult<false> service_with_special_names_fields_p
 typedef apache::thrift::ThriftPresult<true, apache::thrift::FieldData<0, ::apache::thrift::type_class::integral, ::std::int32_t*>> service_with_special_names_fields_presult;
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::getT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::getT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_get_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "get";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "get",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::getterT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::getterT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_getter_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "getter";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "getter",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::listsT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::listsT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_lists_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "lists";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "lists",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::mapsT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::mapsT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_maps_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "maps";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "maps",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::nameT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::nameT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_name_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "name";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "name",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::name_to_valueT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::name_to_valueT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_name_to_value_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "name_to_value";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "name_to_value",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::namesT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::namesT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_names_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "names";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "names",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::prefix_treeT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::prefix_treeT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_prefix_tree_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "prefix_tree";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "prefix_tree",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::setsT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::setsT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_sets_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "sets";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "sets",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::setterT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::setterT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_setter_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "setter";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "setter",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::strT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::strT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_str_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "str";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "str",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::stringsT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::stringsT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_strings_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "strings";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "strings",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::typeT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::typeT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_type_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "type";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "type",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::valueT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::valueT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_value_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "value";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "value",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::value_to_nameT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::value_to_nameT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_value_to_name_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "value_to_name";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "value_to_name",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::valuesT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::valuesT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_values_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "values";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "values",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::idT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::idT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_id_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "id";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "id",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::idsT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::idsT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_ids_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "ids";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "ids",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::descriptorT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::descriptorT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_descriptor_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "descriptor";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "descriptor",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::descriptorsT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::descriptorsT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_descriptors_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "descriptors";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "descriptors",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::keyT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::keyT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_key_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "key";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "key",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::keysT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::keysT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_keys_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "keys";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "keys",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::annotationT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::annotationT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_annotation_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "annotation";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "annotation",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::annotationsT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::annotationsT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_annotations_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "annotations";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "annotations",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::memberT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::memberT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_member_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "member";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "member",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::membersT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::membersT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_members_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "members";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "members",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::fieldT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::fieldT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_field_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "field";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "field",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 template <typename Protocol_>
-void service_with_special_namesAsyncClient::fieldsT(Protocol_* prot, apache::thrift::RpcOptions rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::fieldsT(Protocol_* prot, const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
 
-  std::shared_ptr<apache::thrift::transport::THeader> header(ctx, &ctx->header);
   service_with_special_names_fields_pargs args;
   auto sizer = [&](Protocol_* p) { return args.serializedSizeZC(p); };
   auto writer = [&](Protocol_* p) { args.write(p); };
-  static constexpr std::string_view methodName = "fields";
-  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, std::move(rpcOptions), std::move(callback), ctx->ctx, std::move(header), channel_.get(), apache::thrift::ManagedStringView::from_static(methodName), writer, sizer);
-  ctx->reqContext.setRequestHeader(nullptr);
+
+  static ::apache::thrift::MethodMetadata::Data* methodMetadata =
+        new ::apache::thrift::MethodMetadata::Data(
+                "fields",
+                ::apache::thrift::FunctionQualifier::Unspecified);
+  apache::thrift::clientSendT<apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE, Protocol_>(prot, rpcOptions, std::move(callback), contextStack, std::move(header), channel_.get(), ::apache::thrift::MethodMetadata::from_static(methodMetadata), writer, sizer);
+
 }
 
 
@@ -411,27 +495,30 @@ void service_with_special_namesAsyncClient::get(std::unique_ptr<apache::thrift::
 }
 
 void service_with_special_namesAsyncClient::get(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = getCtx(&rpcOptions);
+  auto [ctx, header] = getCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  getImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  getImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::getImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::getImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      getT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      getT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      getT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      getT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -441,13 +528,21 @@ void service_with_special_namesAsyncClient::getImpl(const apache::thrift::RpcOpt
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::getCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::getCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.get");
+      "service_with_special_names.get",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_get() {
@@ -460,16 +555,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = getCtx(&rpcOptions);
+  auto [ctx, header] = getCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  getImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  getImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -531,24 +626,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_get
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_get_presult;
-  constexpr auto const fname = "get";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -580,27 +674,30 @@ void service_with_special_namesAsyncClient::getter(std::unique_ptr<apache::thrif
 }
 
 void service_with_special_namesAsyncClient::getter(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = getterCtx(&rpcOptions);
+  auto [ctx, header] = getterCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  getterImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  getterImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::getterImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::getterImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      getterT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      getterT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      getterT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      getterT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -610,13 +707,21 @@ void service_with_special_namesAsyncClient::getterImpl(const apache::thrift::Rpc
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::getterCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::getterCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.getter");
+      "service_with_special_names.getter",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_getter() {
@@ -629,16 +734,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = getterCtx(&rpcOptions);
+  auto [ctx, header] = getterCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  getterImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  getterImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -700,24 +805,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_get
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_getter_presult;
-  constexpr auto const fname = "getter";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -749,27 +853,30 @@ void service_with_special_namesAsyncClient::lists(std::unique_ptr<apache::thrift
 }
 
 void service_with_special_namesAsyncClient::lists(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = listsCtx(&rpcOptions);
+  auto [ctx, header] = listsCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  listsImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  listsImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::listsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::listsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      listsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      listsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      listsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      listsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -779,13 +886,21 @@ void service_with_special_namesAsyncClient::listsImpl(const apache::thrift::RpcO
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::listsCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::listsCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.lists");
+      "service_with_special_names.lists",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_lists() {
@@ -798,16 +913,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = listsCtx(&rpcOptions);
+  auto [ctx, header] = listsCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  listsImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  listsImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -869,24 +984,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_lis
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_lists_presult;
-  constexpr auto const fname = "lists";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -918,27 +1032,30 @@ void service_with_special_namesAsyncClient::maps(std::unique_ptr<apache::thrift:
 }
 
 void service_with_special_namesAsyncClient::maps(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = mapsCtx(&rpcOptions);
+  auto [ctx, header] = mapsCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  mapsImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  mapsImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::mapsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::mapsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      mapsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      mapsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      mapsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      mapsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -948,13 +1065,21 @@ void service_with_special_namesAsyncClient::mapsImpl(const apache::thrift::RpcOp
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::mapsCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::mapsCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.maps");
+      "service_with_special_names.maps",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_maps() {
@@ -967,16 +1092,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = mapsCtx(&rpcOptions);
+  auto [ctx, header] = mapsCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  mapsImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  mapsImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -1038,24 +1163,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_map
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_maps_presult;
-  constexpr auto const fname = "maps";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -1087,27 +1211,30 @@ void service_with_special_namesAsyncClient::name(std::unique_ptr<apache::thrift:
 }
 
 void service_with_special_namesAsyncClient::name(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = nameCtx(&rpcOptions);
+  auto [ctx, header] = nameCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  nameImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  nameImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::nameImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::nameImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      nameT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      nameT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      nameT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      nameT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -1117,13 +1244,21 @@ void service_with_special_namesAsyncClient::nameImpl(const apache::thrift::RpcOp
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::nameCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::nameCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.name");
+      "service_with_special_names.name",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_name() {
@@ -1136,16 +1271,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = nameCtx(&rpcOptions);
+  auto [ctx, header] = nameCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  nameImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  nameImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -1207,24 +1342,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_nam
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_name_presult;
-  constexpr auto const fname = "name";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -1256,27 +1390,30 @@ void service_with_special_namesAsyncClient::name_to_value(std::unique_ptr<apache
 }
 
 void service_with_special_namesAsyncClient::name_to_value(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = name_to_valueCtx(&rpcOptions);
+  auto [ctx, header] = name_to_valueCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  name_to_valueImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  name_to_valueImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::name_to_valueImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::name_to_valueImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      name_to_valueT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      name_to_valueT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      name_to_valueT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      name_to_valueT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -1286,13 +1423,21 @@ void service_with_special_namesAsyncClient::name_to_valueImpl(const apache::thri
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::name_to_valueCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::name_to_valueCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.name_to_value");
+      "service_with_special_names.name_to_value",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_name_to_value() {
@@ -1305,16 +1450,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = name_to_valueCtx(&rpcOptions);
+  auto [ctx, header] = name_to_valueCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  name_to_valueImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  name_to_valueImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -1376,24 +1521,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_nam
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_name_to_value_presult;
-  constexpr auto const fname = "name_to_value";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -1425,27 +1569,30 @@ void service_with_special_namesAsyncClient::names(std::unique_ptr<apache::thrift
 }
 
 void service_with_special_namesAsyncClient::names(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = namesCtx(&rpcOptions);
+  auto [ctx, header] = namesCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  namesImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  namesImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::namesImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::namesImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      namesT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      namesT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      namesT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      namesT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -1455,13 +1602,21 @@ void service_with_special_namesAsyncClient::namesImpl(const apache::thrift::RpcO
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::namesCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::namesCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.names");
+      "service_with_special_names.names",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_names() {
@@ -1474,16 +1629,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = namesCtx(&rpcOptions);
+  auto [ctx, header] = namesCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  namesImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  namesImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -1545,24 +1700,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_nam
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_names_presult;
-  constexpr auto const fname = "names";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -1594,27 +1748,30 @@ void service_with_special_namesAsyncClient::prefix_tree(std::unique_ptr<apache::
 }
 
 void service_with_special_namesAsyncClient::prefix_tree(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = prefix_treeCtx(&rpcOptions);
+  auto [ctx, header] = prefix_treeCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  prefix_treeImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  prefix_treeImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::prefix_treeImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::prefix_treeImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      prefix_treeT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      prefix_treeT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      prefix_treeT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      prefix_treeT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -1624,13 +1781,21 @@ void service_with_special_namesAsyncClient::prefix_treeImpl(const apache::thrift
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::prefix_treeCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::prefix_treeCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.prefix_tree");
+      "service_with_special_names.prefix_tree",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_prefix_tree() {
@@ -1643,16 +1808,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = prefix_treeCtx(&rpcOptions);
+  auto [ctx, header] = prefix_treeCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  prefix_treeImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  prefix_treeImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -1714,24 +1879,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_pre
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_prefix_tree_presult;
-  constexpr auto const fname = "prefix_tree";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -1763,27 +1927,30 @@ void service_with_special_namesAsyncClient::sets(std::unique_ptr<apache::thrift:
 }
 
 void service_with_special_namesAsyncClient::sets(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = setsCtx(&rpcOptions);
+  auto [ctx, header] = setsCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  setsImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  setsImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::setsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::setsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      setsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      setsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      setsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      setsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -1793,13 +1960,21 @@ void service_with_special_namesAsyncClient::setsImpl(const apache::thrift::RpcOp
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::setsCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::setsCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.sets");
+      "service_with_special_names.sets",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_sets() {
@@ -1812,16 +1987,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = setsCtx(&rpcOptions);
+  auto [ctx, header] = setsCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  setsImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  setsImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -1883,24 +2058,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_set
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_sets_presult;
-  constexpr auto const fname = "sets";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -1932,27 +2106,30 @@ void service_with_special_namesAsyncClient::setter(std::unique_ptr<apache::thrif
 }
 
 void service_with_special_namesAsyncClient::setter(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = setterCtx(&rpcOptions);
+  auto [ctx, header] = setterCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  setterImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  setterImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::setterImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::setterImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      setterT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      setterT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      setterT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      setterT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -1962,13 +2139,21 @@ void service_with_special_namesAsyncClient::setterImpl(const apache::thrift::Rpc
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::setterCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::setterCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.setter");
+      "service_with_special_names.setter",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_setter() {
@@ -1981,16 +2166,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = setterCtx(&rpcOptions);
+  auto [ctx, header] = setterCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  setterImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  setterImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -2052,24 +2237,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_set
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_setter_presult;
-  constexpr auto const fname = "setter";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -2101,27 +2285,30 @@ void service_with_special_namesAsyncClient::str(std::unique_ptr<apache::thrift::
 }
 
 void service_with_special_namesAsyncClient::str(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = strCtx(&rpcOptions);
+  auto [ctx, header] = strCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  strImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  strImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::strImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::strImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      strT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      strT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      strT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      strT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -2131,13 +2318,21 @@ void service_with_special_namesAsyncClient::strImpl(const apache::thrift::RpcOpt
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::strCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::strCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.str");
+      "service_with_special_names.str",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_str() {
@@ -2150,16 +2345,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = strCtx(&rpcOptions);
+  auto [ctx, header] = strCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  strImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  strImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -2221,24 +2416,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_str
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_str_presult;
-  constexpr auto const fname = "str";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -2270,27 +2464,30 @@ void service_with_special_namesAsyncClient::strings(std::unique_ptr<apache::thri
 }
 
 void service_with_special_namesAsyncClient::strings(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = stringsCtx(&rpcOptions);
+  auto [ctx, header] = stringsCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  stringsImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  stringsImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::stringsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::stringsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      stringsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      stringsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      stringsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      stringsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -2300,13 +2497,21 @@ void service_with_special_namesAsyncClient::stringsImpl(const apache::thrift::Rp
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::stringsCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::stringsCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.strings");
+      "service_with_special_names.strings",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_strings() {
@@ -2319,16 +2524,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = stringsCtx(&rpcOptions);
+  auto [ctx, header] = stringsCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  stringsImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  stringsImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -2390,24 +2595,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_str
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_strings_presult;
-  constexpr auto const fname = "strings";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -2439,27 +2643,30 @@ void service_with_special_namesAsyncClient::type(std::unique_ptr<apache::thrift:
 }
 
 void service_with_special_namesAsyncClient::type(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = typeCtx(&rpcOptions);
+  auto [ctx, header] = typeCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  typeImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  typeImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::typeImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::typeImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      typeT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      typeT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      typeT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      typeT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -2469,13 +2676,21 @@ void service_with_special_namesAsyncClient::typeImpl(const apache::thrift::RpcOp
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::typeCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::typeCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.type");
+      "service_with_special_names.type",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_type() {
@@ -2488,16 +2703,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = typeCtx(&rpcOptions);
+  auto [ctx, header] = typeCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  typeImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  typeImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -2559,24 +2774,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_typ
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_type_presult;
-  constexpr auto const fname = "type";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -2608,27 +2822,30 @@ void service_with_special_namesAsyncClient::value(std::unique_ptr<apache::thrift
 }
 
 void service_with_special_namesAsyncClient::value(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = valueCtx(&rpcOptions);
+  auto [ctx, header] = valueCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  valueImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  valueImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::valueImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::valueImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      valueT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      valueT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      valueT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      valueT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -2638,13 +2855,21 @@ void service_with_special_namesAsyncClient::valueImpl(const apache::thrift::RpcO
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::valueCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::valueCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.value");
+      "service_with_special_names.value",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_value() {
@@ -2657,16 +2882,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = valueCtx(&rpcOptions);
+  auto [ctx, header] = valueCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  valueImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  valueImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -2728,24 +2953,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_val
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_value_presult;
-  constexpr auto const fname = "value";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -2777,27 +3001,30 @@ void service_with_special_namesAsyncClient::value_to_name(std::unique_ptr<apache
 }
 
 void service_with_special_namesAsyncClient::value_to_name(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = value_to_nameCtx(&rpcOptions);
+  auto [ctx, header] = value_to_nameCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  value_to_nameImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  value_to_nameImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::value_to_nameImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::value_to_nameImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      value_to_nameT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      value_to_nameT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      value_to_nameT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      value_to_nameT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -2807,13 +3034,21 @@ void service_with_special_namesAsyncClient::value_to_nameImpl(const apache::thri
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::value_to_nameCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::value_to_nameCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.value_to_name");
+      "service_with_special_names.value_to_name",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_value_to_name() {
@@ -2826,16 +3061,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = value_to_nameCtx(&rpcOptions);
+  auto [ctx, header] = value_to_nameCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  value_to_nameImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  value_to_nameImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -2897,24 +3132,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_val
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_value_to_name_presult;
-  constexpr auto const fname = "value_to_name";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -2946,27 +3180,30 @@ void service_with_special_namesAsyncClient::values(std::unique_ptr<apache::thrif
 }
 
 void service_with_special_namesAsyncClient::values(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = valuesCtx(&rpcOptions);
+  auto [ctx, header] = valuesCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  valuesImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  valuesImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::valuesImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::valuesImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      valuesT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      valuesT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      valuesT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      valuesT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -2976,13 +3213,21 @@ void service_with_special_namesAsyncClient::valuesImpl(const apache::thrift::Rpc
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::valuesCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::valuesCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.values");
+      "service_with_special_names.values",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_values() {
@@ -2995,16 +3240,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = valuesCtx(&rpcOptions);
+  auto [ctx, header] = valuesCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  valuesImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  valuesImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -3066,24 +3311,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_val
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_values_presult;
-  constexpr auto const fname = "values";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -3115,27 +3359,30 @@ void service_with_special_namesAsyncClient::id(std::unique_ptr<apache::thrift::R
 }
 
 void service_with_special_namesAsyncClient::id(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = idCtx(&rpcOptions);
+  auto [ctx, header] = idCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  idImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  idImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::idImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::idImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      idT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      idT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      idT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      idT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -3145,13 +3392,21 @@ void service_with_special_namesAsyncClient::idImpl(const apache::thrift::RpcOpti
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::idCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::idCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.id");
+      "service_with_special_names.id",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_id() {
@@ -3164,16 +3419,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = idCtx(&rpcOptions);
+  auto [ctx, header] = idCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  idImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  idImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -3235,24 +3490,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_id(
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_id_presult;
-  constexpr auto const fname = "id";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -3284,27 +3538,30 @@ void service_with_special_namesAsyncClient::ids(std::unique_ptr<apache::thrift::
 }
 
 void service_with_special_namesAsyncClient::ids(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = idsCtx(&rpcOptions);
+  auto [ctx, header] = idsCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  idsImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  idsImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::idsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::idsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      idsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      idsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      idsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      idsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -3314,13 +3571,21 @@ void service_with_special_namesAsyncClient::idsImpl(const apache::thrift::RpcOpt
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::idsCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::idsCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.ids");
+      "service_with_special_names.ids",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_ids() {
@@ -3333,16 +3598,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = idsCtx(&rpcOptions);
+  auto [ctx, header] = idsCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  idsImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  idsImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -3404,24 +3669,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_ids
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_ids_presult;
-  constexpr auto const fname = "ids";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -3453,27 +3717,30 @@ void service_with_special_namesAsyncClient::descriptor(std::unique_ptr<apache::t
 }
 
 void service_with_special_namesAsyncClient::descriptor(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = descriptorCtx(&rpcOptions);
+  auto [ctx, header] = descriptorCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  descriptorImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  descriptorImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::descriptorImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::descriptorImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      descriptorT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      descriptorT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      descriptorT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      descriptorT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -3483,13 +3750,21 @@ void service_with_special_namesAsyncClient::descriptorImpl(const apache::thrift:
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::descriptorCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::descriptorCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.descriptor");
+      "service_with_special_names.descriptor",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_descriptor() {
@@ -3502,16 +3777,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = descriptorCtx(&rpcOptions);
+  auto [ctx, header] = descriptorCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  descriptorImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  descriptorImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -3573,24 +3848,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_des
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_descriptor_presult;
-  constexpr auto const fname = "descriptor";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -3622,27 +3896,30 @@ void service_with_special_namesAsyncClient::descriptors(std::unique_ptr<apache::
 }
 
 void service_with_special_namesAsyncClient::descriptors(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = descriptorsCtx(&rpcOptions);
+  auto [ctx, header] = descriptorsCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  descriptorsImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  descriptorsImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::descriptorsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::descriptorsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      descriptorsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      descriptorsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      descriptorsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      descriptorsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -3652,13 +3929,21 @@ void service_with_special_namesAsyncClient::descriptorsImpl(const apache::thrift
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::descriptorsCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::descriptorsCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.descriptors");
+      "service_with_special_names.descriptors",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_descriptors() {
@@ -3671,16 +3956,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = descriptorsCtx(&rpcOptions);
+  auto [ctx, header] = descriptorsCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  descriptorsImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  descriptorsImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -3742,24 +4027,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_des
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_descriptors_presult;
-  constexpr auto const fname = "descriptors";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -3791,27 +4075,30 @@ void service_with_special_namesAsyncClient::key(std::unique_ptr<apache::thrift::
 }
 
 void service_with_special_namesAsyncClient::key(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = keyCtx(&rpcOptions);
+  auto [ctx, header] = keyCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  keyImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  keyImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::keyImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::keyImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      keyT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      keyT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      keyT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      keyT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -3821,13 +4108,21 @@ void service_with_special_namesAsyncClient::keyImpl(const apache::thrift::RpcOpt
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::keyCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::keyCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.key");
+      "service_with_special_names.key",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_key() {
@@ -3840,16 +4135,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = keyCtx(&rpcOptions);
+  auto [ctx, header] = keyCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  keyImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  keyImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -3911,24 +4206,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_key
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_key_presult;
-  constexpr auto const fname = "key";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -3960,27 +4254,30 @@ void service_with_special_namesAsyncClient::keys(std::unique_ptr<apache::thrift:
 }
 
 void service_with_special_namesAsyncClient::keys(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = keysCtx(&rpcOptions);
+  auto [ctx, header] = keysCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  keysImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  keysImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::keysImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::keysImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      keysT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      keysT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      keysT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      keysT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -3990,13 +4287,21 @@ void service_with_special_namesAsyncClient::keysImpl(const apache::thrift::RpcOp
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::keysCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::keysCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.keys");
+      "service_with_special_names.keys",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_keys() {
@@ -4009,16 +4314,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = keysCtx(&rpcOptions);
+  auto [ctx, header] = keysCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  keysImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  keysImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -4080,24 +4385,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_key
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_keys_presult;
-  constexpr auto const fname = "keys";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -4129,27 +4433,30 @@ void service_with_special_namesAsyncClient::annotation(std::unique_ptr<apache::t
 }
 
 void service_with_special_namesAsyncClient::annotation(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = annotationCtx(&rpcOptions);
+  auto [ctx, header] = annotationCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  annotationImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  annotationImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::annotationImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::annotationImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      annotationT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      annotationT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      annotationT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      annotationT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -4159,13 +4466,21 @@ void service_with_special_namesAsyncClient::annotationImpl(const apache::thrift:
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::annotationCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::annotationCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.annotation");
+      "service_with_special_names.annotation",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_annotation() {
@@ -4178,16 +4493,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = annotationCtx(&rpcOptions);
+  auto [ctx, header] = annotationCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  annotationImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  annotationImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -4249,24 +4564,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_ann
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_annotation_presult;
-  constexpr auto const fname = "annotation";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -4298,27 +4612,30 @@ void service_with_special_namesAsyncClient::annotations(std::unique_ptr<apache::
 }
 
 void service_with_special_namesAsyncClient::annotations(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = annotationsCtx(&rpcOptions);
+  auto [ctx, header] = annotationsCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  annotationsImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  annotationsImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::annotationsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::annotationsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      annotationsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      annotationsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      annotationsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      annotationsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -4328,13 +4645,21 @@ void service_with_special_namesAsyncClient::annotationsImpl(const apache::thrift
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::annotationsCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::annotationsCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.annotations");
+      "service_with_special_names.annotations",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_annotations() {
@@ -4347,16 +4672,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = annotationsCtx(&rpcOptions);
+  auto [ctx, header] = annotationsCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  annotationsImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  annotationsImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -4418,24 +4743,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_ann
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_annotations_presult;
-  constexpr auto const fname = "annotations";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -4467,27 +4791,30 @@ void service_with_special_namesAsyncClient::member(std::unique_ptr<apache::thrif
 }
 
 void service_with_special_namesAsyncClient::member(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = memberCtx(&rpcOptions);
+  auto [ctx, header] = memberCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  memberImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  memberImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::memberImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::memberImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      memberT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      memberT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      memberT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      memberT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -4497,13 +4824,21 @@ void service_with_special_namesAsyncClient::memberImpl(const apache::thrift::Rpc
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::memberCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::memberCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.member");
+      "service_with_special_names.member",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_member() {
@@ -4516,16 +4851,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = memberCtx(&rpcOptions);
+  auto [ctx, header] = memberCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  memberImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  memberImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -4587,24 +4922,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_mem
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_member_presult;
-  constexpr auto const fname = "member";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -4636,27 +4970,30 @@ void service_with_special_namesAsyncClient::members(std::unique_ptr<apache::thri
 }
 
 void service_with_special_namesAsyncClient::members(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = membersCtx(&rpcOptions);
+  auto [ctx, header] = membersCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  membersImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  membersImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::membersImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::membersImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      membersT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      membersT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      membersT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      membersT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -4666,13 +5003,21 @@ void service_with_special_namesAsyncClient::membersImpl(const apache::thrift::Rp
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::membersCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::membersCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.members");
+      "service_with_special_names.members",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_members() {
@@ -4685,16 +5030,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = membersCtx(&rpcOptions);
+  auto [ctx, header] = membersCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  membersImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  membersImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -4756,24 +5101,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_mem
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_members_presult;
-  constexpr auto const fname = "members";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -4805,27 +5149,30 @@ void service_with_special_namesAsyncClient::field(std::unique_ptr<apache::thrift
 }
 
 void service_with_special_namesAsyncClient::field(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = fieldCtx(&rpcOptions);
+  auto [ctx, header] = fieldCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  fieldImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  fieldImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::fieldImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::fieldImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      fieldT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      fieldT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      fieldT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      fieldT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -4835,13 +5182,21 @@ void service_with_special_namesAsyncClient::fieldImpl(const apache::thrift::RpcO
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::fieldCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::fieldCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.field");
+      "service_with_special_names.field",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_field() {
@@ -4854,16 +5209,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = fieldCtx(&rpcOptions);
+  auto [ctx, header] = fieldCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  fieldImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  fieldImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -4925,24 +5280,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_fie
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_field_presult;
-  constexpr auto const fname = "field";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {
@@ -4974,27 +5328,30 @@ void service_with_special_namesAsyncClient::fields(std::unique_ptr<apache::thrif
 }
 
 void service_with_special_namesAsyncClient::fields(apache::thrift::RpcOptions& rpcOptions, std::unique_ptr<apache::thrift::RequestCallback> callback) {
-  auto ctx = fieldsCtx(&rpcOptions);
+  auto [ctx, header] = fieldsCtx(&rpcOptions);
   apache::thrift::RequestCallback::Context callbackContext;
   callbackContext.protocolId =
       apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
-  callbackContext.ctx = std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx);
+  auto* contextStack = ctx.get();
+  if (callback) {
+    callbackContext.ctx = std::move(ctx);
+  }
   auto wrappedCallback = apache::thrift::toRequestClientCallbackPtr(std::move(callback), std::move(callbackContext));
-  fieldsImpl(rpcOptions, std::move(ctx), std::move(wrappedCallback));
+  fieldsImpl(rpcOptions, std::move(header), contextStack, std::move(wrappedCallback));
 }
 
-void service_with_special_namesAsyncClient::fieldsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::detail::ac::ClientRequestContext> ctx, apache::thrift::RequestClientCallback::Ptr callback) {
+void service_with_special_namesAsyncClient::fieldsImpl(const apache::thrift::RpcOptions& rpcOptions, std::shared_ptr<apache::thrift::transport::THeader> header, apache::thrift::ContextStack* contextStack, apache::thrift::RequestClientCallback::Ptr callback) {
   switch (apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolWriter writer;
-      fieldsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      fieldsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolWriter writer;
-      fieldsT(&writer, rpcOptions, std::move(ctx), std::move(callback));
+      fieldsT(&writer, rpcOptions, std::move(header), contextStack, std::move(callback));
       break;
     }
     default:
@@ -5004,13 +5361,21 @@ void service_with_special_namesAsyncClient::fieldsImpl(const apache::thrift::Rpc
   }
 }
 
-std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with_special_namesAsyncClient::fieldsCtx(apache::thrift::RpcOptions* rpcOptions) {
-  return std::make_shared<apache::thrift::detail::ac::ClientRequestContext>(
-      channel_->getProtocolId(),
-      rpcOptions ? rpcOptions->releaseWriteHeaders() : std::map<std::string, std::string>{},
+std::pair<std::unique_ptr<::apache::thrift::ContextStack>, std::shared_ptr<::apache::thrift::transport::THeader>> service_with_special_namesAsyncClient::fieldsCtx(apache::thrift::RpcOptions* rpcOptions) {
+  auto header = std::make_shared<apache::thrift::transport::THeader>(
+      apache::thrift::transport::THeader::ALLOW_BIG_FRAMES);
+  header->setProtocolId(channel_->getProtocolId());
+  if (rpcOptions) {
+    header->setHeaders(rpcOptions->releaseWriteHeaders());
+  }
+
+  auto ctx = apache::thrift::ContextStack::createWithClientContext(
       handlers_,
       getServiceName(),
-      "service_with_special_names.fields");
+      "service_with_special_names.fields",
+      *header);
+
+  return {std::move(ctx), std::move(header)};
 }
 
 ::std::int32_t service_with_special_namesAsyncClient::sync_fields() {
@@ -5023,16 +5388,16 @@ std::shared_ptr<::apache::thrift::detail::ac::ClientRequestContext> service_with
   apache::thrift::ClientSyncCallback<false> callback(&returnState);
   auto protocolId = apache::thrift::GeneratedAsyncClient::getChannel()->getProtocolId();
   auto evb = apache::thrift::GeneratedAsyncClient::getChannel()->getEventBase();
-  auto ctx = fieldsCtx(&rpcOptions);
+  auto [ctx, header] = fieldsCtx(&rpcOptions);
   auto wrappedCallback = apache::thrift::RequestClientCallback::Ptr(&callback);
-  fieldsImpl(rpcOptions, ctx, std::move(wrappedCallback));
+  fieldsImpl(rpcOptions, std::move(header), ctx.get(), std::move(wrappedCallback));
   callback.waitUntilDone(evb);
 
   if (returnState.isException()) {
     returnState.exception().throw_exception();
   }
   returnState.resetProtocolId(protocolId);
-  returnState.resetCtx(std::shared_ptr<apache::thrift::ContextStack>(ctx, &ctx->ctx));
+  returnState.resetCtx(std::move(ctx));
   SCOPE_EXIT {
     if (returnState.header() && !returnState.header()->getHeaders().empty()) {
       rpcOptions.setReadHeaders(returnState.header()->releaseHeaders());
@@ -5094,24 +5459,23 @@ folly::exception_wrapper service_with_special_namesAsyncClient::recv_wrapped_fie
   if (state.isException()) {
     return std::move(state.exception());
   }
-  if (!state.buf()) {
+  if (!state.hasResponseBuffer()) {
     return folly::make_exception_wrapper<apache::thrift::TApplicationException>("recv_ called without result");
   }
 
   using result = service_with_special_names_fields_presult;
-  constexpr auto const fname = "fields";
   switch (state.protocolId()) {
     case apache::thrift::protocol::T_BINARY_PROTOCOL:
     {
       apache::thrift::BinaryProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     case apache::thrift::protocol::T_COMPACT_PROTOCOL:
     {
       apache::thrift::CompactProtocolReader reader;
       return apache::thrift::detail::ac::recv_wrapped<result>(
-          fname, &reader, state, _return);
+          &reader, state, _return);
     }
     default:
     {

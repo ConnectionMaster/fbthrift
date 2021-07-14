@@ -68,6 +68,7 @@ void TccStructTraits<::cpp2::Color>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Color::Color(apache::thrift::FragileConstructor, double red__arg, double green__arg, double blue__arg, double alpha__arg) :
     red(std::move(red__arg)),
@@ -80,12 +81,13 @@ Color::Color(apache::thrift::FragileConstructor, double red__arg, double green__
   __isset.alpha = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void Color::__clear() {
   // clear all fields
-  red = 0;
-  green = 0;
-  blue = 0;
-  alpha = 0;
+  this->red = 0;
+  this->green = 0;
+  this->blue = 0;
+  this->alpha = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -178,12 +180,37 @@ void TccStructTraits<::cpp2::Vehicle>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+Vehicle::Vehicle(const Vehicle&) = default;
+Vehicle& Vehicle::operator=(const Vehicle&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Vehicle::Vehicle() :
-      hasAC(false) {}
+      hasAC(false) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 Vehicle::~Vehicle() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+Vehicle::Vehicle(Vehicle&& other) noexcept  :
+    color(std::move(other.color)),
+    licensePlate(std::move(other.licensePlate)),
+    description(std::move(other.description)),
+    name(std::move(other.name)),
+    hasAC(std::move(other.hasAC)),
+    __isset(other.__isset) {}
+Vehicle& Vehicle::operator=(FOLLY_MAYBE_UNUSED Vehicle&& other) noexcept {
+    this->color = std::move(other.color);
+    this->licensePlate = std::move(other.licensePlate);
+    this->description = std::move(other.description);
+    this->name = std::move(other.name);
+    this->hasAC = std::move(other.hasAC);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Vehicle::Vehicle(apache::thrift::FragileConstructor, ::cpp2::Color color__arg, ::std::string licensePlate__arg, ::std::string description__arg, ::std::string name__arg, bool hasAC__arg) :
@@ -199,13 +226,14 @@ Vehicle::Vehicle(apache::thrift::FragileConstructor, ::cpp2::Color color__arg, :
   __isset.hasAC = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void Vehicle::__clear() {
   // clear all fields
-  color.__clear();
-  licensePlate = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  description = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  name = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  hasAC = false;
+  this->color.__clear();
+  this->licensePlate = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->description = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->name = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->hasAC = false;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -325,15 +353,50 @@ void TccStructTraits<::cpp2::Person>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+Person::Person(const Person&) = default;
+Person& Person::operator=(const Person&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Person::Person() :
       id(0),
       age(0),
       bestFriend(0),
-      afraidOfAnimal(static_cast< ::cpp2::Animal>(0)) {}
+      afraidOfAnimal(static_cast< ::cpp2::Animal>(0)) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 Person::~Person() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+Person::Person(Person&& other) noexcept  :
+    id(std::move(other.id)),
+    name(std::move(other.name)),
+    age(std::move(other.age)),
+    address(std::move(other.address)),
+    favoriteColor(std::move(other.favoriteColor)),
+    friends(std::move(other.friends)),
+    bestFriend(std::move(other.bestFriend)),
+    petNames(std::move(other.petNames)),
+    afraidOfAnimal(std::move(other.afraidOfAnimal)),
+    vehicles(std::move(other.vehicles)),
+    __isset(other.__isset) {}
+Person& Person::operator=(FOLLY_MAYBE_UNUSED Person&& other) noexcept {
+    this->id = std::move(other.id);
+    this->name = std::move(other.name);
+    this->age = std::move(other.age);
+    this->address = std::move(other.address);
+    this->favoriteColor = std::move(other.favoriteColor);
+    this->friends = std::move(other.friends);
+    this->bestFriend = std::move(other.bestFriend);
+    this->petNames = std::move(other.petNames);
+    this->afraidOfAnimal = std::move(other.afraidOfAnimal);
+    this->vehicles = std::move(other.vehicles);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Person::Person(apache::thrift::FragileConstructor, ::cpp2::PersonID id__arg, ::std::string name__arg, ::std::int16_t age__arg, ::std::string address__arg, ::cpp2::Color favoriteColor__arg, ::std::set<::cpp2::PersonID> friends__arg, ::cpp2::PersonID bestFriend__arg, ::std::map<::cpp2::Animal, ::std::string> petNames__arg, ::cpp2::Animal afraidOfAnimal__arg, ::std::vector<::cpp2::Vehicle> vehicles__arg) :
@@ -359,18 +422,19 @@ Person::Person(apache::thrift::FragileConstructor, ::cpp2::PersonID id__arg, ::s
   __isset.vehicles = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void Person::__clear() {
   // clear all fields
-  id = 0;
-  name = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  age = 0;
-  address = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  favoriteColor.__clear();
-  friends.clear();
-  bestFriend = 0;
-  petNames.clear();
-  afraidOfAnimal = static_cast< ::cpp2::Animal>(0);
-  vehicles.clear();
+  this->id = 0;
+  this->name = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->age = 0;
+  this->address = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->favoriteColor.__clear();
+  this->friends.clear();
+  this->bestFriend = 0;
+  this->petNames.clear();
+  this->afraidOfAnimal = static_cast< ::cpp2::Animal>(0);
+  this->vehicles.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

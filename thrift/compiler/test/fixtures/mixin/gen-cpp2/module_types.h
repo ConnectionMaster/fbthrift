@@ -75,6 +75,13 @@ typedef ::cpp2::Mixin3Base Mixin3;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Mixin1 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -92,46 +99,33 @@ class Mixin1 final  {
 
  public:
 
-  Mixin1() {}
+  Mixin1() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Mixin1(apache::thrift::FragileConstructor, ::std::string field1__arg);
 
-  Mixin1(Mixin1&&) = default;
+  Mixin1(Mixin1&&) noexcept;
 
-  Mixin1(const Mixin1&) = default;
+  Mixin1(const Mixin1& src);
 
 
-  Mixin1& operator=(Mixin1&&) = default;
-
-  Mixin1& operator=(const Mixin1&) = default;
+  Mixin1& operator=(Mixin1&&) noexcept;
+  Mixin1& operator=(const Mixin1& src);
   void __clear();
  private:
   ::std::string field1;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool field1;
   } __isset = {};
-  bool operator==(const Mixin1& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Mixin1& __x, const Mixin1& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Mixin1& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Mixin1& __x, const Mixin1& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Mixin1& __x, const Mixin1& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Mixin1& __x, const Mixin1& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Mixin1&) const;
+  bool operator<(const Mixin1&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> field1_ref() const& {
@@ -162,6 +156,7 @@ class Mixin1 final  {
   }
 
   template <typename T_Mixin1_field1_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.field1_ref() = BAR;` instead of `FOO.set_field1(BAR);`")]]
   ::std::string& set_field1(T_Mixin1_field1_struct_setter&& field1_) {
     field1 = std::forward<T_Mixin1_field1_struct_setter>(field1_);
     __isset.field1 = true;
@@ -181,7 +176,7 @@ class Mixin1 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Mixin1 >;
+  friend class ::apache::thrift::Cpp2Ops<Mixin1>;
   friend void swap(Mixin1& a, Mixin1& b);
 };
 
@@ -194,6 +189,13 @@ uint32_t Mixin1::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Mixin2 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -211,49 +213,36 @@ class Mixin2 final  {
 
  public:
 
-  Mixin2() {}
+  Mixin2() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Mixin2(apache::thrift::FragileConstructor, ::cpp2::Mixin1 m1__arg, ::std::string field2__arg);
 
-  Mixin2(Mixin2&&) = default;
+  Mixin2(Mixin2&&) noexcept;
 
-  Mixin2(const Mixin2&) = default;
+  Mixin2(const Mixin2& src);
 
 
-  Mixin2& operator=(Mixin2&&) = default;
-
-  Mixin2& operator=(const Mixin2&) = default;
+  Mixin2& operator=(Mixin2&&) noexcept;
+  Mixin2& operator=(const Mixin2& src);
   void __clear();
  private:
   ::cpp2::Mixin1 m1;
  private:
   ::std::string field2;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool m1;
     bool field2;
   } __isset = {};
-  bool operator==(const Mixin2& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Mixin2& __x, const Mixin2& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Mixin2& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Mixin2& __x, const Mixin2& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Mixin2& __x, const Mixin2& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Mixin2& __x, const Mixin2& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Mixin2&) const;
+  bool operator<(const Mixin2&) const;
 
   template <typename..., typename T = ::cpp2::Mixin1>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> m1_ref() const& {
@@ -302,6 +291,7 @@ class Mixin2 final  {
   ::cpp2::Mixin1 get_m1() &&;
 
   template <typename T_Mixin2_m1_struct_setter = ::cpp2::Mixin1>
+  [[deprecated("Use `FOO.m1_ref() = BAR;` instead of `FOO.set_m1(BAR);`")]]
   ::cpp2::Mixin1& set_m1(T_Mixin2_m1_struct_setter&& m1_) {
     m1 = std::forward<T_Mixin2_m1_struct_setter>(m1_);
     __isset.m1 = true;
@@ -318,6 +308,7 @@ class Mixin2 final  {
   ::std::string* get_field2() && = delete;
 
   template <typename T_Mixin2_field2_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.field2_ref() = BAR;` instead of `FOO.set_field2(BAR);`")]]
   ::std::string& set_field2(T_Mixin2_field2_struct_setter&& field2_) {
     field2 = std::forward<T_Mixin2_field2_struct_setter>(field2_);
     __isset.field2 = true;
@@ -337,7 +328,7 @@ class Mixin2 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Mixin2 >;
+  friend class ::apache::thrift::Cpp2Ops<Mixin2>;
   friend void swap(Mixin2& a, Mixin2& b);
 };
 
@@ -350,6 +341,13 @@ uint32_t Mixin2::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Mixin3Base final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -367,46 +365,33 @@ class Mixin3Base final  {
 
  public:
 
-  Mixin3Base() {}
+  Mixin3Base() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Mixin3Base(apache::thrift::FragileConstructor, ::std::string field3__arg);
 
-  Mixin3Base(Mixin3Base&&) = default;
+  Mixin3Base(Mixin3Base&&) noexcept;
 
-  Mixin3Base(const Mixin3Base&) = default;
+  Mixin3Base(const Mixin3Base& src);
 
 
-  Mixin3Base& operator=(Mixin3Base&&) = default;
-
-  Mixin3Base& operator=(const Mixin3Base&) = default;
+  Mixin3Base& operator=(Mixin3Base&&) noexcept;
+  Mixin3Base& operator=(const Mixin3Base& src);
   void __clear();
  private:
   ::std::string field3;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool field3;
   } __isset = {};
-  bool operator==(const Mixin3Base& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Mixin3Base& __x, const Mixin3Base& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Mixin3Base& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Mixin3Base& __x, const Mixin3Base& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Mixin3Base& __x, const Mixin3Base& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Mixin3Base& __x, const Mixin3Base& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Mixin3Base&) const;
+  bool operator<(const Mixin3Base&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> field3_ref() const& {
@@ -437,6 +422,7 @@ class Mixin3Base final  {
   }
 
   template <typename T_Mixin3Base_field3_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.field3_ref() = BAR;` instead of `FOO.set_field3(BAR);`")]]
   ::std::string& set_field3(T_Mixin3Base_field3_struct_setter&& field3_) {
     field3 = std::forward<T_Mixin3Base_field3_struct_setter>(field3_);
     __isset.field3 = true;
@@ -456,7 +442,7 @@ class Mixin3Base final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Mixin3Base >;
+  friend class ::apache::thrift::Cpp2Ops<Mixin3Base>;
   friend void swap(Mixin3Base& a, Mixin3Base& b);
 };
 
@@ -469,6 +455,13 @@ uint32_t Mixin3Base::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Foo final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -486,19 +479,19 @@ class Foo final  {
 
  public:
 
-  Foo() {}
+  Foo() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Foo(apache::thrift::FragileConstructor, ::std::string field4__arg, ::cpp2::Mixin2 m2__arg, ::cpp2::Mixin3 m3__arg);
 
-  Foo(Foo&&) = default;
+  Foo(Foo&&) noexcept;
 
-  Foo(const Foo&) = default;
+  Foo(const Foo& src);
 
 
-  Foo& operator=(Foo&&) = default;
-
-  Foo& operator=(const Foo&) = default;
+  Foo& operator=(Foo&&) noexcept;
+  Foo& operator=(const Foo& src);
   void __clear();
  private:
   ::std::string field4;
@@ -507,31 +500,18 @@ class Foo final  {
  private:
   ::cpp2::Mixin3 m3;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool field4;
     bool m2;
     bool m3;
   } __isset = {};
-  bool operator==(const Foo& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Foo& __x, const Foo& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Foo& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Foo& __x, const Foo& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Foo& __x, const Foo& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Foo& __x, const Foo& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Foo&) const;
+  bool operator<(const Foo&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> field4_ref() const& {
@@ -618,6 +598,7 @@ class Foo final  {
   }
 
   template <typename T_Foo_field4_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.field4_ref() = BAR;` instead of `FOO.set_field4(BAR);`")]]
   ::std::string& set_field4(T_Foo_field4_struct_setter&& field4_) {
     field4 = std::forward<T_Foo_field4_struct_setter>(field4_);
     __isset.field4 = true;
@@ -627,6 +608,7 @@ class Foo final  {
   ::cpp2::Mixin2 get_m2() &&;
 
   template <typename T_Foo_m2_struct_setter = ::cpp2::Mixin2>
+  [[deprecated("Use `FOO.m2_ref() = BAR;` instead of `FOO.set_m2(BAR);`")]]
   ::cpp2::Mixin2& set_m2(T_Foo_m2_struct_setter&& m2_) {
     m2 = std::forward<T_Foo_m2_struct_setter>(m2_);
     __isset.m2 = true;
@@ -636,6 +618,7 @@ class Foo final  {
   ::cpp2::Mixin3 get_m3() &&;
 
   template <typename T_Foo_m3_struct_setter = ::cpp2::Mixin3>
+  [[deprecated("Use `FOO.m3_ref() = BAR;` instead of `FOO.set_m3(BAR);`")]]
   ::cpp2::Mixin3& set_m3(T_Foo_m3_struct_setter&& m3_) {
     m3 = std::forward<T_Foo_m3_struct_setter>(m3_);
     __isset.m3 = true;
@@ -655,7 +638,7 @@ class Foo final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Foo >;
+  friend class ::apache::thrift::Cpp2Ops<Foo>;
   friend void swap(Foo& a, Foo& b);
 };
 

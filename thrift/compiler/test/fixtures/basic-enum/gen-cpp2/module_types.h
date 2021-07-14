@@ -172,6 +172,13 @@ class MyStruct;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace test { namespace fixtures { namespace enumstrict {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -191,7 +198,8 @@ class MyStruct final  {
 
   MyStruct() :
       myEnum(static_cast< ::test::fixtures::enumstrict::MyEnum>(0)),
-      myBigEnum( ::test::fixtures::enumstrict::MyBigEnum::ONE) {}
+      myBigEnum( ::test::fixtures::enumstrict::MyBigEnum::ONE) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::test::fixtures::enumstrict::MyEnum myEnum__arg, ::test::fixtures::enumstrict::MyBigEnum myBigEnum__arg);
@@ -210,30 +218,17 @@ class MyStruct final  {
  private:
   ::test::fixtures::enumstrict::MyBigEnum myBigEnum;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool myEnum;
     bool myBigEnum;
   } __isset = {};
-  bool operator==(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStruct& __x, const MyStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStruct&) const;
+  bool operator<(const MyStruct&) const;
 
   template <typename..., typename T = ::test::fixtures::enumstrict::MyEnum>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> myEnum_ref() const& {
@@ -279,6 +274,7 @@ class MyStruct final  {
     return myEnum;
   }
 
+  [[deprecated("Use `FOO.myEnum_ref() = BAR;` instead of `FOO.set_myEnum(BAR);`")]]
   ::test::fixtures::enumstrict::MyEnum& set_myEnum(::test::fixtures::enumstrict::MyEnum myEnum_) {
     myEnum = myEnum_;
     __isset.myEnum = true;
@@ -289,6 +285,7 @@ class MyStruct final  {
     return myBigEnum;
   }
 
+  [[deprecated("Use `FOO.myBigEnum_ref() = BAR;` instead of `FOO.set_myBigEnum(BAR);`")]]
   ::test::fixtures::enumstrict::MyBigEnum& set_myBigEnum(::test::fixtures::enumstrict::MyBigEnum myBigEnum_) {
     myBigEnum = myBigEnum_;
     __isset.myBigEnum = true;
@@ -308,7 +305,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 

@@ -7,21 +7,20 @@
 
 package test.fixtures.params;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class NestedContainersBlockingReactiveWrapper 
     implements NestedContainers.Reactive {
     private final NestedContainers _delegate;
-    private final reactor.core.scheduler.Scheduler _scheduler;
 
-    public NestedContainersBlockingReactiveWrapper(NestedContainers _delegate, reactor.core.scheduler.Scheduler _scheduler) {
+    public NestedContainersBlockingReactiveWrapper(NestedContainers _delegate) {
         
         this._delegate = _delegate;
-        this._scheduler = _scheduler;
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
@@ -33,7 +32,7 @@ public class NestedContainersBlockingReactiveWrapper
                 } catch (Throwable _e) {
                     throw reactor.core.Exceptions.propagate(_e);
                 }
-            }).subscribeOn(_scheduler);
+            }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
     }
 
     @java.lang.Override
@@ -44,7 +43,7 @@ public class NestedContainersBlockingReactiveWrapper
                 } catch (Throwable _e) {
                     throw reactor.core.Exceptions.propagate(_e);
                 }
-            }).subscribeOn(_scheduler);
+            }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
     }
 
     @java.lang.Override
@@ -55,7 +54,7 @@ public class NestedContainersBlockingReactiveWrapper
                 } catch (Throwable _e) {
                     throw reactor.core.Exceptions.propagate(_e);
                 }
-            }).subscribeOn(_scheduler);
+            }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
     }
 
     @java.lang.Override
@@ -66,7 +65,7 @@ public class NestedContainersBlockingReactiveWrapper
                 } catch (Throwable _e) {
                     throw reactor.core.Exceptions.propagate(_e);
                 }
-            }).subscribeOn(_scheduler);
+            }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
     }
 
     @java.lang.Override
@@ -77,7 +76,7 @@ public class NestedContainersBlockingReactiveWrapper
                 } catch (Throwable _e) {
                     throw reactor.core.Exceptions.propagate(_e);
                 }
-            }).subscribeOn(_scheduler);
+            }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
     }
 
 }

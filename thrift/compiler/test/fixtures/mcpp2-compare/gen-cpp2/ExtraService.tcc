@@ -36,6 +36,10 @@ void ExtraServiceAsyncProcessor::setUpAndProcess_simple_function(apache::thrift:
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void ExtraServiceAsyncProcessor::process_simple_function(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -45,12 +49,9 @@ void ExtraServiceAsyncProcessor::process_simple_function(apache::thrift::Respons
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "simple_function");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "simple_function");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<bool>>(std::move(req), std::move(ctxStack), return_simple_function<ProtocolIn_,ProtocolOut_>, throw_wrapped_simple_function<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -58,12 +59,12 @@ void ExtraServiceAsyncProcessor::process_simple_function(apache::thrift::Respons
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue ExtraServiceAsyncProcessor::return_simple_function(int32_t protoSeqId, apache::thrift::ContextStack* ctx, bool const& _return) {
+apache::thrift::LegacySerializedResponse ExtraServiceAsyncProcessor::return_simple_function(int32_t protoSeqId, apache::thrift::ContextStack* ctx, bool const& _return) {
   ProtocolOut_ prot;
   ExtraService_simple_function_presult result;
   result.get<0>().value = const_cast<bool*>(&_return);
   result.setIsSet(0, true);
-  return serializeResponse("simple_function", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("simple_function", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -89,6 +90,10 @@ void ExtraServiceAsyncProcessor::setUpAndProcess_throws_function(apache::thrift:
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void ExtraServiceAsyncProcessor::process_throws_function(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -98,12 +103,9 @@ void ExtraServiceAsyncProcessor::process_throws_function(apache::thrift::Respons
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "throws_function");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "throws_function");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<void>>(std::move(req), std::move(ctxStack), return_throws_function<ProtocolIn_,ProtocolOut_>, throw_wrapped_throws_function<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -111,10 +113,10 @@ void ExtraServiceAsyncProcessor::process_throws_function(apache::thrift::Respons
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue ExtraServiceAsyncProcessor::return_throws_function(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
+apache::thrift::LegacySerializedResponse ExtraServiceAsyncProcessor::return_throws_function(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
   ProtocolOut_ prot;
   ExtraService_throws_function_presult result;
-  return serializeResponse("throws_function", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("throws_function", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -124,13 +126,21 @@ void ExtraServiceAsyncProcessor::throw_wrapped_throws_function(apache::thrift::R
   }
   ExtraService_throws_function_presult result;
   if (ew.with_exception([&]( ::some::valid::ns::AnException& e) {
-    ctx->userExceptionWrapped(true, ew);
+    if (ctx) {
+      ctx->userExceptionWrapped(true, ew);
+    }
+    ::apache::thrift::util::appendExceptionToHeader(ew, *reqCtx);
+    ::apache::thrift::util::appendErrorClassificationToHeader< ::some::valid::ns::AnException>(*reqCtx);
     result.get<0>().ref() = e;
     result.setIsSet(0, true);
   }
   )) {} else
   if (ew.with_exception([&]( ::some::valid::ns::AnotherException& e) {
-    ctx->userExceptionWrapped(true, ew);
+    if (ctx) {
+      ctx->userExceptionWrapped(true, ew);
+    }
+    ::apache::thrift::util::appendExceptionToHeader(ew, *reqCtx);
+    ::apache::thrift::util::appendErrorClassificationToHeader< ::some::valid::ns::AnotherException>(*reqCtx);
     result.get<1>().ref() = e;
     result.setIsSet(1, true);
   }
@@ -142,9 +152,9 @@ void ExtraServiceAsyncProcessor::throw_wrapped_throws_function(apache::thrift::R
     return;
   }
   ProtocolOut_ prot;
-  auto queue = serializeResponse("throws_function", &prot, protoSeqId, ctx, result);
-  queue.append(apache::thrift::transport::THeader::transform(queue.move(), reqCtx->getHeader()->getWriteTransforms()));
-  return req->sendReply(queue.move());
+  auto response = serializeLegacyResponse("throws_function", &prot, protoSeqId, ctx, result);
+  response.buffer = apache::thrift::transport::THeader::transform(std::move(response.buffer), reqCtx->getHeader()->getWriteTransforms());
+  return req->sendReply(std::move(response.buffer));
 }
 
 template <typename ProtocolIn_, typename ProtocolOut_>
@@ -159,6 +169,10 @@ void ExtraServiceAsyncProcessor::setUpAndProcess_throws_function2(apache::thrift
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void ExtraServiceAsyncProcessor::process_throws_function2(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -170,12 +184,9 @@ void ExtraServiceAsyncProcessor::process_throws_function2(apache::thrift::Respon
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "throws_function2");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "throws_function2");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<bool>>(std::move(req), std::move(ctxStack), return_throws_function2<ProtocolIn_,ProtocolOut_>, throw_wrapped_throws_function2<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -183,12 +194,12 @@ void ExtraServiceAsyncProcessor::process_throws_function2(apache::thrift::Respon
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue ExtraServiceAsyncProcessor::return_throws_function2(int32_t protoSeqId, apache::thrift::ContextStack* ctx, bool const& _return) {
+apache::thrift::LegacySerializedResponse ExtraServiceAsyncProcessor::return_throws_function2(int32_t protoSeqId, apache::thrift::ContextStack* ctx, bool const& _return) {
   ProtocolOut_ prot;
   ExtraService_throws_function2_presult result;
   result.get<0>().value = const_cast<bool*>(&_return);
   result.setIsSet(0, true);
-  return serializeResponse("throws_function2", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("throws_function2", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -198,13 +209,21 @@ void ExtraServiceAsyncProcessor::throw_wrapped_throws_function2(apache::thrift::
   }
   ExtraService_throws_function2_presult result;
   if (ew.with_exception([&]( ::some::valid::ns::AnException& e) {
-    ctx->userExceptionWrapped(true, ew);
+    if (ctx) {
+      ctx->userExceptionWrapped(true, ew);
+    }
+    ::apache::thrift::util::appendExceptionToHeader(ew, *reqCtx);
+    ::apache::thrift::util::appendErrorClassificationToHeader< ::some::valid::ns::AnException>(*reqCtx);
     result.get<1>().ref() = e;
     result.setIsSet(1, true);
   }
   )) {} else
   if (ew.with_exception([&]( ::some::valid::ns::AnotherException& e) {
-    ctx->userExceptionWrapped(true, ew);
+    if (ctx) {
+      ctx->userExceptionWrapped(true, ew);
+    }
+    ::apache::thrift::util::appendExceptionToHeader(ew, *reqCtx);
+    ::apache::thrift::util::appendErrorClassificationToHeader< ::some::valid::ns::AnotherException>(*reqCtx);
     result.get<2>().ref() = e;
     result.setIsSet(2, true);
   }
@@ -216,9 +235,9 @@ void ExtraServiceAsyncProcessor::throw_wrapped_throws_function2(apache::thrift::
     return;
   }
   ProtocolOut_ prot;
-  auto queue = serializeResponse("throws_function2", &prot, protoSeqId, ctx, result);
-  queue.append(apache::thrift::transport::THeader::transform(queue.move(), reqCtx->getHeader()->getWriteTransforms()));
-  return req->sendReply(queue.move());
+  auto response = serializeLegacyResponse("throws_function2", &prot, protoSeqId, ctx, result);
+  response.buffer = apache::thrift::transport::THeader::transform(std::move(response.buffer), reqCtx->getHeader()->getWriteTransforms());
+  return req->sendReply(std::move(response.buffer));
 }
 
 template <typename ProtocolIn_, typename ProtocolOut_>
@@ -233,6 +252,10 @@ void ExtraServiceAsyncProcessor::setUpAndProcess_throws_function3(apache::thrift
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void ExtraServiceAsyncProcessor::process_throws_function3(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -246,12 +269,9 @@ void ExtraServiceAsyncProcessor::process_throws_function3(apache::thrift::Respon
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "throws_function3");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "throws_function3");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<::std::map<::std::int32_t, ::std::string>>>(std::move(req), std::move(ctxStack), return_throws_function3<ProtocolIn_,ProtocolOut_>, throw_wrapped_throws_function3<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -259,12 +279,12 @@ void ExtraServiceAsyncProcessor::process_throws_function3(apache::thrift::Respon
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue ExtraServiceAsyncProcessor::return_throws_function3(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::std::map<::std::int32_t, ::std::string> const& _return) {
+apache::thrift::LegacySerializedResponse ExtraServiceAsyncProcessor::return_throws_function3(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::std::map<::std::int32_t, ::std::string> const& _return) {
   ProtocolOut_ prot;
   ExtraService_throws_function3_presult result;
   result.get<0>().value = const_cast<::std::map<::std::int32_t, ::std::string>*>(&_return);
   result.setIsSet(0, true);
-  return serializeResponse("throws_function3", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("throws_function3", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -274,13 +294,21 @@ void ExtraServiceAsyncProcessor::throw_wrapped_throws_function3(apache::thrift::
   }
   ExtraService_throws_function3_presult result;
   if (ew.with_exception([&]( ::some::valid::ns::AnException& e) {
-    ctx->userExceptionWrapped(true, ew);
+    if (ctx) {
+      ctx->userExceptionWrapped(true, ew);
+    }
+    ::apache::thrift::util::appendExceptionToHeader(ew, *reqCtx);
+    ::apache::thrift::util::appendErrorClassificationToHeader< ::some::valid::ns::AnException>(*reqCtx);
     result.get<1>().ref() = e;
     result.setIsSet(1, true);
   }
   )) {} else
   if (ew.with_exception([&]( ::some::valid::ns::AnotherException& e) {
-    ctx->userExceptionWrapped(true, ew);
+    if (ctx) {
+      ctx->userExceptionWrapped(true, ew);
+    }
+    ::apache::thrift::util::appendExceptionToHeader(ew, *reqCtx);
+    ::apache::thrift::util::appendErrorClassificationToHeader< ::some::valid::ns::AnotherException>(*reqCtx);
     result.get<2>().ref() = e;
     result.setIsSet(2, true);
   }
@@ -292,9 +320,9 @@ void ExtraServiceAsyncProcessor::throw_wrapped_throws_function3(apache::thrift::
     return;
   }
   ProtocolOut_ prot;
-  auto queue = serializeResponse("throws_function3", &prot, protoSeqId, ctx, result);
-  queue.append(apache::thrift::transport::THeader::transform(queue.move(), reqCtx->getHeader()->getWriteTransforms()));
-  return req->sendReply(queue.move());
+  auto response = serializeLegacyResponse("throws_function3", &prot, protoSeqId, ctx, result);
+  response.buffer = apache::thrift::transport::THeader::transform(std::move(response.buffer), reqCtx->getHeader()->getWriteTransforms());
+  return req->sendReply(std::move(response.buffer));
 }
 
 template <typename ProtocolIn_, typename ProtocolOut_>

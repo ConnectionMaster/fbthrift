@@ -19,6 +19,7 @@
 #include <folly/io/IOBuf.h>
 
 #include <thrift/lib/cpp/TApplicationException.h>
+#include <thrift/lib/cpp2/protocol/Protocol.h>
 #include <thrift/lib/thrift/gen-cpp2/RpcMetadata_types.h>
 
 namespace apache {
@@ -46,9 +47,7 @@ class SerializedCompressedRequest {
 
   SerializedCompressedRequest clone() const;
 
-  CompressionAlgorithm getCompressionAlgorithm() const {
-    return compression_;
-  }
+  CompressionAlgorithm getCompressionAlgorithm() const { return compression_; }
 
  private:
   std::unique_ptr<folly::IOBuf> buffer_;
@@ -73,6 +72,22 @@ struct LegacySerializedRequest {
   std::unique_ptr<folly::IOBuf> buffer;
 };
 
+struct ResponsePayload {
+  ResponsePayload() = default;
+  /* implicit */ ResponsePayload(std::unique_ptr<folly::IOBuf> buffer)
+      : buffer_(std::move(buffer)) {}
+
+  std::unique_ptr<folly::IOBuf> buffer() && { return std::move(buffer_); }
+
+  const folly::IOBuf* buffer() const& { return buffer_.get(); }
+
+  explicit operator bool() const { return static_cast<bool>(buffer_); }
+  std::size_t length() const { return buffer_->computeChainDataLength(); }
+
+ private:
+  std::unique_ptr<folly::IOBuf> buffer_;
+};
+
 struct SerializedResponse {
   explicit SerializedResponse(std::unique_ptr<folly::IOBuf> buffer_)
       : buffer(std::move(buffer_)) {}
@@ -81,7 +96,8 @@ struct SerializedResponse {
 };
 
 struct LegacySerializedResponse {
-  /* implicit */ LegacySerializedResponse(std::unique_ptr<folly::IOBuf> buffer_)
+  explicit LegacySerializedResponse(
+      std::unique_ptr<folly::IOBuf> buffer_ = std::unique_ptr<folly::IOBuf>{})
       : buffer(std::move(buffer_)) {}
 
   LegacySerializedResponse(
@@ -105,6 +121,13 @@ struct LegacySerializedResponse {
       int32_t seqid,
       folly::StringPiece methodName,
       const TApplicationException& ex);
+
+  LegacySerializedResponse(
+      uint16_t protocolId,
+      int32_t seqid,
+      MessageType mtype,
+      folly::StringPiece methodName,
+      SerializedResponse&& serializedResponse);
 
   std::unique_ptr<folly::IOBuf> buffer;
 };

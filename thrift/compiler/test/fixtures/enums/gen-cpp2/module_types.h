@@ -104,6 +104,13 @@ class SomeStruct;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class SomeStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -124,19 +131,19 @@ class SomeStruct final  {
   SomeStruct() :
       reasonable( ::cpp2::Metasyntactic::FOO),
       fine( ::cpp2::Metasyntactic::BAR),
-      questionable(static_cast< ::cpp2::Metasyntactic>(-1)) {}
+      questionable(static_cast< ::cpp2::Metasyntactic>(-1)) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   SomeStruct(apache::thrift::FragileConstructor, ::cpp2::Metasyntactic reasonable__arg, ::cpp2::Metasyntactic fine__arg, ::cpp2::Metasyntactic questionable__arg, ::std::set<::std::int32_t> tags__arg);
 
-  SomeStruct(SomeStruct&&) = default;
+  SomeStruct(SomeStruct&&) noexcept;
 
-  SomeStruct(const SomeStruct&) = default;
+  SomeStruct(const SomeStruct& src);
 
 
-  SomeStruct& operator=(SomeStruct&&) = default;
-
-  SomeStruct& operator=(const SomeStruct&) = default;
+  SomeStruct& operator=(SomeStruct&&) noexcept;
+  SomeStruct& operator=(const SomeStruct& src);
   void __clear();
  private:
   ::cpp2::Metasyntactic reasonable;
@@ -147,7 +154,7 @@ class SomeStruct final  {
  private:
   ::std::set<::std::int32_t> tags;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool reasonable;
@@ -155,24 +162,11 @@ class SomeStruct final  {
     bool questionable;
     bool tags;
   } __isset = {};
-  bool operator==(const SomeStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const SomeStruct& __x, const SomeStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const SomeStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const SomeStruct& __x, const SomeStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const SomeStruct& __x, const SomeStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const SomeStruct& __x, const SomeStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const SomeStruct&) const;
+  bool operator<(const SomeStruct&) const;
 
   template <typename..., typename T = ::cpp2::Metasyntactic>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> reasonable_ref() const& {
@@ -258,6 +252,7 @@ class SomeStruct final  {
     return reasonable;
   }
 
+  [[deprecated("Use `FOO.reasonable_ref() = BAR;` instead of `FOO.set_reasonable(BAR);`")]]
   ::cpp2::Metasyntactic& set_reasonable(::cpp2::Metasyntactic reasonable_) {
     reasonable = reasonable_;
     __isset.reasonable = true;
@@ -268,6 +263,7 @@ class SomeStruct final  {
     return fine;
   }
 
+  [[deprecated("Use `FOO.fine_ref() = BAR;` instead of `FOO.set_fine(BAR);`")]]
   ::cpp2::Metasyntactic& set_fine(::cpp2::Metasyntactic fine_) {
     fine = fine_;
     __isset.fine = true;
@@ -278,6 +274,7 @@ class SomeStruct final  {
     return questionable;
   }
 
+  [[deprecated("Use `FOO.questionable_ref() = BAR;` instead of `FOO.set_questionable(BAR);`")]]
   ::cpp2::Metasyntactic& set_questionable(::cpp2::Metasyntactic questionable_) {
     questionable = questionable_;
     __isset.questionable = true;
@@ -287,6 +284,7 @@ class SomeStruct final  {
   ::std::set<::std::int32_t> get_tags() &&;
 
   template <typename T_SomeStruct_tags_struct_setter = ::std::set<::std::int32_t>>
+  [[deprecated("Use `FOO.tags_ref() = BAR;` instead of `FOO.set_tags(BAR);`")]]
   ::std::set<::std::int32_t>& set_tags(T_SomeStruct_tags_struct_setter&& tags_) {
     tags = std::forward<T_SomeStruct_tags_struct_setter>(tags_);
     __isset.tags = true;
@@ -306,7 +304,7 @@ class SomeStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< SomeStruct >;
+  friend class ::apache::thrift::Cpp2Ops<SomeStruct>;
   friend void swap(SomeStruct& a, SomeStruct& b);
 };
 

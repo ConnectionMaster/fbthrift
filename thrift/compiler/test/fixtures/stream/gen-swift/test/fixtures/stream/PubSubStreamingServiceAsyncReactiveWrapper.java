@@ -7,6 +7,7 @@
 
 package test.fixtures.stream;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class PubSubStreamingServiceAsyncReactiveWrapper 
@@ -19,7 +20,7 @@ public class PubSubStreamingServiceAsyncReactiveWrapper
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
@@ -39,7 +40,7 @@ public class PubSubStreamingServiceAsyncReactiveWrapper
     }
 
     @java.lang.Override
-    public reactor.core.publisher.Flux<com.facebook.swift.transport.model.StreamResponse<Integer,Integer>> responseandstreamthrows(final int foo) {
+    public reactor.core.publisher.Flux<com.facebook.thrift.model.StreamResponse<Integer,Integer>> responseandstreamthrows(final int foo) {
         throw new UnsupportedOperationException();
     }
 

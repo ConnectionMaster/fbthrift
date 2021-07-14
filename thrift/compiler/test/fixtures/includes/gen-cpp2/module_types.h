@@ -50,6 +50,13 @@ class MyStruct;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -69,19 +76,19 @@ class MyStruct final  {
 
   MyStruct() :
       MyIncludedField(::apache::thrift::detail::make_constant< ::cpp2::Included>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::MyIntField>(2LL), ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::MyTransitiveField>(::apache::thrift::detail::make_constant< ::cpp2::Foo>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::a>(2LL))))),
-      MyIncludedInt(42LL) {}
+      MyIncludedInt(42LL) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::cpp2::Included MyIncludedField__arg, ::cpp2::Included MyOtherIncludedField__arg, ::cpp2::IncludedInt64 MyIncludedInt__arg);
 
-  MyStruct(MyStruct&&) = default;
+  MyStruct(MyStruct&&) noexcept;
 
-  MyStruct(const MyStruct&) = default;
+  MyStruct(const MyStruct& src);
 
 
-  MyStruct& operator=(MyStruct&&) = default;
-
-  MyStruct& operator=(const MyStruct&) = default;
+  MyStruct& operator=(MyStruct&&) noexcept;
+  MyStruct& operator=(const MyStruct& src);
   void __clear();
  private:
   ::cpp2::Included MyIncludedField;
@@ -90,31 +97,18 @@ class MyStruct final  {
  private:
   ::cpp2::IncludedInt64 MyIncludedInt;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool MyIncludedField;
     bool MyOtherIncludedField;
     bool MyIncludedInt;
   } __isset = {};
-  bool operator==(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStruct& __x, const MyStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStruct&) const;
+  bool operator<(const MyStruct&) const;
 
   template <typename..., typename T = ::cpp2::Included>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> MyIncludedField_ref() const& {
@@ -179,6 +173,7 @@ class MyStruct final  {
   ::cpp2::Included get_MyIncludedField() &&;
 
   template <typename T_MyStruct_MyIncludedField_struct_setter = ::cpp2::Included>
+  [[deprecated("Use `FOO.MyIncludedField_ref() = BAR;` instead of `FOO.set_MyIncludedField(BAR);`")]]
   ::cpp2::Included& set_MyIncludedField(T_MyStruct_MyIncludedField_struct_setter&& MyIncludedField_) {
     MyIncludedField = std::forward<T_MyStruct_MyIncludedField_struct_setter>(MyIncludedField_);
     __isset.MyIncludedField = true;
@@ -188,6 +183,7 @@ class MyStruct final  {
   ::cpp2::Included get_MyOtherIncludedField() &&;
 
   template <typename T_MyStruct_MyOtherIncludedField_struct_setter = ::cpp2::Included>
+  [[deprecated("Use `FOO.MyOtherIncludedField_ref() = BAR;` instead of `FOO.set_MyOtherIncludedField(BAR);`")]]
   ::cpp2::Included& set_MyOtherIncludedField(T_MyStruct_MyOtherIncludedField_struct_setter&& MyOtherIncludedField_) {
     MyOtherIncludedField = std::forward<T_MyStruct_MyOtherIncludedField_struct_setter>(MyOtherIncludedField_);
     __isset.MyOtherIncludedField = true;
@@ -198,6 +194,7 @@ class MyStruct final  {
     return MyIncludedInt;
   }
 
+  [[deprecated("Use `FOO.MyIncludedInt_ref() = BAR;` instead of `FOO.set_MyIncludedInt(BAR);`")]]
   ::cpp2::IncludedInt64& set_MyIncludedInt(::cpp2::IncludedInt64 MyIncludedInt_) {
     MyIncludedInt = MyIncludedInt_;
     __isset.MyIncludedInt = true;
@@ -217,7 +214,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 

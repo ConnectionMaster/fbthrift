@@ -14,28 +14,68 @@ std::unique_ptr<apache::thrift::AsyncProcessor> MyServiceSvIf::getProcessor() {
   return std::make_unique<MyServiceAsyncProcessor>(this);
 }
 
+MyServiceSvIf::CreateMethodMetadataResult MyServiceSvIf::createMethodMetadata() {
+  return ::apache::thrift::detail::ap::createMethodMetadataMap<MyServiceAsyncProcessor>();
+}
+
 
 void MyServiceSvIf::query(std::unique_ptr<::cpp2::MyStruct> /*s*/, std::unique_ptr<::cpp2::Included> /*i*/) {
   apache::thrift::detail::si::throw_app_exn_unimplemented("query");
 }
 
 folly::SemiFuture<folly::Unit> MyServiceSvIf::semifuture_query(std::unique_ptr<::cpp2::MyStruct> p_s, std::unique_ptr<::cpp2::Included> p_i) {
-  return apache::thrift::detail::si::semifuture([&] {
-    return query(std::move(p_s), std::move(p_i));
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_query.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  query(std::move(p_s), std::move(p_i));
+  return folly::makeSemiFuture();
 }
 
 folly::Future<folly::Unit> MyServiceSvIf::future_query(std::unique_ptr<::cpp2::MyStruct> p_s, std::unique_ptr<::cpp2::Included> p_i) {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_query(std::move(p_s), std::move(p_i)), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_query.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_query(std::move(p_s), std::move(p_i)), getInternalKeepAlive());
 }
 
 void MyServiceSvIf::async_tm_query(std::unique_ptr<apache::thrift::HandlerCallback<void>> callback, std::unique_ptr<::cpp2::MyStruct> p_s, std::unique_ptr<::cpp2::Included> p_i) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_query(std::move(p_s), std::move(p_i));
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_query.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_query.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_query(std::move(p_s), std::move(p_i));
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_query(std::move(p_s), std::move(p_i));
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        query(std::move(p_s), std::move(p_i));
+        callback->done();
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 void MyServiceSvIf::has_arg_docs(std::unique_ptr<::cpp2::MyStruct> /*s*/, std::unique_ptr<::cpp2::Included> /*i*/) {
@@ -43,22 +83,58 @@ void MyServiceSvIf::has_arg_docs(std::unique_ptr<::cpp2::MyStruct> /*s*/, std::u
 }
 
 folly::SemiFuture<folly::Unit> MyServiceSvIf::semifuture_has_arg_docs(std::unique_ptr<::cpp2::MyStruct> p_s, std::unique_ptr<::cpp2::Included> p_i) {
-  return apache::thrift::detail::si::semifuture([&] {
-    return has_arg_docs(std::move(p_s), std::move(p_i));
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_has_arg_docs.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  has_arg_docs(std::move(p_s), std::move(p_i));
+  return folly::makeSemiFuture();
 }
 
 folly::Future<folly::Unit> MyServiceSvIf::future_has_arg_docs(std::unique_ptr<::cpp2::MyStruct> p_s, std::unique_ptr<::cpp2::Included> p_i) {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_has_arg_docs(std::move(p_s), std::move(p_i)), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_has_arg_docs.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_has_arg_docs(std::move(p_s), std::move(p_i)), getInternalKeepAlive());
 }
 
 void MyServiceSvIf::async_tm_has_arg_docs(std::unique_ptr<apache::thrift::HandlerCallback<void>> callback, std::unique_ptr<::cpp2::MyStruct> p_s, std::unique_ptr<::cpp2::Included> p_i) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_has_arg_docs(std::move(p_s), std::move(p_i));
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_has_arg_docs.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_has_arg_docs.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_has_arg_docs(std::move(p_s), std::move(p_i));
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_has_arg_docs(std::move(p_s), std::move(p_i));
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        has_arg_docs(std::move(p_s), std::move(p_i));
+        callback->done();
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 void MyServiceSvNull::query(std::unique_ptr<::cpp2::MyStruct> /*s*/, std::unique_ptr<::cpp2::Included> /*i*/) {
@@ -83,26 +159,17 @@ void MyServiceAsyncProcessor::processSerializedCompressedRequest(apache::thrift:
   apache::thrift::detail::ap::process(this, std::move(req), std::move(serializedRequest), protType, context, eb, tm);
 }
 
-std::shared_ptr<folly::RequestContext> MyServiceAsyncProcessor::getBaseContextForRequest() {
-  return iface_->getBaseContextForRequest();
+void MyServiceAsyncProcessor::processSerializedCompressedRequestWithMetadata(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, const apache::thrift::AsyncProcessorFactory::MethodMetadata& methodMetadata, apache::thrift::protocol::PROTOCOL_TYPES protType, apache::thrift::Cpp2RequestContext* context, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  apache::thrift::detail::ap::process(this, std::move(req), std::move(serializedRequest), methodMetadata, protType, context, eb, tm);
 }
 
-const MyServiceAsyncProcessor::ProcessMap& MyServiceAsyncProcessor::getBinaryProtocolProcessMap() {
-  return binaryProcessMap_;
+const MyServiceAsyncProcessor::ProcessMap& MyServiceAsyncProcessor::getOwnProcessMap() {
+  return kOwnProcessMap_;
 }
 
-const MyServiceAsyncProcessor::ProcessMap MyServiceAsyncProcessor::binaryProcessMap_ {
-  {"query", &MyServiceAsyncProcessor::setUpAndProcess_query<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"has_arg_docs", &MyServiceAsyncProcessor::setUpAndProcess_has_arg_docs<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-};
-
-const MyServiceAsyncProcessor::ProcessMap& MyServiceAsyncProcessor::getCompactProtocolProcessMap() {
-  return compactProcessMap_;
-}
-
-const MyServiceAsyncProcessor::ProcessMap MyServiceAsyncProcessor::compactProcessMap_ {
-  {"query", &MyServiceAsyncProcessor::setUpAndProcess_query<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"has_arg_docs", &MyServiceAsyncProcessor::setUpAndProcess_has_arg_docs<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
+const MyServiceAsyncProcessor::ProcessMap MyServiceAsyncProcessor::kOwnProcessMap_ {
+  {"query", {&MyServiceAsyncProcessor::setUpAndProcess_query<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &MyServiceAsyncProcessor::setUpAndProcess_query<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"has_arg_docs", {&MyServiceAsyncProcessor::setUpAndProcess_has_arg_docs<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &MyServiceAsyncProcessor::setUpAndProcess_has_arg_docs<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
 };
 
 } // cpp2

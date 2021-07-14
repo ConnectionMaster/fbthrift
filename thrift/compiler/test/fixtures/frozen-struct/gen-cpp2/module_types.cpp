@@ -69,12 +69,39 @@ void TccStructTraits<::some::ns::ModuleA>::translateFieldName(
 namespace some { namespace ns {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+ModuleA::ModuleA(const ModuleA&) = default;
+ModuleA& ModuleA::operator=(const ModuleA&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 ModuleA::ModuleA() :
-      i32Field(0) {}
+      i32Field(0) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 ModuleA::~ModuleA() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+ModuleA::ModuleA(ModuleA&& other) noexcept  :
+    i32Field(std::move(other.i32Field)),
+    strField(std::move(other.strField)),
+    listField(std::move(other.listField)),
+    mapField(std::move(other.mapField)),
+    inclAField(std::move(other.inclAField)),
+    inclBField(std::move(other.inclBField)),
+    __isset(other.__isset) {}
+ModuleA& ModuleA::operator=(FOLLY_MAYBE_UNUSED ModuleA&& other) noexcept {
+    this->i32Field = std::move(other.i32Field);
+    this->strField = std::move(other.strField);
+    this->listField = std::move(other.listField);
+    this->mapField = std::move(other.mapField);
+    this->inclAField = std::move(other.inclAField);
+    this->inclBField = std::move(other.inclBField);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 ModuleA::ModuleA(apache::thrift::FragileConstructor, ::std::int32_t i32Field__arg, ::std::string strField__arg, ::std::vector<::std::int16_t> listField__arg, ::std::map<::std::string, ::std::int32_t> mapField__arg, ::some::ns::IncludedA inclAField__arg, ::some::ns::IncludedB inclBField__arg) :
@@ -92,14 +119,15 @@ ModuleA::ModuleA(apache::thrift::FragileConstructor, ::std::int32_t i32Field__ar
   __isset.inclBField = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void ModuleA::__clear() {
   // clear all fields
-  i32Field = 0;
-  strField = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  listField.clear();
-  mapField.clear();
-  inclAField.__clear();
-  inclBField.__clear();
+  this->i32Field = 0;
+  this->strField = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->listField.clear();
+  this->mapField.clear();
+  this->inclAField.__clear();
+  this->inclBField.__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -261,6 +289,7 @@ void TccStructTraits<::some::ns::ModuleB>::translateFieldName(
 
 namespace some { namespace ns {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 ModuleB::ModuleB(apache::thrift::FragileConstructor, ::std::int32_t i32Field__arg, ::some::ns::EnumB inclEnumB__arg) :
     i32Field(std::move(i32Field__arg)),
@@ -269,10 +298,11 @@ ModuleB::ModuleB(apache::thrift::FragileConstructor, ::std::int32_t i32Field__ar
   __isset.inclEnumB = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void ModuleB::__clear() {
   // clear all fields
-  i32Field = 0;
-  inclEnumB = static_cast< ::some::ns::EnumB>(0);
+  this->i32Field = 0;
+  this->inclEnumB = static_cast< ::some::ns::EnumB>(0);
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

@@ -69,6 +69,10 @@ struct aa_map;
 struct aa_string;
 struct not_a_container;
 struct not_a_container;
+struct i32_field;
+struct IntTypedef_field;
+struct UintTypedef_field;
+struct __field;
 } // namespace tag
 namespace detail {
 #ifndef APACHE_THRIFT_ACCESSOR_field
@@ -291,6 +295,22 @@ APACHE_THRIFT_DEFINE_ACCESSOR(not_a_container);
 #define APACHE_THRIFT_ACCESSOR_not_a_container
 APACHE_THRIFT_DEFINE_ACCESSOR(not_a_container);
 #endif
+#ifndef APACHE_THRIFT_ACCESSOR_i32_field
+#define APACHE_THRIFT_ACCESSOR_i32_field
+APACHE_THRIFT_DEFINE_ACCESSOR(i32_field);
+#endif
+#ifndef APACHE_THRIFT_ACCESSOR_IntTypedef_field
+#define APACHE_THRIFT_ACCESSOR_IntTypedef_field
+APACHE_THRIFT_DEFINE_ACCESSOR(IntTypedef_field);
+#endif
+#ifndef APACHE_THRIFT_ACCESSOR_UintTypedef_field
+#define APACHE_THRIFT_ACCESSOR_UintTypedef_field
+APACHE_THRIFT_DEFINE_ACCESSOR(UintTypedef_field);
+#endif
+#ifndef APACHE_THRIFT_ACCESSOR___field
+#define APACHE_THRIFT_ACCESSOR___field
+APACHE_THRIFT_DEFINE_ACCESSOR(__field);
+#endif
 } // namespace detail
 } // namespace thrift
 } // namespace apache
@@ -505,11 +525,15 @@ class NoexceptMoveComplexStruct;
 class NoExceptMoveUnion;
 class AllocatorAware;
 class AllocatorAware2;
+class TypedefStruct;
+class StructWithDoubleUnderscores;
 }}}} // apache::thrift::fixtures::types
 // END forward_declare
 // BEGIN typedefs
 namespace apache { namespace thrift { namespace fixtures { namespace types {
 typedef ::std::string TBinary;
+typedef ::std::int32_t IntTypedef;
+typedef ::apache::thrift::fixtures::types::IntTypedef UintTypedef;
 
 }}}} // apache::thrift::fixtures::types
 // END typedefs
@@ -526,6 +550,13 @@ template<> struct equal_to<typename ::apache::thrift::fixtures::types::decorated
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class decorated_struct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -543,46 +574,33 @@ class decorated_struct final  {
 
  public:
 
-  decorated_struct() {}
+  decorated_struct() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   decorated_struct(apache::thrift::FragileConstructor, ::std::string field__arg);
 
-  decorated_struct(decorated_struct&&) = default;
+  decorated_struct(decorated_struct&&) noexcept;
 
-  decorated_struct(const decorated_struct&) = default;
+  decorated_struct(const decorated_struct& src);
 
 
-  decorated_struct& operator=(decorated_struct&&) = default;
-
-  decorated_struct& operator=(const decorated_struct&) = default;
+  decorated_struct& operator=(decorated_struct&&) noexcept;
+  decorated_struct& operator=(const decorated_struct& src);
   void __clear();
  private:
   ::std::string field;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool field;
   } __isset = {};
-  bool operator==(const decorated_struct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const decorated_struct& __x, const decorated_struct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const decorated_struct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const decorated_struct& __x, const decorated_struct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const decorated_struct& __x, const decorated_struct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const decorated_struct& __x, const decorated_struct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const decorated_struct&) const;
+  bool operator<(const decorated_struct&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> field_ref() const& {
@@ -613,6 +631,7 @@ class decorated_struct final  {
   }
 
   template <typename T_decorated_struct_field_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.field_ref() = BAR;` instead of `FOO.set_field(BAR);`")]]
   ::std::string& set_field(T_decorated_struct_field_struct_setter&& field_) {
     field = std::forward<T_decorated_struct_field_struct_setter>(field_);
     __isset.field = true;
@@ -632,7 +651,7 @@ class decorated_struct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< decorated_struct >;
+  friend class ::apache::thrift::Cpp2Ops<decorated_struct>;
   friend void swap(decorated_struct& a, decorated_struct& b);
 };
 
@@ -645,6 +664,13 @@ uint32_t decorated_struct::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ContainerStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -668,14 +694,13 @@ class ContainerStruct final  {
   [[deprecated("This constructor is deprecated")]]
   ContainerStruct(apache::thrift::FragileConstructor, ::std::vector<::std::int32_t> fieldA__arg, std::list<::std::int32_t> fieldB__arg, std::deque<::std::int32_t> fieldC__arg, folly::fbvector<::std::int32_t> fieldD__arg, folly::small_vector<::std::int32_t> fieldE__arg, folly::sorted_vector_set<::std::int32_t> fieldF__arg, folly::sorted_vector_map<::std::int32_t, ::std::string> fieldG__arg, ::apache::thrift::fixtures::types::SomeMap fieldH__arg);
 
-  ContainerStruct(ContainerStruct&&) = default;
+  ContainerStruct(ContainerStruct&&) noexcept;
 
-  ContainerStruct(const ContainerStruct&) = default;
+  ContainerStruct(const ContainerStruct& src);
 
 
-  ContainerStruct& operator=(ContainerStruct&&) = default;
-
-  ContainerStruct& operator=(const ContainerStruct&) = default;
+  ContainerStruct& operator=(ContainerStruct&&) noexcept;
+  ContainerStruct& operator=(const ContainerStruct& src);
   void __clear();
 
   ~ContainerStruct();
@@ -697,7 +722,7 @@ class ContainerStruct final  {
  private:
   ::apache::thrift::fixtures::types::SomeMap fieldH;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool fieldA;
@@ -709,24 +734,11 @@ class ContainerStruct final  {
     bool fieldG;
     bool fieldH;
   } __isset = {};
-  bool operator==(const ContainerStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ContainerStruct& __x, const ContainerStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ContainerStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ContainerStruct& __x, const ContainerStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ContainerStruct& __x, const ContainerStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ContainerStruct& __x, const ContainerStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ContainerStruct&) const;
+  bool operator<(const ContainerStruct&) const;
 
   template <typename..., typename T = ::std::vector<::std::int32_t>>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> fieldA_ref() const& {
@@ -891,6 +903,7 @@ class ContainerStruct final  {
   ::std::vector<::std::int32_t> get_fieldA() &&;
 
   template <typename T_ContainerStruct_fieldA_struct_setter = ::std::vector<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldA_ref() = BAR;` instead of `FOO.set_fieldA(BAR);`")]]
   ::std::vector<::std::int32_t>& set_fieldA(T_ContainerStruct_fieldA_struct_setter&& fieldA_) {
     fieldA = std::forward<T_ContainerStruct_fieldA_struct_setter>(fieldA_);
     __isset.fieldA = true;
@@ -900,6 +913,7 @@ class ContainerStruct final  {
   std::list<::std::int32_t> get_fieldB() &&;
 
   template <typename T_ContainerStruct_fieldB_struct_setter = std::list<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldB_ref() = BAR;` instead of `FOO.set_fieldB(BAR);`")]]
   std::list<::std::int32_t>& set_fieldB(T_ContainerStruct_fieldB_struct_setter&& fieldB_) {
     fieldB = std::forward<T_ContainerStruct_fieldB_struct_setter>(fieldB_);
     __isset.fieldB = true;
@@ -909,6 +923,7 @@ class ContainerStruct final  {
   std::deque<::std::int32_t> get_fieldC() &&;
 
   template <typename T_ContainerStruct_fieldC_struct_setter = std::deque<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldC_ref() = BAR;` instead of `FOO.set_fieldC(BAR);`")]]
   std::deque<::std::int32_t>& set_fieldC(T_ContainerStruct_fieldC_struct_setter&& fieldC_) {
     fieldC = std::forward<T_ContainerStruct_fieldC_struct_setter>(fieldC_);
     __isset.fieldC = true;
@@ -918,6 +933,7 @@ class ContainerStruct final  {
   folly::fbvector<::std::int32_t> get_fieldD() &&;
 
   template <typename T_ContainerStruct_fieldD_struct_setter = folly::fbvector<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldD_ref() = BAR;` instead of `FOO.set_fieldD(BAR);`")]]
   folly::fbvector<::std::int32_t>& set_fieldD(T_ContainerStruct_fieldD_struct_setter&& fieldD_) {
     fieldD = std::forward<T_ContainerStruct_fieldD_struct_setter>(fieldD_);
     __isset.fieldD = true;
@@ -927,6 +943,7 @@ class ContainerStruct final  {
   folly::small_vector<::std::int32_t> get_fieldE() &&;
 
   template <typename T_ContainerStruct_fieldE_struct_setter = folly::small_vector<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldE_ref() = BAR;` instead of `FOO.set_fieldE(BAR);`")]]
   folly::small_vector<::std::int32_t>& set_fieldE(T_ContainerStruct_fieldE_struct_setter&& fieldE_) {
     fieldE = std::forward<T_ContainerStruct_fieldE_struct_setter>(fieldE_);
     __isset.fieldE = true;
@@ -936,6 +953,7 @@ class ContainerStruct final  {
   folly::sorted_vector_set<::std::int32_t> get_fieldF() &&;
 
   template <typename T_ContainerStruct_fieldF_struct_setter = folly::sorted_vector_set<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldF_ref() = BAR;` instead of `FOO.set_fieldF(BAR);`")]]
   folly::sorted_vector_set<::std::int32_t>& set_fieldF(T_ContainerStruct_fieldF_struct_setter&& fieldF_) {
     fieldF = std::forward<T_ContainerStruct_fieldF_struct_setter>(fieldF_);
     __isset.fieldF = true;
@@ -945,6 +963,7 @@ class ContainerStruct final  {
   folly::sorted_vector_map<::std::int32_t, ::std::string> get_fieldG() &&;
 
   template <typename T_ContainerStruct_fieldG_struct_setter = folly::sorted_vector_map<::std::int32_t, ::std::string>>
+  [[deprecated("Use `FOO.fieldG_ref() = BAR;` instead of `FOO.set_fieldG(BAR);`")]]
   folly::sorted_vector_map<::std::int32_t, ::std::string>& set_fieldG(T_ContainerStruct_fieldG_struct_setter&& fieldG_) {
     fieldG = std::forward<T_ContainerStruct_fieldG_struct_setter>(fieldG_);
     __isset.fieldG = true;
@@ -954,6 +973,7 @@ class ContainerStruct final  {
   ::apache::thrift::fixtures::types::SomeMap get_fieldH() &&;
 
   template <typename T_ContainerStruct_fieldH_struct_setter = ::apache::thrift::fixtures::types::SomeMap>
+  [[deprecated("Use `FOO.fieldH_ref() = BAR;` instead of `FOO.set_fieldH(BAR);`")]]
   ::apache::thrift::fixtures::types::SomeMap& set_fieldH(T_ContainerStruct_fieldH_struct_setter&& fieldH_) {
     fieldH = std::forward<T_ContainerStruct_fieldH_struct_setter>(fieldH_);
     __isset.fieldH = true;
@@ -973,7 +993,7 @@ class ContainerStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ContainerStruct >;
+  friend class ::apache::thrift::Cpp2Ops<ContainerStruct>;
   friend void swap(ContainerStruct& a, ContainerStruct& b);
 };
 
@@ -986,6 +1006,13 @@ uint32_t ContainerStruct::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class CppTypeStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1003,46 +1030,33 @@ class CppTypeStruct final  {
 
  public:
 
-  CppTypeStruct() {}
+  CppTypeStruct() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   CppTypeStruct(apache::thrift::FragileConstructor, std::list<int32_t> fieldA__arg);
 
-  CppTypeStruct(CppTypeStruct&&) = default;
+  CppTypeStruct(CppTypeStruct&&) noexcept;
 
-  CppTypeStruct(const CppTypeStruct&) = default;
+  CppTypeStruct(const CppTypeStruct& src);
 
 
-  CppTypeStruct& operator=(CppTypeStruct&&) = default;
-
-  CppTypeStruct& operator=(const CppTypeStruct&) = default;
+  CppTypeStruct& operator=(CppTypeStruct&&) noexcept;
+  CppTypeStruct& operator=(const CppTypeStruct& src);
   void __clear();
  private:
   std::list<int32_t> fieldA;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool fieldA;
   } __isset = {};
-  bool operator==(const CppTypeStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const CppTypeStruct& __x, const CppTypeStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const CppTypeStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const CppTypeStruct& __x, const CppTypeStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const CppTypeStruct& __x, const CppTypeStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const CppTypeStruct& __x, const CppTypeStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const CppTypeStruct&) const;
+  bool operator<(const CppTypeStruct&) const;
 
   template <typename..., typename T = std::list<int32_t>>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> fieldA_ref() const& {
@@ -1067,6 +1081,7 @@ class CppTypeStruct final  {
   std::list<int32_t> get_fieldA() &&;
 
   template <typename T_CppTypeStruct_fieldA_struct_setter = std::list<int32_t>>
+  [[deprecated("Use `FOO.fieldA_ref() = BAR;` instead of `FOO.set_fieldA(BAR);`")]]
   std::list<int32_t>& set_fieldA(T_CppTypeStruct_fieldA_struct_setter&& fieldA_) {
     fieldA = std::forward<T_CppTypeStruct_fieldA_struct_setter>(fieldA_);
     __isset.fieldA = true;
@@ -1086,7 +1101,7 @@ class CppTypeStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< CppTypeStruct >;
+  friend class ::apache::thrift::Cpp2Ops<CppTypeStruct>;
   friend void swap(CppTypeStruct& a, CppTypeStruct& b);
 };
 
@@ -1099,6 +1114,13 @@ uint32_t CppTypeStruct::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class VirtualStruct  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1117,19 +1139,19 @@ class VirtualStruct  {
  public:
 
   VirtualStruct() :
-      MyIntField(0) {}
+      MyIntField(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   VirtualStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg);
 
-  VirtualStruct(VirtualStruct&&) = default;
+  VirtualStruct(VirtualStruct&&) noexcept;
 
-  VirtualStruct(const VirtualStruct&) = default;
+  VirtualStruct(const VirtualStruct& src);
 
 
-  VirtualStruct& operator=(VirtualStruct&&) = default;
-
-  VirtualStruct& operator=(const VirtualStruct&) = default;
+  VirtualStruct& operator=(VirtualStruct&&) noexcept;
+  VirtualStruct& operator=(const VirtualStruct& src);
   void __clear();
 
   virtual ~VirtualStruct() {}
@@ -1137,29 +1159,16 @@ class VirtualStruct  {
  private:
   ::std::int64_t MyIntField;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool MyIntField;
   } __isset = {};
-  bool operator==(const VirtualStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const VirtualStruct& __x, const VirtualStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const VirtualStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const VirtualStruct& __x, const VirtualStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const VirtualStruct& __x, const VirtualStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const VirtualStruct& __x, const VirtualStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const VirtualStruct&) const;
+  bool operator<(const VirtualStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> MyIntField_ref() const& {
@@ -1185,6 +1194,7 @@ class VirtualStruct  {
     return MyIntField;
   }
 
+  [[deprecated("Use `FOO.MyIntField_ref() = BAR;` instead of `FOO.set_MyIntField(BAR);`")]]
   ::std::int64_t& set_MyIntField(::std::int64_t MyIntField_) {
     MyIntField = MyIntField_;
     __isset.MyIntField = true;
@@ -1204,7 +1214,7 @@ class VirtualStruct  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< VirtualStruct >;
+  friend class ::apache::thrift::Cpp2Ops<VirtualStruct>;
   friend void swap(VirtualStruct& a, VirtualStruct& b);
 };
 
@@ -1217,6 +1227,13 @@ uint32_t VirtualStruct::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStructWithForwardRefEnum final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1236,49 +1253,36 @@ class MyStructWithForwardRefEnum final  {
 
   MyStructWithForwardRefEnum() :
       a( ::apache::thrift::fixtures::types::MyForwardRefEnum::NONZERO),
-      b( ::apache::thrift::fixtures::types::MyForwardRefEnum::NONZERO) {}
+      b( ::apache::thrift::fixtures::types::MyForwardRefEnum::NONZERO) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStructWithForwardRefEnum(apache::thrift::FragileConstructor, ::apache::thrift::fixtures::types::MyForwardRefEnum a__arg, ::apache::thrift::fixtures::types::MyForwardRefEnum b__arg);
 
-  MyStructWithForwardRefEnum(MyStructWithForwardRefEnum&&) = default;
+  MyStructWithForwardRefEnum(MyStructWithForwardRefEnum&&) noexcept;
 
-  MyStructWithForwardRefEnum(const MyStructWithForwardRefEnum&) = default;
+  MyStructWithForwardRefEnum(const MyStructWithForwardRefEnum& src);
 
 
-  MyStructWithForwardRefEnum& operator=(MyStructWithForwardRefEnum&&) = default;
-
-  MyStructWithForwardRefEnum& operator=(const MyStructWithForwardRefEnum&) = default;
+  MyStructWithForwardRefEnum& operator=(MyStructWithForwardRefEnum&&) noexcept;
+  MyStructWithForwardRefEnum& operator=(const MyStructWithForwardRefEnum& src);
   void __clear();
  private:
   ::apache::thrift::fixtures::types::MyForwardRefEnum a;
  private:
   ::apache::thrift::fixtures::types::MyForwardRefEnum b;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool a;
     bool b;
   } __isset = {};
-  bool operator==(const MyStructWithForwardRefEnum& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStructWithForwardRefEnum& __x, const MyStructWithForwardRefEnum& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStructWithForwardRefEnum& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStructWithForwardRefEnum& __x, const MyStructWithForwardRefEnum& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStructWithForwardRefEnum& __x, const MyStructWithForwardRefEnum& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStructWithForwardRefEnum& __x, const MyStructWithForwardRefEnum& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStructWithForwardRefEnum&) const;
+  bool operator<(const MyStructWithForwardRefEnum&) const;
 
   template <typename..., typename T = ::apache::thrift::fixtures::types::MyForwardRefEnum>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> a_ref() const& {
@@ -1324,6 +1328,7 @@ class MyStructWithForwardRefEnum final  {
     return a;
   }
 
+  [[deprecated("Use `FOO.a_ref() = BAR;` instead of `FOO.set_a(BAR);`")]]
   ::apache::thrift::fixtures::types::MyForwardRefEnum& set_a(::apache::thrift::fixtures::types::MyForwardRefEnum a_) {
     a = a_;
     __isset.a = true;
@@ -1334,6 +1339,7 @@ class MyStructWithForwardRefEnum final  {
     return b;
   }
 
+  [[deprecated("Use `FOO.b_ref() = BAR;` instead of `FOO.set_b(BAR);`")]]
   ::apache::thrift::fixtures::types::MyForwardRefEnum& set_b(::apache::thrift::fixtures::types::MyForwardRefEnum b_) {
     b = b_;
     __isset.b = true;
@@ -1353,7 +1359,7 @@ class MyStructWithForwardRefEnum final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStructWithForwardRefEnum >;
+  friend class ::apache::thrift::Cpp2Ops<MyStructWithForwardRefEnum>;
   friend void swap(MyStructWithForwardRefEnum& a, MyStructWithForwardRefEnum& b);
 };
 
@@ -1366,6 +1372,13 @@ uint32_t MyStructWithForwardRefEnum::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class TrivialNumeric final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1385,7 +1398,8 @@ class TrivialNumeric final  {
 
   TrivialNumeric() :
       a(0),
-      b(0) {}
+      b(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   TrivialNumeric(apache::thrift::FragileConstructor, ::std::int32_t a__arg, bool b__arg);
@@ -1404,30 +1418,17 @@ class TrivialNumeric final  {
  private:
   bool b;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool a;
     bool b;
   } __isset = {};
-  bool operator==(const TrivialNumeric& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const TrivialNumeric& __x, const TrivialNumeric& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const TrivialNumeric& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const TrivialNumeric& __x, const TrivialNumeric& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const TrivialNumeric& __x, const TrivialNumeric& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const TrivialNumeric& __x, const TrivialNumeric& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const TrivialNumeric&) const;
+  bool operator<(const TrivialNumeric&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> a_ref() const& {
@@ -1473,6 +1474,7 @@ class TrivialNumeric final  {
     return a;
   }
 
+  [[deprecated("Use `FOO.a_ref() = BAR;` instead of `FOO.set_a(BAR);`")]]
   ::std::int32_t& set_a(::std::int32_t a_) {
     a = a_;
     __isset.a = true;
@@ -1483,6 +1485,7 @@ class TrivialNumeric final  {
     return b;
   }
 
+  [[deprecated("Use `FOO.b_ref() = BAR;` instead of `FOO.set_b(BAR);`")]]
   bool& set_b(bool b_) {
     b = b_;
     __isset.b = true;
@@ -1502,7 +1505,7 @@ class TrivialNumeric final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< TrivialNumeric >;
+  friend class ::apache::thrift::Cpp2Ops<TrivialNumeric>;
   friend void swap(TrivialNumeric& a, TrivialNumeric& b);
 };
 
@@ -1515,6 +1518,13 @@ uint32_t TrivialNumeric::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class TrivialNestedWithDefault final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1534,7 +1544,8 @@ class TrivialNestedWithDefault final  {
 
   TrivialNestedWithDefault() :
       z(4),
-      n(::apache::thrift::detail::make_constant< ::apache::thrift::fixtures::types::TrivialNumeric>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::a>(3), ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::b>(true))) {}
+      n(::apache::thrift::detail::make_constant< ::apache::thrift::fixtures::types::TrivialNumeric>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::a>(3), ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::b>(true))) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   TrivialNestedWithDefault(apache::thrift::FragileConstructor, ::std::int32_t z__arg, ::apache::thrift::fixtures::types::TrivialNumeric n__arg);
@@ -1553,30 +1564,17 @@ class TrivialNestedWithDefault final  {
  private:
   ::apache::thrift::fixtures::types::TrivialNumeric n;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool z;
     bool n;
   } __isset = {};
-  bool operator==(const TrivialNestedWithDefault& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const TrivialNestedWithDefault& __x, const TrivialNestedWithDefault& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const TrivialNestedWithDefault& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const TrivialNestedWithDefault& __x, const TrivialNestedWithDefault& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const TrivialNestedWithDefault& __x, const TrivialNestedWithDefault& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const TrivialNestedWithDefault& __x, const TrivialNestedWithDefault& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const TrivialNestedWithDefault&) const;
+  bool operator<(const TrivialNestedWithDefault&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> z_ref() const& {
@@ -1622,6 +1620,7 @@ class TrivialNestedWithDefault final  {
     return z;
   }
 
+  [[deprecated("Use `FOO.z_ref() = BAR;` instead of `FOO.set_z(BAR);`")]]
   ::std::int32_t& set_z(::std::int32_t z_) {
     z = z_;
     __isset.z = true;
@@ -1631,6 +1630,7 @@ class TrivialNestedWithDefault final  {
   ::apache::thrift::fixtures::types::TrivialNumeric get_n() &&;
 
   template <typename T_TrivialNestedWithDefault_n_struct_setter = ::apache::thrift::fixtures::types::TrivialNumeric>
+  [[deprecated("Use `FOO.n_ref() = BAR;` instead of `FOO.set_n(BAR);`")]]
   ::apache::thrift::fixtures::types::TrivialNumeric& set_n(T_TrivialNestedWithDefault_n_struct_setter&& n_) {
     n = std::forward<T_TrivialNestedWithDefault_n_struct_setter>(n_);
     __isset.n = true;
@@ -1650,7 +1650,7 @@ class TrivialNestedWithDefault final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< TrivialNestedWithDefault >;
+  friend class ::apache::thrift::Cpp2Ops<TrivialNestedWithDefault>;
   friend void swap(TrivialNestedWithDefault& a, TrivialNestedWithDefault& b);
 };
 
@@ -1663,6 +1663,13 @@ uint32_t TrivialNestedWithDefault::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ComplexString final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1680,49 +1687,36 @@ class ComplexString final  {
 
  public:
 
-  ComplexString() {}
+  ComplexString() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   ComplexString(apache::thrift::FragileConstructor, ::std::string a__arg, ::std::map<::std::string, ::std::int32_t> b__arg);
 
-  ComplexString(ComplexString&&) = default;
+  ComplexString(ComplexString&&) noexcept;
 
-  ComplexString(const ComplexString&) = default;
+  ComplexString(const ComplexString& src);
 
 
-  ComplexString& operator=(ComplexString&&) = default;
-
-  ComplexString& operator=(const ComplexString&) = default;
+  ComplexString& operator=(ComplexString&&) noexcept;
+  ComplexString& operator=(const ComplexString& src);
   void __clear();
  private:
   ::std::string a;
  private:
   ::std::map<::std::string, ::std::int32_t> b;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool a;
     bool b;
   } __isset = {};
-  bool operator==(const ComplexString& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ComplexString& __x, const ComplexString& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ComplexString& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ComplexString& __x, const ComplexString& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ComplexString& __x, const ComplexString& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ComplexString& __x, const ComplexString& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ComplexString&) const;
+  bool operator<(const ComplexString&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> a_ref() const& {
@@ -1773,6 +1767,7 @@ class ComplexString final  {
   }
 
   template <typename T_ComplexString_a_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.a_ref() = BAR;` instead of `FOO.set_a(BAR);`")]]
   ::std::string& set_a(T_ComplexString_a_struct_setter&& a_) {
     a = std::forward<T_ComplexString_a_struct_setter>(a_);
     __isset.a = true;
@@ -1782,6 +1777,7 @@ class ComplexString final  {
   ::std::map<::std::string, ::std::int32_t> get_b() &&;
 
   template <typename T_ComplexString_b_struct_setter = ::std::map<::std::string, ::std::int32_t>>
+  [[deprecated("Use `FOO.b_ref() = BAR;` instead of `FOO.set_b(BAR);`")]]
   ::std::map<::std::string, ::std::int32_t>& set_b(T_ComplexString_b_struct_setter&& b_) {
     b = std::forward<T_ComplexString_b_struct_setter>(b_);
     __isset.b = true;
@@ -1801,7 +1797,7 @@ class ComplexString final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ComplexString >;
+  friend class ::apache::thrift::Cpp2Ops<ComplexString>;
   friend void swap(ComplexString& a, ComplexString& b);
 };
 
@@ -1814,6 +1810,13 @@ uint32_t ComplexString::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ComplexNestedWithDefault final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1832,50 +1835,37 @@ class ComplexNestedWithDefault final  {
  public:
 
   ComplexNestedWithDefault() :
-      z(apache::thrift::StringTraits< std::string>::fromStringLiteral("4")),
-      n(::apache::thrift::detail::make_constant< ::apache::thrift::fixtures::types::ComplexString>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::a>(apache::thrift::StringTraits< std::string>::fromStringLiteral("3")), ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::b>(std::initializer_list<std::pair<const ::std::string, ::std::int32_t>>{{apache::thrift::StringTraits< std::string>::fromStringLiteral("a"), 3}}))) {}
+      z(apache::thrift::StringTraits<std::string>::fromStringLiteral("4")),
+      n(::apache::thrift::detail::make_constant< ::apache::thrift::fixtures::types::ComplexString>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::a>(apache::thrift::StringTraits<std::string>::fromStringLiteral("3")), ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::b>(std::initializer_list<std::pair<const ::std::string, ::std::int32_t>>{{apache::thrift::StringTraits<std::string>::fromStringLiteral("a"), 3}}))) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   ComplexNestedWithDefault(apache::thrift::FragileConstructor, ::std::string z__arg, ::apache::thrift::fixtures::types::ComplexString n__arg);
 
-  ComplexNestedWithDefault(ComplexNestedWithDefault&&) = default;
+  ComplexNestedWithDefault(ComplexNestedWithDefault&&) noexcept;
 
-  ComplexNestedWithDefault(const ComplexNestedWithDefault&) = default;
+  ComplexNestedWithDefault(const ComplexNestedWithDefault& src);
 
 
-  ComplexNestedWithDefault& operator=(ComplexNestedWithDefault&&) = default;
-
-  ComplexNestedWithDefault& operator=(const ComplexNestedWithDefault&) = default;
+  ComplexNestedWithDefault& operator=(ComplexNestedWithDefault&&) noexcept;
+  ComplexNestedWithDefault& operator=(const ComplexNestedWithDefault& src);
   void __clear();
  private:
   ::std::string z;
  private:
   ::apache::thrift::fixtures::types::ComplexString n;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool z;
     bool n;
   } __isset = {};
-  bool operator==(const ComplexNestedWithDefault& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ComplexNestedWithDefault& __x, const ComplexNestedWithDefault& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ComplexNestedWithDefault& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ComplexNestedWithDefault& __x, const ComplexNestedWithDefault& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ComplexNestedWithDefault& __x, const ComplexNestedWithDefault& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ComplexNestedWithDefault& __x, const ComplexNestedWithDefault& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ComplexNestedWithDefault&) const;
+  bool operator<(const ComplexNestedWithDefault&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> z_ref() const& {
@@ -1926,6 +1916,7 @@ class ComplexNestedWithDefault final  {
   }
 
   template <typename T_ComplexNestedWithDefault_z_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.z_ref() = BAR;` instead of `FOO.set_z(BAR);`")]]
   ::std::string& set_z(T_ComplexNestedWithDefault_z_struct_setter&& z_) {
     z = std::forward<T_ComplexNestedWithDefault_z_struct_setter>(z_);
     __isset.z = true;
@@ -1935,6 +1926,7 @@ class ComplexNestedWithDefault final  {
   ::apache::thrift::fixtures::types::ComplexString get_n() &&;
 
   template <typename T_ComplexNestedWithDefault_n_struct_setter = ::apache::thrift::fixtures::types::ComplexString>
+  [[deprecated("Use `FOO.n_ref() = BAR;` instead of `FOO.set_n(BAR);`")]]
   ::apache::thrift::fixtures::types::ComplexString& set_n(T_ComplexNestedWithDefault_n_struct_setter&& n_) {
     n = std::forward<T_ComplexNestedWithDefault_n_struct_setter>(n_);
     __isset.n = true;
@@ -1954,7 +1946,7 @@ class ComplexNestedWithDefault final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ComplexNestedWithDefault >;
+  friend class ::apache::thrift::Cpp2Ops<ComplexNestedWithDefault>;
   friend void swap(ComplexNestedWithDefault& a, ComplexNestedWithDefault& b);
 };
 
@@ -1967,6 +1959,13 @@ uint32_t ComplexNestedWithDefault::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MinPadding final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1989,19 +1988,19 @@ class MinPadding final  {
       biggish(0),
       medium(0),
       small(0),
-      tiny(0) {}
+      tiny(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MinPadding(apache::thrift::FragileConstructor, ::std::int8_t small__arg, ::std::int64_t big__arg, ::std::int16_t medium__arg, ::std::int32_t biggish__arg, ::std::int8_t tiny__arg);
 
-  MinPadding(MinPadding&&) = default;
+  MinPadding(MinPadding&&) noexcept;
 
-  MinPadding(const MinPadding&) = default;
+  MinPadding(const MinPadding& src);
 
 
-  MinPadding& operator=(MinPadding&&) = default;
-
-  MinPadding& operator=(const MinPadding&) = default;
+  MinPadding& operator=(MinPadding&&) noexcept;
+  MinPadding& operator=(const MinPadding& src);
   void __clear();
  public:
   ::std::int64_t big;
@@ -2014,25 +2013,12 @@ class MinPadding final  {
  public:
   ::std::int8_t tiny;
 
+ private:
+
  public:
-  bool operator==(const MinPadding& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MinPadding& __x, const MinPadding& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MinPadding& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MinPadding& __x, const MinPadding& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MinPadding& __x, const MinPadding& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MinPadding& __x, const MinPadding& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const MinPadding&) const;
+  bool operator<(const MinPadding&) const;
 
   template <typename..., typename T = ::std::int8_t>
   FOLLY_ERASE ::apache::thrift::required_field_ref<const T&> small_ref() const& {
@@ -2138,6 +2124,7 @@ class MinPadding final  {
     return small;
   }
 
+  [[deprecated("Use `FOO.small_ref() = BAR;` instead of `FOO.set_small(BAR);`")]]
   ::std::int8_t& set_small(::std::int8_t small_) {
     small = small_;
     return small;
@@ -2147,6 +2134,7 @@ class MinPadding final  {
     return big;
   }
 
+  [[deprecated("Use `FOO.big_ref() = BAR;` instead of `FOO.set_big(BAR);`")]]
   ::std::int64_t& set_big(::std::int64_t big_) {
     big = big_;
     return big;
@@ -2156,6 +2144,7 @@ class MinPadding final  {
     return medium;
   }
 
+  [[deprecated("Use `FOO.medium_ref() = BAR;` instead of `FOO.set_medium(BAR);`")]]
   ::std::int16_t& set_medium(::std::int16_t medium_) {
     medium = medium_;
     return medium;
@@ -2165,6 +2154,7 @@ class MinPadding final  {
     return biggish;
   }
 
+  [[deprecated("Use `FOO.biggish_ref() = BAR;` instead of `FOO.set_biggish(BAR);`")]]
   ::std::int32_t& set_biggish(::std::int32_t biggish_) {
     biggish = biggish_;
     return biggish;
@@ -2174,6 +2164,7 @@ class MinPadding final  {
     return tiny;
   }
 
+  [[deprecated("Use `FOO.tiny_ref() = BAR;` instead of `FOO.set_tiny(BAR);`")]]
   ::std::int8_t& set_tiny(::std::int8_t tiny_) {
     tiny = tiny_;
     return tiny;
@@ -2192,7 +2183,7 @@ class MinPadding final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MinPadding >;
+  friend class ::apache::thrift::Cpp2Ops<MinPadding>;
   friend void swap(MinPadding& a, MinPadding& b);
 };
 
@@ -2205,6 +2196,13 @@ uint32_t MinPadding::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyDataItem final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2222,7 +2220,8 @@ class MyDataItem final  {
 
  public:
 
-  MyDataItem() {}
+  MyDataItem() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyDataItem(apache::thrift::FragileConstructor);
@@ -2237,6 +2236,8 @@ class MyDataItem final  {
   MyDataItem& operator=(const MyDataItem&) = default;
   void __clear();
 
+ public:
+
   template <class Protocol_>
   uint32_t read(Protocol_* iprot);
   template <class Protocol_>
@@ -2250,7 +2251,7 @@ class MyDataItem final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyDataItem >;
+  friend class ::apache::thrift::Cpp2Ops<MyDataItem>;
   friend void swap(MyDataItem& a, MyDataItem& b);
 };
 
@@ -2263,6 +2264,13 @@ uint32_t MyDataItem::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2282,19 +2290,19 @@ class MyStruct final  {
 
   MyStruct() :
       MyIntField(0),
-      majorVer(0) {}
+      majorVer(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg, ::std::string MyStringField__arg, ::std::int64_t majorVer__arg, ::apache::thrift::fixtures::types::MyDataItem data__arg);
 
-  MyStruct(MyStruct&&) = default;
+  MyStruct(MyStruct&&) noexcept;
 
-  MyStruct(const MyStruct&) = default;
+  MyStruct(const MyStruct& src);
 
 
-  MyStruct& operator=(MyStruct&&) = default;
-
-  MyStruct& operator=(const MyStruct&) = default;
+  MyStruct& operator=(MyStruct&&) noexcept;
+  MyStruct& operator=(const MyStruct& src);
   void __clear();
  private:
   ::std::int64_t MyIntField;
@@ -2305,7 +2313,7 @@ class MyStruct final  {
  private:
   ::apache::thrift::fixtures::types::MyDataItem data;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool MyIntField;
@@ -2313,6 +2321,8 @@ class MyStruct final  {
     bool majorVer;
     bool data;
   } __isset = {};
+
+ public:
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> MyIntField_ref() const& {
@@ -2398,6 +2408,7 @@ class MyStruct final  {
     return MyIntField;
   }
 
+  [[deprecated("Use `FOO.MyIntField_ref() = BAR;` instead of `FOO.set_MyIntField(BAR);`")]]
   ::std::int64_t& set_MyIntField(::std::int64_t MyIntField_) {
     MyIntField = MyIntField_;
     __isset.MyIntField = true;
@@ -2413,6 +2424,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_MyStringField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.MyStringField_ref() = BAR;` instead of `FOO.set_MyStringField(BAR);`")]]
   ::std::string& set_MyStringField(T_MyStruct_MyStringField_struct_setter&& MyStringField_) {
     MyStringField = std::forward<T_MyStruct_MyStringField_struct_setter>(MyStringField_);
     __isset.MyStringField = true;
@@ -2423,6 +2435,7 @@ class MyStruct final  {
     return majorVer;
   }
 
+  [[deprecated("Use `FOO.majorVer_ref() = BAR;` instead of `FOO.set_majorVer(BAR);`")]]
   ::std::int64_t& set_majorVer(::std::int64_t majorVer_) {
     majorVer = majorVer_;
     __isset.majorVer = true;
@@ -2432,6 +2445,7 @@ class MyStruct final  {
   ::apache::thrift::fixtures::types::MyDataItem get_data() &&;
 
   template <typename T_MyStruct_data_struct_setter = ::apache::thrift::fixtures::types::MyDataItem>
+  [[deprecated("Use `FOO.data_ref() = BAR;` instead of `FOO.set_data(BAR);`")]]
   ::apache::thrift::fixtures::types::MyDataItem& set_data(T_MyStruct_data_struct_setter&& data_) {
     data = std::forward<T_MyStruct_data_struct_setter>(data_);
     __isset.data = true;
@@ -2451,7 +2465,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 
@@ -2464,6 +2478,13 @@ uint32_t MyStruct::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Renaming final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2482,7 +2503,8 @@ class Renaming final  {
  public:
 
   Renaming() :
-      bar(0) {}
+      bar(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Renaming(apache::thrift::FragileConstructor, ::std::int64_t bar__arg);
@@ -2499,29 +2521,16 @@ class Renaming final  {
  private:
   ::std::int64_t bar;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool bar;
   } __isset = {};
-  bool operator==(const Renaming& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Renaming& __x, const Renaming& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Renaming& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Renaming& __x, const Renaming& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Renaming& __x, const Renaming& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Renaming& __x, const Renaming& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Renaming&) const;
+  bool operator<(const Renaming&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> bar_ref() const& {
@@ -2547,6 +2556,7 @@ class Renaming final  {
     return bar;
   }
 
+  [[deprecated("Use `FOO.bar_ref() = BAR;` instead of `FOO.set_bar(BAR);`")]]
   ::std::int64_t& set_bar(::std::int64_t bar_) {
     bar = bar_;
     __isset.bar = true;
@@ -2566,7 +2576,7 @@ class Renaming final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Renaming >;
+  friend class ::apache::thrift::Cpp2Ops<Renaming>;
   friend void swap(Renaming& a, Renaming& b);
 };
 
@@ -2579,6 +2589,13 @@ uint32_t Renaming::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class AnnotatedTypes final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2596,49 +2613,36 @@ class AnnotatedTypes final  {
 
  public:
 
-  AnnotatedTypes() {}
+  AnnotatedTypes() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   AnnotatedTypes(apache::thrift::FragileConstructor, ::apache::thrift::fixtures::types::TBinary binary_field__arg, ::apache::thrift::fixtures::types::SomeListOfTypeMap list_field__arg);
 
-  AnnotatedTypes(AnnotatedTypes&&) = default;
+  AnnotatedTypes(AnnotatedTypes&&) noexcept;
 
-  AnnotatedTypes(const AnnotatedTypes&) = default;
+  AnnotatedTypes(const AnnotatedTypes& src);
 
 
-  AnnotatedTypes& operator=(AnnotatedTypes&&) = default;
-
-  AnnotatedTypes& operator=(const AnnotatedTypes&) = default;
+  AnnotatedTypes& operator=(AnnotatedTypes&&) noexcept;
+  AnnotatedTypes& operator=(const AnnotatedTypes& src);
   void __clear();
  private:
   ::apache::thrift::fixtures::types::TBinary binary_field;
  private:
   ::apache::thrift::fixtures::types::SomeListOfTypeMap list_field;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool binary_field;
     bool list_field;
   } __isset = {};
-  bool operator==(const AnnotatedTypes& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const AnnotatedTypes& __x, const AnnotatedTypes& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const AnnotatedTypes& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const AnnotatedTypes& __x, const AnnotatedTypes& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const AnnotatedTypes& __x, const AnnotatedTypes& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const AnnotatedTypes& __x, const AnnotatedTypes& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const AnnotatedTypes&) const;
+  bool operator<(const AnnotatedTypes&) const;
 
   template <typename..., typename T = ::apache::thrift::fixtures::types::TBinary>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> binary_field_ref() const& {
@@ -2689,6 +2693,7 @@ class AnnotatedTypes final  {
   }
 
   template <typename T_AnnotatedTypes_binary_field_struct_setter = ::apache::thrift::fixtures::types::TBinary>
+  [[deprecated("Use `FOO.binary_field_ref() = BAR;` instead of `FOO.set_binary_field(BAR);`")]]
   ::apache::thrift::fixtures::types::TBinary& set_binary_field(T_AnnotatedTypes_binary_field_struct_setter&& binary_field_) {
     binary_field = std::forward<T_AnnotatedTypes_binary_field_struct_setter>(binary_field_);
     __isset.binary_field = true;
@@ -2698,6 +2703,7 @@ class AnnotatedTypes final  {
   ::apache::thrift::fixtures::types::SomeListOfTypeMap get_list_field() &&;
 
   template <typename T_AnnotatedTypes_list_field_struct_setter = ::apache::thrift::fixtures::types::SomeListOfTypeMap>
+  [[deprecated("Use `FOO.list_field_ref() = BAR;` instead of `FOO.set_list_field(BAR);`")]]
   ::apache::thrift::fixtures::types::SomeListOfTypeMap& set_list_field(T_AnnotatedTypes_list_field_struct_setter&& list_field_) {
     list_field = std::forward<T_AnnotatedTypes_list_field_struct_setter>(list_field_);
     __isset.list_field = true;
@@ -2717,7 +2723,7 @@ class AnnotatedTypes final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< AnnotatedTypes >;
+  friend class ::apache::thrift::Cpp2Ops<AnnotatedTypes>;
   friend void swap(AnnotatedTypes& a, AnnotatedTypes& b);
 };
 
@@ -2730,6 +2736,13 @@ uint32_t AnnotatedTypes::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ForwardUsageStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2747,46 +2760,33 @@ class ForwardUsageStruct final  {
 
  public:
 
-  ForwardUsageStruct() {}
+  ForwardUsageStruct() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   ForwardUsageStruct(apache::thrift::FragileConstructor, ::apache::thrift::fixtures::types::ForwardUsageRoot foo__arg);
 
-  ForwardUsageStruct(ForwardUsageStruct&&) = default;
+  ForwardUsageStruct(ForwardUsageStruct&&) noexcept;
 
-  ForwardUsageStruct(const ForwardUsageStruct&) = default;
+  ForwardUsageStruct(const ForwardUsageStruct& src);
 
 
-  ForwardUsageStruct& operator=(ForwardUsageStruct&&) = default;
-
-  ForwardUsageStruct& operator=(const ForwardUsageStruct&) = default;
+  ForwardUsageStruct& operator=(ForwardUsageStruct&&) noexcept;
+  ForwardUsageStruct& operator=(const ForwardUsageStruct& src);
   void __clear();
  private:
   ::apache::thrift::fixtures::types::ForwardUsageRoot foo;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool foo;
   } __isset = {};
-  bool operator==(const ForwardUsageStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ForwardUsageStruct& __x, const ForwardUsageStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ForwardUsageStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ForwardUsageStruct& __x, const ForwardUsageStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ForwardUsageStruct& __x, const ForwardUsageStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ForwardUsageStruct& __x, const ForwardUsageStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ForwardUsageStruct&) const;
+  bool operator<(const ForwardUsageStruct&) const;
 
   template <typename..., typename T = ::apache::thrift::fixtures::types::ForwardUsageRoot>
   FOLLY_ERASE ::apache::thrift::optional_field_ref<const T&> foo_ref() const& {
@@ -2812,6 +2812,7 @@ class ForwardUsageStruct final  {
   ::apache::thrift::fixtures::types::ForwardUsageRoot* get_foo() && = delete;
 
   template <typename T_ForwardUsageStruct_foo_struct_setter = ::apache::thrift::fixtures::types::ForwardUsageRoot>
+  [[deprecated("Use `FOO.foo_ref() = BAR;` instead of `FOO.set_foo(BAR);`")]]
   ::apache::thrift::fixtures::types::ForwardUsageRoot& set_foo(T_ForwardUsageStruct_foo_struct_setter&& foo_) {
     foo = std::forward<T_ForwardUsageStruct_foo_struct_setter>(foo_);
     __isset.foo = true;
@@ -2831,7 +2832,7 @@ class ForwardUsageStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ForwardUsageStruct >;
+  friend class ::apache::thrift::Cpp2Ops<ForwardUsageStruct>;
   friend void swap(ForwardUsageStruct& a, ForwardUsageStruct& b);
 };
 
@@ -2844,6 +2845,13 @@ uint32_t ForwardUsageStruct::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ForwardUsageRoot final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2861,46 +2869,34 @@ class ForwardUsageRoot final  {
 
  public:
 
-  ForwardUsageRoot() {}
+  ForwardUsageRoot() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
-  ForwardUsageRoot(apache::thrift::FragileConstructor, ::apache::thrift::fixtures::types::ForwardUsageStruct ForwardUsageStruct__arg, std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef> ForwardUsageByRef__arg);
+  ForwardUsageRoot(apache::thrift::FragileConstructor, ::apache::thrift::fixtures::types::ForwardUsageStruct ForwardUsageStruct__arg, ::std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef> ForwardUsageByRef__arg);
 
-  ForwardUsageRoot(ForwardUsageRoot&&) = default;
+  ForwardUsageRoot(ForwardUsageRoot&&) noexcept;
   ForwardUsageRoot(const ForwardUsageRoot& src);
 
 
-  ForwardUsageRoot& operator=(ForwardUsageRoot&&) = default;
+  ForwardUsageRoot& operator=(ForwardUsageRoot&&) noexcept;
   ForwardUsageRoot& operator=(const ForwardUsageRoot& src);
   void __clear();
  private:
   ::apache::thrift::fixtures::types::ForwardUsageStruct ForwardUsageStruct;
  public:
-  std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef> ForwardUsageByRef;
+  ::std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef> ForwardUsageByRef;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool ForwardUsageStruct;
   } __isset = {};
-  bool operator==(const ForwardUsageRoot& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ForwardUsageRoot& __x, const ForwardUsageRoot& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ForwardUsageRoot& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ForwardUsageRoot& __x, const ForwardUsageRoot& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ForwardUsageRoot& __x, const ForwardUsageRoot& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ForwardUsageRoot& __x, const ForwardUsageRoot& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ForwardUsageRoot&) const;
+  bool operator<(const ForwardUsageRoot&) const;
 
   template <typename..., typename T = ::apache::thrift::fixtures::types::ForwardUsageStruct>
   FOLLY_ERASE ::apache::thrift::optional_field_ref<const T&> ForwardUsageStruct_ref() const& {
@@ -2921,22 +2917,23 @@ class ForwardUsageRoot final  {
   FOLLY_ERASE ::apache::thrift::optional_field_ref<T&&> ForwardUsageStruct_ref() && {
     return {std::move(this->ForwardUsageStruct), __isset.ForwardUsageStruct};
   }
-  template <typename ..., typename T = std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef>>
+  template <typename ..., typename T = ::std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef>>
   FOLLY_ERASE T& ForwardUsageByRef_ref() & { return ForwardUsageByRef; }
 
-  template <typename ..., typename T = std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef>>
+  template <typename ..., typename T = ::std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef>>
   FOLLY_ERASE const T& ForwardUsageByRef_ref() const& { return ForwardUsageByRef; }
 
-  template <typename ..., typename T = std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef>>
+  template <typename ..., typename T = ::std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef>>
   FOLLY_ERASE T&& ForwardUsageByRef_ref() && { return std::move(ForwardUsageByRef); }
 
-  template <typename ..., typename T = std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef>>
+  template <typename ..., typename T = ::std::unique_ptr<::apache::thrift::fixtures::types::ForwardUsageByRef>>
   FOLLY_ERASE const T&& ForwardUsageByRef_ref() const&& { return std::move(ForwardUsageByRef); }
   const ::apache::thrift::fixtures::types::ForwardUsageStruct* get_ForwardUsageStruct() const&;
   ::apache::thrift::fixtures::types::ForwardUsageStruct* get_ForwardUsageStruct() &;
   ::apache::thrift::fixtures::types::ForwardUsageStruct* get_ForwardUsageStruct() && = delete;
 
   template <typename T_ForwardUsageRoot_ForwardUsageStruct_struct_setter = ::apache::thrift::fixtures::types::ForwardUsageStruct>
+  [[deprecated("Use `FOO.ForwardUsageStruct_ref() = BAR;` instead of `FOO.set_ForwardUsageStruct(BAR);`")]]
   ::apache::thrift::fixtures::types::ForwardUsageStruct& set_ForwardUsageStruct(T_ForwardUsageRoot_ForwardUsageStruct_struct_setter&& ForwardUsageStruct_) {
     ForwardUsageStruct = std::forward<T_ForwardUsageRoot_ForwardUsageStruct_struct_setter>(ForwardUsageStruct_);
     __isset.ForwardUsageStruct = true;
@@ -2956,7 +2953,7 @@ class ForwardUsageRoot final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ForwardUsageRoot >;
+  friend class ::apache::thrift::Cpp2Ops<ForwardUsageRoot>;
   friend void swap(ForwardUsageRoot& a, ForwardUsageRoot& b);
 };
 
@@ -2969,6 +2966,13 @@ uint32_t ForwardUsageRoot::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ForwardUsageByRef final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -2986,46 +2990,33 @@ class ForwardUsageByRef final  {
 
  public:
 
-  ForwardUsageByRef() {}
+  ForwardUsageByRef() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   ForwardUsageByRef(apache::thrift::FragileConstructor, ::apache::thrift::fixtures::types::ForwardUsageRoot foo__arg);
 
-  ForwardUsageByRef(ForwardUsageByRef&&) = default;
+  ForwardUsageByRef(ForwardUsageByRef&&) noexcept;
 
-  ForwardUsageByRef(const ForwardUsageByRef&) = default;
+  ForwardUsageByRef(const ForwardUsageByRef& src);
 
 
-  ForwardUsageByRef& operator=(ForwardUsageByRef&&) = default;
-
-  ForwardUsageByRef& operator=(const ForwardUsageByRef&) = default;
+  ForwardUsageByRef& operator=(ForwardUsageByRef&&) noexcept;
+  ForwardUsageByRef& operator=(const ForwardUsageByRef& src);
   void __clear();
  private:
   ::apache::thrift::fixtures::types::ForwardUsageRoot foo;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool foo;
   } __isset = {};
-  bool operator==(const ForwardUsageByRef& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ForwardUsageByRef& __x, const ForwardUsageByRef& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ForwardUsageByRef& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ForwardUsageByRef& __x, const ForwardUsageByRef& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ForwardUsageByRef& __x, const ForwardUsageByRef& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ForwardUsageByRef& __x, const ForwardUsageByRef& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ForwardUsageByRef&) const;
+  bool operator<(const ForwardUsageByRef&) const;
 
   template <typename..., typename T = ::apache::thrift::fixtures::types::ForwardUsageRoot>
   FOLLY_ERASE ::apache::thrift::optional_field_ref<const T&> foo_ref() const& {
@@ -3051,6 +3042,7 @@ class ForwardUsageByRef final  {
   ::apache::thrift::fixtures::types::ForwardUsageRoot* get_foo() && = delete;
 
   template <typename T_ForwardUsageByRef_foo_struct_setter = ::apache::thrift::fixtures::types::ForwardUsageRoot>
+  [[deprecated("Use `FOO.foo_ref() = BAR;` instead of `FOO.set_foo(BAR);`")]]
   ::apache::thrift::fixtures::types::ForwardUsageRoot& set_foo(T_ForwardUsageByRef_foo_struct_setter&& foo_) {
     foo = std::forward<T_ForwardUsageByRef_foo_struct_setter>(foo_);
     __isset.foo = true;
@@ -3070,7 +3062,7 @@ class ForwardUsageByRef final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ForwardUsageByRef >;
+  friend class ::apache::thrift::Cpp2Ops<ForwardUsageByRef>;
   friend void swap(ForwardUsageByRef& a, ForwardUsageByRef& b);
 };
 
@@ -3083,6 +3075,13 @@ uint32_t ForwardUsageByRef::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class NoexceptMoveEmpty final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -3100,37 +3099,26 @@ class NoexceptMoveEmpty final  {
 
  public:
 
-  NoexceptMoveEmpty() {}
+  NoexceptMoveEmpty() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   NoexceptMoveEmpty(apache::thrift::FragileConstructor);
-  NoexceptMoveEmpty(NoexceptMoveEmpty&& other) noexcept {}
+
+  NoexceptMoveEmpty(NoexceptMoveEmpty&&) = default;
 
   NoexceptMoveEmpty(const NoexceptMoveEmpty&) = default;
 
 
-  NoexceptMoveEmpty& operator=(NoexceptMoveEmpty&&) noexcept = default;
+  NoexceptMoveEmpty& operator=(NoexceptMoveEmpty&&) = default;
 
   NoexceptMoveEmpty& operator=(const NoexceptMoveEmpty&) = default;
   void __clear();
-  bool operator==(const NoexceptMoveEmpty& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const NoexceptMoveEmpty& __x, const NoexceptMoveEmpty& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const NoexceptMoveEmpty& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const NoexceptMoveEmpty& __x, const NoexceptMoveEmpty& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const NoexceptMoveEmpty& __x, const NoexceptMoveEmpty& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const NoexceptMoveEmpty& __x, const NoexceptMoveEmpty& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const NoexceptMoveEmpty&) const;
+  bool operator<(const NoexceptMoveEmpty&) const;
 
   template <class Protocol_>
   uint32_t read(Protocol_* iprot);
@@ -3145,7 +3133,7 @@ class NoexceptMoveEmpty final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< NoexceptMoveEmpty >;
+  friend class ::apache::thrift::Cpp2Ops<NoexceptMoveEmpty>;
   friend void swap(NoexceptMoveEmpty& a, NoexceptMoveEmpty& b);
 };
 
@@ -3158,6 +3146,13 @@ uint32_t NoexceptMoveEmpty::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class NoexceptMoveSimpleStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -3176,46 +3171,34 @@ class NoexceptMoveSimpleStruct final  {
  public:
 
   NoexceptMoveSimpleStruct() :
-      boolField(0) {}
+      boolField(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   NoexceptMoveSimpleStruct(apache::thrift::FragileConstructor, ::std::int64_t boolField__arg);
-  NoexceptMoveSimpleStruct(NoexceptMoveSimpleStruct&& other) noexcept :
-      boolField(std::move(other.boolField)),
-      __isset(other.__isset) {}
+
+  NoexceptMoveSimpleStruct(NoexceptMoveSimpleStruct&&) = default;
+
   NoexceptMoveSimpleStruct(const NoexceptMoveSimpleStruct&) = default;
 
 
-  NoexceptMoveSimpleStruct& operator=(NoexceptMoveSimpleStruct&&) noexcept = default;
+  NoexceptMoveSimpleStruct& operator=(NoexceptMoveSimpleStruct&&) = default;
 
   NoexceptMoveSimpleStruct& operator=(const NoexceptMoveSimpleStruct&) = default;
   void __clear();
  private:
   ::std::int64_t boolField;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool boolField;
   } __isset = {};
-  bool operator==(const NoexceptMoveSimpleStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const NoexceptMoveSimpleStruct& __x, const NoexceptMoveSimpleStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const NoexceptMoveSimpleStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const NoexceptMoveSimpleStruct& __x, const NoexceptMoveSimpleStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const NoexceptMoveSimpleStruct& __x, const NoexceptMoveSimpleStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const NoexceptMoveSimpleStruct& __x, const NoexceptMoveSimpleStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const NoexceptMoveSimpleStruct&) const;
+  bool operator<(const NoexceptMoveSimpleStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> boolField_ref() const& {
@@ -3241,6 +3224,7 @@ class NoexceptMoveSimpleStruct final  {
     return boolField;
   }
 
+  [[deprecated("Use `FOO.boolField_ref() = BAR;` instead of `FOO.set_boolField(BAR);`")]]
   ::std::int64_t& set_boolField(::std::int64_t boolField_) {
     boolField = boolField_;
     __isset.boolField = true;
@@ -3260,7 +3244,7 @@ class NoexceptMoveSimpleStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< NoexceptMoveSimpleStruct >;
+  friend class ::apache::thrift::Cpp2Ops<NoexceptMoveSimpleStruct>;
   friend void swap(NoexceptMoveSimpleStruct& a, NoexceptMoveSimpleStruct& b);
 };
 
@@ -3273,6 +3257,13 @@ uint32_t NoexceptMoveSimpleStruct::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class NoexceptMoveComplexStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -3295,14 +3286,14 @@ class NoexceptMoveComplexStruct final  {
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   NoexceptMoveComplexStruct(apache::thrift::FragileConstructor, bool MyBoolField__arg, ::std::int64_t MyIntField__arg, ::std::string MyStringField__arg, ::std::string MyStringField2__arg, ::std::string MyBinaryField__arg, ::std::string MyBinaryField2__arg, ::std::string MyBinaryField3__arg, ::std::vector<::std::string> MyBinaryListField4__arg, ::std::map<::apache::thrift::fixtures::types::MyEnumA, ::std::string> MyMapEnumAndInt__arg);
-  NoexceptMoveComplexStruct(NoexceptMoveComplexStruct&& other) noexcept;
 
-  NoexceptMoveComplexStruct(const NoexceptMoveComplexStruct&) = default;
+  NoexceptMoveComplexStruct(NoexceptMoveComplexStruct&&) noexcept;
+
+  NoexceptMoveComplexStruct(const NoexceptMoveComplexStruct& src);
 
 
-  NoexceptMoveComplexStruct& operator=(NoexceptMoveComplexStruct&&) noexcept = default;
-
-  NoexceptMoveComplexStruct& operator=(const NoexceptMoveComplexStruct&) = default;
+  NoexceptMoveComplexStruct& operator=(NoexceptMoveComplexStruct&&) noexcept;
+  NoexceptMoveComplexStruct& operator=(const NoexceptMoveComplexStruct& src);
   void __clear();
 
   ~NoexceptMoveComplexStruct();
@@ -3326,7 +3317,7 @@ class NoexceptMoveComplexStruct final  {
  private:
   ::std::map<::apache::thrift::fixtures::types::MyEnumA, ::std::string> MyMapEnumAndInt;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool MyBoolField;
@@ -3338,24 +3329,11 @@ class NoexceptMoveComplexStruct final  {
     bool MyBinaryListField4;
     bool MyMapEnumAndInt;
   } __isset = {};
-  bool operator==(const NoexceptMoveComplexStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const NoexceptMoveComplexStruct& __x, const NoexceptMoveComplexStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const NoexceptMoveComplexStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const NoexceptMoveComplexStruct& __x, const NoexceptMoveComplexStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const NoexceptMoveComplexStruct& __x, const NoexceptMoveComplexStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const NoexceptMoveComplexStruct& __x, const NoexceptMoveComplexStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const NoexceptMoveComplexStruct&) const;
+  bool operator<(const NoexceptMoveComplexStruct&) const;
 
   template <typename..., typename T = bool>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> MyBoolField_ref() const& {
@@ -3541,6 +3519,7 @@ class NoexceptMoveComplexStruct final  {
     return MyBoolField;
   }
 
+  [[deprecated("Use `FOO.MyBoolField_ref() = BAR;` instead of `FOO.set_MyBoolField(BAR);`")]]
   bool& set_MyBoolField(bool MyBoolField_) {
     MyBoolField = MyBoolField_;
     __isset.MyBoolField = true;
@@ -3551,6 +3530,7 @@ class NoexceptMoveComplexStruct final  {
     return MyIntField;
   }
 
+  [[deprecated("Use `FOO.MyIntField_ref() = BAR;` instead of `FOO.set_MyIntField(BAR);`")]]
   ::std::int64_t& set_MyIntField(::std::int64_t MyIntField_) {
     MyIntField = MyIntField_;
     __isset.MyIntField = true;
@@ -3566,6 +3546,7 @@ class NoexceptMoveComplexStruct final  {
   }
 
   template <typename T_NoexceptMoveComplexStruct_MyStringField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.MyStringField_ref() = BAR;` instead of `FOO.set_MyStringField(BAR);`")]]
   ::std::string& set_MyStringField(T_NoexceptMoveComplexStruct_MyStringField_struct_setter&& MyStringField_) {
     MyStringField = std::forward<T_NoexceptMoveComplexStruct_MyStringField_struct_setter>(MyStringField_);
     __isset.MyStringField = true;
@@ -3581,6 +3562,7 @@ class NoexceptMoveComplexStruct final  {
   }
 
   template <typename T_NoexceptMoveComplexStruct_MyStringField2_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.MyStringField2_ref() = BAR;` instead of `FOO.set_MyStringField2(BAR);`")]]
   ::std::string& set_MyStringField2(T_NoexceptMoveComplexStruct_MyStringField2_struct_setter&& MyStringField2_) {
     MyStringField2 = std::forward<T_NoexceptMoveComplexStruct_MyStringField2_struct_setter>(MyStringField2_);
     __isset.MyStringField2 = true;
@@ -3596,6 +3578,7 @@ class NoexceptMoveComplexStruct final  {
   }
 
   template <typename T_NoexceptMoveComplexStruct_MyBinaryField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.MyBinaryField_ref() = BAR;` instead of `FOO.set_MyBinaryField(BAR);`")]]
   ::std::string& set_MyBinaryField(T_NoexceptMoveComplexStruct_MyBinaryField_struct_setter&& MyBinaryField_) {
     MyBinaryField = std::forward<T_NoexceptMoveComplexStruct_MyBinaryField_struct_setter>(MyBinaryField_);
     __isset.MyBinaryField = true;
@@ -3612,6 +3595,7 @@ class NoexceptMoveComplexStruct final  {
   ::std::string* get_MyBinaryField2() && = delete;
 
   template <typename T_NoexceptMoveComplexStruct_MyBinaryField2_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.MyBinaryField2_ref() = BAR;` instead of `FOO.set_MyBinaryField2(BAR);`")]]
   ::std::string& set_MyBinaryField2(T_NoexceptMoveComplexStruct_MyBinaryField2_struct_setter&& MyBinaryField2_) {
     MyBinaryField2 = std::forward<T_NoexceptMoveComplexStruct_MyBinaryField2_struct_setter>(MyBinaryField2_);
     __isset.MyBinaryField2 = true;
@@ -3627,6 +3611,7 @@ class NoexceptMoveComplexStruct final  {
   }
 
   template <typename T_NoexceptMoveComplexStruct_MyBinaryField3_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.MyBinaryField3_ref() = BAR;` instead of `FOO.set_MyBinaryField3(BAR);`")]]
   ::std::string& set_MyBinaryField3(T_NoexceptMoveComplexStruct_MyBinaryField3_struct_setter&& MyBinaryField3_) {
     MyBinaryField3 = std::forward<T_NoexceptMoveComplexStruct_MyBinaryField3_struct_setter>(MyBinaryField3_);
     return MyBinaryField3;
@@ -3635,6 +3620,7 @@ class NoexceptMoveComplexStruct final  {
   ::std::vector<::std::string> get_MyBinaryListField4() &&;
 
   template <typename T_NoexceptMoveComplexStruct_MyBinaryListField4_struct_setter = ::std::vector<::std::string>>
+  [[deprecated("Use `FOO.MyBinaryListField4_ref() = BAR;` instead of `FOO.set_MyBinaryListField4(BAR);`")]]
   ::std::vector<::std::string>& set_MyBinaryListField4(T_NoexceptMoveComplexStruct_MyBinaryListField4_struct_setter&& MyBinaryListField4_) {
     MyBinaryListField4 = std::forward<T_NoexceptMoveComplexStruct_MyBinaryListField4_struct_setter>(MyBinaryListField4_);
     __isset.MyBinaryListField4 = true;
@@ -3644,6 +3630,7 @@ class NoexceptMoveComplexStruct final  {
   ::std::map<::apache::thrift::fixtures::types::MyEnumA, ::std::string> get_MyMapEnumAndInt() &&;
 
   template <typename T_NoexceptMoveComplexStruct_MyMapEnumAndInt_struct_setter = ::std::map<::apache::thrift::fixtures::types::MyEnumA, ::std::string>>
+  [[deprecated("Use `FOO.MyMapEnumAndInt_ref() = BAR;` instead of `FOO.set_MyMapEnumAndInt(BAR);`")]]
   ::std::map<::apache::thrift::fixtures::types::MyEnumA, ::std::string>& set_MyMapEnumAndInt(T_NoexceptMoveComplexStruct_MyMapEnumAndInt_struct_setter&& MyMapEnumAndInt_) {
     MyMapEnumAndInt = std::forward<T_NoexceptMoveComplexStruct_MyMapEnumAndInt_struct_setter>(MyMapEnumAndInt_);
     __isset.MyMapEnumAndInt = true;
@@ -3663,7 +3650,7 @@ class NoexceptMoveComplexStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< NoexceptMoveComplexStruct >;
+  friend class ::apache::thrift::Cpp2Ops<NoexceptMoveComplexStruct>;
   friend void swap(NoexceptMoveComplexStruct& a, NoexceptMoveComplexStruct& b);
 };
 
@@ -3676,6 +3663,13 @@ uint32_t NoexceptMoveComplexStruct::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class NoExceptMoveUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -3808,24 +3802,9 @@ class NoExceptMoveUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const NoExceptMoveUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const NoExceptMoveUnion& __x, const NoExceptMoveUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const NoExceptMoveUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const NoExceptMoveUnion& __x, const NoExceptMoveUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const NoExceptMoveUnion& __x, const NoExceptMoveUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const NoExceptMoveUnion& __x, const NoExceptMoveUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const NoExceptMoveUnion&) const;
+  bool operator<(const NoExceptMoveUnion&) const;
 
   ::std::string& set_string_field(::std::string const &t) {
     __clear();
@@ -3855,22 +3834,26 @@ class NoExceptMoveUnion final  {
     return value_.i32_field;
   }
 
-  ::std::string const & get_string_field() const {
-    assert(type_ == Type::string_field);
+  ::std::string const& get_string_field() const {
+    if (type_ != Type::string_field) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.string_field;
   }
 
-  ::std::int32_t const & get_i32_field() const {
-    assert(type_ == Type::i32_field);
+  ::std::int32_t const& get_i32_field() const {
+    if (type_ != Type::i32_field) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.i32_field;
   }
 
-  ::std::string & mutable_string_field() {
+  ::std::string& mutable_string_field() {
     assert(type_ == Type::string_field);
     return value_.string_field;
   }
 
-  ::std::int32_t & mutable_i32_field() {
+  ::std::int32_t& mutable_i32_field() {
     assert(type_ == Type::i32_field);
     return value_.i32_field;
   }
@@ -3946,7 +3929,7 @@ class NoExceptMoveUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< NoExceptMoveUnion >;
+  friend class ::apache::thrift::Cpp2Ops<NoExceptMoveUnion>;
   friend void swap(NoExceptMoveUnion& a, NoExceptMoveUnion& b);
 };
 
@@ -3959,6 +3942,13 @@ uint32_t NoExceptMoveUnion::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class AllocatorAware final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -3989,9 +3979,9 @@ class AllocatorAware final  {
   [[deprecated("This constructor is deprecated")]]
   AllocatorAware(apache::thrift::FragileConstructor, ::std::vector<::std::int32_t> aa_list__arg, ::std::set<::std::int32_t> aa_set__arg, ::std::map<::std::int32_t, ::std::int32_t> aa_map__arg, ::std::string aa_string__arg, ::std::int32_t not_a_container__arg);
 
-  AllocatorAware(AllocatorAware&&) = default;
+  AllocatorAware(AllocatorAware&&) noexcept;
 
-  AllocatorAware(const AllocatorAware&) = default;
+  AllocatorAware(const AllocatorAware& src);
 
   explicit AllocatorAware(const allocator_type& alloc) noexcept :
     __fbthrift_alloc(alloc),
@@ -4019,9 +4009,8 @@ class AllocatorAware final  {
     not_a_container(std::move(other.not_a_container)),
     __isset(other.__isset) {}
 
-  AllocatorAware& operator=(AllocatorAware&&) = default;
-
-  AllocatorAware& operator=(const AllocatorAware&) = default;
+  AllocatorAware& operator=(AllocatorAware&&) noexcept;
+  AllocatorAware& operator=(const AllocatorAware& src);
   void __clear();
 
   ~AllocatorAware();
@@ -4037,7 +4026,7 @@ class AllocatorAware final  {
  private:
   ::std::int32_t not_a_container;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool aa_list;
@@ -4046,24 +4035,11 @@ class AllocatorAware final  {
     bool aa_string;
     bool not_a_container;
   } __isset = {};
-  bool operator==(const AllocatorAware& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const AllocatorAware& __x, const AllocatorAware& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const AllocatorAware& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const AllocatorAware& __x, const AllocatorAware& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const AllocatorAware& __x, const AllocatorAware& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const AllocatorAware& __x, const AllocatorAware& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const AllocatorAware&) const;
+  bool operator<(const AllocatorAware&) const;
 
   template <typename..., typename T = ::std::vector<::std::int32_t>>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> aa_list_ref() const& {
@@ -4168,6 +4144,7 @@ class AllocatorAware final  {
   ::std::vector<::std::int32_t> get_aa_list() &&;
 
   template <typename T_AllocatorAware_aa_list_struct_setter = ::std::vector<::std::int32_t>>
+  [[deprecated("Use `FOO.aa_list_ref() = BAR;` instead of `FOO.set_aa_list(BAR);`")]]
   ::std::vector<::std::int32_t>& set_aa_list(T_AllocatorAware_aa_list_struct_setter&& aa_list_) {
     aa_list = std::forward<T_AllocatorAware_aa_list_struct_setter>(aa_list_);
     __isset.aa_list = true;
@@ -4177,6 +4154,7 @@ class AllocatorAware final  {
   ::std::set<::std::int32_t> get_aa_set() &&;
 
   template <typename T_AllocatorAware_aa_set_struct_setter = ::std::set<::std::int32_t>>
+  [[deprecated("Use `FOO.aa_set_ref() = BAR;` instead of `FOO.set_aa_set(BAR);`")]]
   ::std::set<::std::int32_t>& set_aa_set(T_AllocatorAware_aa_set_struct_setter&& aa_set_) {
     aa_set = std::forward<T_AllocatorAware_aa_set_struct_setter>(aa_set_);
     __isset.aa_set = true;
@@ -4186,6 +4164,7 @@ class AllocatorAware final  {
   ::std::map<::std::int32_t, ::std::int32_t> get_aa_map() &&;
 
   template <typename T_AllocatorAware_aa_map_struct_setter = ::std::map<::std::int32_t, ::std::int32_t>>
+  [[deprecated("Use `FOO.aa_map_ref() = BAR;` instead of `FOO.set_aa_map(BAR);`")]]
   ::std::map<::std::int32_t, ::std::int32_t>& set_aa_map(T_AllocatorAware_aa_map_struct_setter&& aa_map_) {
     aa_map = std::forward<T_AllocatorAware_aa_map_struct_setter>(aa_map_);
     __isset.aa_map = true;
@@ -4201,6 +4180,7 @@ class AllocatorAware final  {
   }
 
   template <typename T_AllocatorAware_aa_string_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.aa_string_ref() = BAR;` instead of `FOO.set_aa_string(BAR);`")]]
   ::std::string& set_aa_string(T_AllocatorAware_aa_string_struct_setter&& aa_string_) {
     aa_string = std::forward<T_AllocatorAware_aa_string_struct_setter>(aa_string_);
     __isset.aa_string = true;
@@ -4211,6 +4191,7 @@ class AllocatorAware final  {
     return not_a_container;
   }
 
+  [[deprecated("Use `FOO.not_a_container_ref() = BAR;` instead of `FOO.set_not_a_container(BAR);`")]]
   ::std::int32_t& set_not_a_container(::std::int32_t not_a_container_) {
     not_a_container = not_a_container_;
     __isset.not_a_container = true;
@@ -4230,7 +4211,7 @@ class AllocatorAware final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< AllocatorAware >;
+  friend class ::apache::thrift::Cpp2Ops<AllocatorAware>;
   friend void swap(AllocatorAware& a, AllocatorAware& b);
 };
 
@@ -4243,6 +4224,13 @@ uint32_t AllocatorAware::read(Protocol_* iprot) {
 
 }}}} // apache::thrift::fixtures::types
 namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class AllocatorAware2 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -4268,14 +4256,15 @@ class AllocatorAware2 final  {
  public:
 
   AllocatorAware2() :
-      not_a_container(0) {}
+      not_a_container(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   AllocatorAware2(apache::thrift::FragileConstructor, ::std::int32_t not_a_container__arg);
 
-  AllocatorAware2(AllocatorAware2&&) = default;
+  AllocatorAware2(AllocatorAware2&&) noexcept;
 
-  AllocatorAware2(const AllocatorAware2&) = default;
+  AllocatorAware2(const AllocatorAware2& src);
 
   explicit AllocatorAware2(const allocator_type& alloc) noexcept :
     __fbthrift_alloc(alloc),
@@ -4291,36 +4280,22 @@ class AllocatorAware2 final  {
     not_a_container(std::move(other.not_a_container)),
     __isset(other.__isset) {}
 
-  AllocatorAware2& operator=(AllocatorAware2&&) = default;
-
-  AllocatorAware2& operator=(const AllocatorAware2&) = default;
+  AllocatorAware2& operator=(AllocatorAware2&&) noexcept;
+  AllocatorAware2& operator=(const AllocatorAware2& src);
   void __clear();
  private:
   ::std::int32_t not_a_container;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool not_a_container;
   } __isset = {};
-  bool operator==(const AllocatorAware2& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const AllocatorAware2& __x, const AllocatorAware2& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const AllocatorAware2& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const AllocatorAware2& __x, const AllocatorAware2& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const AllocatorAware2& __x, const AllocatorAware2& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const AllocatorAware2& __x, const AllocatorAware2& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const AllocatorAware2&) const;
+  bool operator<(const AllocatorAware2&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> not_a_container_ref() const& {
@@ -4346,6 +4321,7 @@ class AllocatorAware2 final  {
     return not_a_container;
   }
 
+  [[deprecated("Use `FOO.not_a_container_ref() = BAR;` instead of `FOO.set_not_a_container(BAR);`")]]
   ::std::int32_t& set_not_a_container(::std::int32_t not_a_container_) {
     not_a_container = not_a_container_;
     __isset.not_a_container = true;
@@ -4365,12 +4341,303 @@ class AllocatorAware2 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< AllocatorAware2 >;
+  friend class ::apache::thrift::Cpp2Ops<AllocatorAware2>;
   friend void swap(AllocatorAware2& a, AllocatorAware2& b);
 };
 
 template <class Protocol_>
 uint32_t AllocatorAware2::read(Protocol_* iprot) {
+  auto _xferStart = iprot->getCursorPosition();
+  readNoXfer(iprot);
+  return iprot->getCursorPosition() - _xferStart;
+}
+
+}}}} // apache::thrift::fixtures::types
+namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class TypedefStruct final  {
+ private:
+  friend struct ::apache::thrift::detail::st::struct_private_access;
+
+  //  used by a static_assert in the corresponding source
+  static constexpr bool __fbthrift_cpp2_gen_json = false;
+  static constexpr bool __fbthrift_cpp2_gen_nimble = false;
+  static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+
+ public:
+  using __fbthrift_cpp2_type = TypedefStruct;
+  static constexpr bool __fbthrift_cpp2_is_union =
+    false;
+
+
+ public:
+
+  TypedefStruct() :
+      i32_field(0),
+      IntTypedef_field(0),
+      UintTypedef_field(0) {
+  }
+  // FragileConstructor for use in initialization lists only.
+  [[deprecated("This constructor is deprecated")]]
+  TypedefStruct(apache::thrift::FragileConstructor, ::std::int32_t i32_field__arg, ::apache::thrift::fixtures::types::IntTypedef IntTypedef_field__arg, std::uint32_t UintTypedef_field__arg);
+
+  TypedefStruct(TypedefStruct&&) noexcept;
+
+  TypedefStruct(const TypedefStruct& src);
+
+
+  TypedefStruct& operator=(TypedefStruct&&) noexcept;
+  TypedefStruct& operator=(const TypedefStruct& src);
+  void __clear();
+ private:
+  ::std::int32_t i32_field;
+ private:
+  ::apache::thrift::fixtures::types::IntTypedef IntTypedef_field;
+ private:
+  std::uint32_t UintTypedef_field;
+
+ private:
+  [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
+  struct __isset {
+    bool i32_field;
+    bool IntTypedef_field;
+    bool UintTypedef_field;
+  } __isset = {};
+
+ public:
+
+  bool operator==(const TypedefStruct&) const;
+  bool operator<(const TypedefStruct&) const;
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&> i32_field_ref() const& {
+    return {this->i32_field, __isset.i32_field};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&&> i32_field_ref() const&& {
+    return {std::move(this->i32_field), __isset.i32_field};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&> i32_field_ref() & {
+    return {this->i32_field, __isset.i32_field};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&&> i32_field_ref() && {
+    return {std::move(this->i32_field), __isset.i32_field};
+  }
+
+  template <typename..., typename T = ::apache::thrift::fixtures::types::IntTypedef>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&> IntTypedef_field_ref() const& {
+    return {this->IntTypedef_field, __isset.IntTypedef_field};
+  }
+
+  template <typename..., typename T = ::apache::thrift::fixtures::types::IntTypedef>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&&> IntTypedef_field_ref() const&& {
+    return {std::move(this->IntTypedef_field), __isset.IntTypedef_field};
+  }
+
+  template <typename..., typename T = ::apache::thrift::fixtures::types::IntTypedef>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&> IntTypedef_field_ref() & {
+    return {this->IntTypedef_field, __isset.IntTypedef_field};
+  }
+
+  template <typename..., typename T = ::apache::thrift::fixtures::types::IntTypedef>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&&> IntTypedef_field_ref() && {
+    return {std::move(this->IntTypedef_field), __isset.IntTypedef_field};
+  }
+
+  template <typename..., typename T = std::uint32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&> UintTypedef_field_ref() const& {
+    return {this->UintTypedef_field, __isset.UintTypedef_field};
+  }
+
+  template <typename..., typename T = std::uint32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&&> UintTypedef_field_ref() const&& {
+    return {std::move(this->UintTypedef_field), __isset.UintTypedef_field};
+  }
+
+  template <typename..., typename T = std::uint32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&> UintTypedef_field_ref() & {
+    return {this->UintTypedef_field, __isset.UintTypedef_field};
+  }
+
+  template <typename..., typename T = std::uint32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&&> UintTypedef_field_ref() && {
+    return {std::move(this->UintTypedef_field), __isset.UintTypedef_field};
+  }
+
+  ::std::int32_t get_i32_field() const {
+    return i32_field;
+  }
+
+  [[deprecated("Use `FOO.i32_field_ref() = BAR;` instead of `FOO.set_i32_field(BAR);`")]]
+  ::std::int32_t& set_i32_field(::std::int32_t i32_field_) {
+    i32_field = i32_field_;
+    __isset.i32_field = true;
+    return i32_field;
+  }
+
+  ::apache::thrift::fixtures::types::IntTypedef get_IntTypedef_field() const {
+    return IntTypedef_field;
+  }
+
+  [[deprecated("Use `FOO.IntTypedef_field_ref() = BAR;` instead of `FOO.set_IntTypedef_field(BAR);`")]]
+  ::apache::thrift::fixtures::types::IntTypedef& set_IntTypedef_field(::apache::thrift::fixtures::types::IntTypedef IntTypedef_field_) {
+    IntTypedef_field = IntTypedef_field_;
+    __isset.IntTypedef_field = true;
+    return IntTypedef_field;
+  }
+
+  std::uint32_t get_UintTypedef_field() const {
+    return UintTypedef_field;
+  }
+
+  [[deprecated("Use `FOO.UintTypedef_field_ref() = BAR;` instead of `FOO.set_UintTypedef_field(BAR);`")]]
+  std::uint32_t& set_UintTypedef_field(std::uint32_t UintTypedef_field_) {
+    UintTypedef_field = UintTypedef_field_;
+    __isset.UintTypedef_field = true;
+    return UintTypedef_field;
+  }
+
+  template <class Protocol_>
+  uint32_t read(Protocol_* iprot);
+  template <class Protocol_>
+  uint32_t serializedSize(Protocol_ const* prot_) const;
+  template <class Protocol_>
+  uint32_t serializedSizeZC(Protocol_ const* prot_) const;
+  template <class Protocol_>
+  uint32_t write(Protocol_* prot_) const;
+
+ private:
+  template <class Protocol_>
+  void readNoXfer(Protocol_* iprot);
+
+  friend class ::apache::thrift::Cpp2Ops<TypedefStruct>;
+  friend void swap(TypedefStruct& a, TypedefStruct& b);
+};
+
+template <class Protocol_>
+uint32_t TypedefStruct::read(Protocol_* iprot) {
+  auto _xferStart = iprot->getCursorPosition();
+  readNoXfer(iprot);
+  return iprot->getCursorPosition() - _xferStart;
+}
+
+}}}} // apache::thrift::fixtures::types
+namespace apache { namespace thrift { namespace fixtures { namespace types {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class StructWithDoubleUnderscores final  {
+ private:
+  friend struct ::apache::thrift::detail::st::struct_private_access;
+
+  //  used by a static_assert in the corresponding source
+  static constexpr bool __fbthrift_cpp2_gen_json = false;
+  static constexpr bool __fbthrift_cpp2_gen_nimble = false;
+  static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+
+ public:
+  using __fbthrift_cpp2_type = StructWithDoubleUnderscores;
+  static constexpr bool __fbthrift_cpp2_is_union =
+    false;
+
+
+ public:
+
+  StructWithDoubleUnderscores() :
+      __field(0) {
+  }
+  // FragileConstructor for use in initialization lists only.
+  [[deprecated("This constructor is deprecated")]]
+  StructWithDoubleUnderscores(apache::thrift::FragileConstructor, ::std::int32_t __field__arg);
+
+  StructWithDoubleUnderscores(StructWithDoubleUnderscores&&) = default;
+
+  StructWithDoubleUnderscores(const StructWithDoubleUnderscores&) = default;
+
+
+  StructWithDoubleUnderscores& operator=(StructWithDoubleUnderscores&&) = default;
+
+  StructWithDoubleUnderscores& operator=(const StructWithDoubleUnderscores&) = default;
+  void __clear();
+ private:
+  ::std::int32_t __field;
+
+ private:
+  [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
+  struct __isset {
+    bool __field;
+  } __isset = {};
+
+ public:
+
+  bool operator==(const StructWithDoubleUnderscores&) const;
+  bool operator<(const StructWithDoubleUnderscores&) const;
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&> __field_ref() const& {
+    return {this->__field, __isset.__field};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&&> __field_ref() const&& {
+    return {std::move(this->__field), __isset.__field};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&> __field_ref() & {
+    return {this->__field, __isset.__field};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&&> __field_ref() && {
+    return {std::move(this->__field), __isset.__field};
+  }
+
+  ::std::int32_t get___field() const {
+    return __field;
+  }
+
+  [[deprecated("Use `FOO.__field_ref() = BAR;` instead of `FOO.set___field(BAR);`")]]
+  ::std::int32_t& set___field(::std::int32_t __field_) {
+    __field = __field_;
+    __isset.__field = true;
+    return __field;
+  }
+
+  template <class Protocol_>
+  uint32_t read(Protocol_* iprot);
+  template <class Protocol_>
+  uint32_t serializedSize(Protocol_ const* prot_) const;
+  template <class Protocol_>
+  uint32_t serializedSizeZC(Protocol_ const* prot_) const;
+  template <class Protocol_>
+  uint32_t write(Protocol_* prot_) const;
+
+ private:
+  template <class Protocol_>
+  void readNoXfer(Protocol_* iprot);
+
+  friend class ::apache::thrift::Cpp2Ops<StructWithDoubleUnderscores>;
+  friend void swap(StructWithDoubleUnderscores& a, StructWithDoubleUnderscores& b);
+};
+
+template <class Protocol_>
+uint32_t StructWithDoubleUnderscores::read(Protocol_* iprot) {
   auto _xferStart = iprot->getCursorPosition();
   readNoXfer(iprot);
   return iprot->getCursorPosition() - _xferStart;

@@ -10,7 +10,7 @@ package test.fixtures.inheritance;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.codec.ThriftField.Requiredness;
 import com.facebook.swift.service.*;
-import com.facebook.swift.transport.client.*;
+import com.facebook.thrift.client.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.util.*;
@@ -51,9 +51,8 @@ public interface MyNode extends java.io.Closeable, test.fixtures.inheritance.MyR
     }
 
     @com.facebook.swift.service.ThriftService("MyNode")
-    interface Reactive extends Closeable, test.fixtures.inheritance.MyRoot.Reactive {
-        @java.lang.Override void close();
-
+    interface Reactive extends reactor.core.Disposable, test.fixtures.inheritance.MyRoot.Reactive {
+        @ThriftMethod(value = "do_mid")
         reactor.core.publisher.Mono<Void> doMid();
 
         default reactor.core.publisher.Mono<Void> doMid(RpcOptions rpcOptions) {

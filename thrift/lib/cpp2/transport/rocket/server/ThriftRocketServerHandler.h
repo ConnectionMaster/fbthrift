@@ -23,6 +23,7 @@
 #include <folly/SocketAddress.h>
 
 #include <thrift/lib/cpp/server/TServerObserver.h>
+#include <thrift/lib/cpp2/server/Cpp2Worker.h>
 #include <thrift/lib/cpp2/server/LoggingEvent.h>
 #include <thrift/lib/cpp2/server/RequestsRegistry.h>
 #include <thrift/lib/cpp2/transport/rocket/server/RocketServerHandler.h>
@@ -37,7 +38,6 @@ namespace thrift {
 
 class AsyncProcessor;
 class Cpp2ConnContext;
-class Cpp2Worker;
 class RequestRpcMetadata;
 class ThriftRequestCore;
 using ThriftRequestCoreUniquePtr =
@@ -72,14 +72,12 @@ class ThriftRocketServerHandler : public RocketServerHandler {
 
   ~ThriftRocketServerHandler() override;
 
-  void handleSetupFrame(SetupFrame&& frame, RocketServerConnection& context)
-      final;
+  void handleSetupFrame(
+      SetupFrame&& frame, RocketServerConnection& context) final;
   void handleRequestResponseFrame(
-      RequestResponseFrame&& frame,
-      RocketServerFrameContext&& context) final;
+      RequestResponseFrame&& frame, RocketServerFrameContext&& context) final;
   void handleRequestFnfFrame(
-      RequestFnfFrame&& frame,
-      RocketServerFrameContext&& context) final;
+      RequestFnfFrame&& frame, RocketServerFrameContext&& context) final;
   void handleRequestStreamFrame(
       RequestStreamFrame&& frame,
       RocketServerFrameContext&& context,
@@ -96,20 +94,20 @@ class ThriftRocketServerHandler : public RocketServerHandler {
 
   void terminateInteraction(int64_t id) final;
 
-  Cpp2ConnContext* getCpp2ConnContext() final {
-    return &connContext_;
-  }
+  Cpp2ConnContext* getCpp2ConnContext() final { return &connContext_; }
 
   void onBeforeHandleFrame() override;
+
+  int32_t getVersion() const final { return version_; }
 
  private:
   const std::shared_ptr<Cpp2Worker> worker_;
   const std::shared_ptr<void> connectionGuard_;
-  const folly::SocketAddress clientAddress_;
   Cpp2ConnContext connContext_;
   const std::vector<std::unique_ptr<SetupFrameHandler>>& setupFrameHandlers_;
-
-  std::shared_ptr<AsyncProcessor> cpp2Processor_;
+  AsyncProcessorFactory* processorFactory_ = nullptr;
+  Cpp2Worker::PerServiceMetadata* serviceMetadata_ = nullptr;
+  std::shared_ptr<AsyncProcessor> processor_;
   std::shared_ptr<concurrency::ThreadManager> threadManager_;
   server::ServerConfigs* serverConfigs_ = nullptr;
   RequestsRegistry* requestsRegistry_ = nullptr;
@@ -130,17 +128,20 @@ class ThriftRocketServerHandler : public RocketServerHandler {
   FOLLY_NOINLINE void handleRequestWithBadChecksum(
       ThriftRequestCoreUniquePtr request);
   FOLLY_NOINLINE void handleRequestOverloadedServer(
-      ThriftRequestCoreUniquePtr request,
-      const std::string& errorCode);
+      ThriftRequestCoreUniquePtr request, const std::string& errorCode);
   FOLLY_NOINLINE void handleAppError(
       ThriftRequestCoreUniquePtr request,
       const std::string& name,
       const std::string& message,
       bool isClientError);
   FOLLY_NOINLINE void handleDecompressionFailure(
-      ThriftRequestCoreUniquePtr request,
-      std::string&& reason);
+      ThriftRequestCoreUniquePtr request, std::string&& reason);
+  FOLLY_NOINLINE void handleServerNotReady(ThriftRequestCoreUniquePtr request);
   FOLLY_NOINLINE void handleServerShutdown(ThriftRequestCoreUniquePtr request);
+
+  enum class InjectedFault { ERROR, DROP, DISCONNECT };
+  FOLLY_NOINLINE void handleInjectedFault(
+      ThriftRequestCoreUniquePtr request, InjectedFault fault);
 };
 
 } // namespace rocket

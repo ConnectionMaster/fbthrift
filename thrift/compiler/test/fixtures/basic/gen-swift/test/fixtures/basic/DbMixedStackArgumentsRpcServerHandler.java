@@ -11,21 +11,20 @@ import java.util.*;
 import org.apache.thrift.protocol.*;
 
 public class DbMixedStackArgumentsRpcServerHandler 
-  implements com.facebook.swift.transport.server.RpcServerHandler {
+  implements com.facebook.thrift.server.RpcServerHandler {
 
-  private final java.util.Map<String, com.facebook.swift.transport.server.RpcServerHandler> _methodMap;
+  private final java.util.Map<String, com.facebook.thrift.server.RpcServerHandler> _methodMap;
 
   private final DbMixedStackArguments.Reactive _delegate;
 
-  private final java.util.List<com.facebook.swift.transport.payload.Reader> _getDataByKey0Readers;
-  private final java.util.List<com.facebook.swift.transport.payload.Reader> _getDataByKey1Readers;
+  private final java.util.List<com.facebook.thrift.payload.Reader> _getDataByKey0Readers;
+  private final java.util.List<com.facebook.thrift.payload.Reader> _getDataByKey1Readers;
 
   private final java.util.List<com.facebook.swift.service.ThriftEventHandler> _eventHandlers;
 
   public DbMixedStackArgumentsRpcServerHandler(DbMixedStackArguments _delegate,
-                                    java.util.List<com.facebook.swift.service.ThriftEventHandler> _eventHandlers,
-                                    reactor.core.scheduler.Scheduler _scheduler) {
-    this(new DbMixedStackArgumentsBlockingReactiveWrapper(_delegate, _scheduler), _eventHandlers);
+                                    java.util.List<com.facebook.swift.service.ThriftEventHandler> _eventHandlers) {
+    this(new DbMixedStackArgumentsBlockingReactiveWrapper(_delegate), _eventHandlers);
   }
 
   public DbMixedStackArgumentsRpcServerHandler(DbMixedStackArguments.Async _delegate,
@@ -41,15 +40,15 @@ public class DbMixedStackArgumentsRpcServerHandler
     this._eventHandlers = _eventHandlers;
 
     _methodMap.put("getDataByKey0", this);
-    _getDataByKey0Readers = _creategetDataByKey0Readers();
+    _getDataByKey0Readers = _create_getDataByKey0_request_readers();
 
     _methodMap.put("getDataByKey1", this);
-    _getDataByKey1Readers = _creategetDataByKey1Readers();
+    _getDataByKey1Readers = _create_getDataByKey1_request_readers();
 
   }
 
-  private static java.util.List<com.facebook.swift.transport.payload.Reader> _creategetDataByKey0Readers() {
-    java.util.List<com.facebook.swift.transport.payload.Reader> _readerList = new java.util.ArrayList<>();
+  private static java.util.List<com.facebook.thrift.payload.Reader> _create_getDataByKey0_request_readers() {
+    java.util.List<com.facebook.thrift.payload.Reader> _readerList = new java.util.ArrayList<>();
 
     
     _readerList.add(oprot -> {
@@ -65,23 +64,21 @@ public class DbMixedStackArgumentsRpcServerHandler
     return _readerList;
   }
 
-  private static com.facebook.swift.transport.payload.Writer _creategetDataByKey0Writer(
+  private static com.facebook.thrift.payload.Writer _create_getDataByKey0_response_writer(
       final Object _r,
       final com.facebook.swift.service.ContextChain _chain,
       final int _seqId) {
       return oprot -> {
       try {
         oprot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("getDataByKey0", TMessageType.REPLY, _seqId));
-        oprot.writeStructBegin(com.facebook.swift.transport.util.GeneratedUtil.TSTRUCT);
+        oprot.writeStructBegin(com.facebook.thrift.util.GeneratedUtil.TSTRUCT);
 
         
         byte[] _iter0 = (byte[])_r;
-        oprot.writeFieldBegin(com.facebook.swift.transport.util.GeneratedUtil.STRING_FIELD);
+        oprot.writeFieldBegin(com.facebook.thrift.util.GeneratedUtil.STRING_FIELD);
 oprot.writeBinary(java.nio.ByteBuffer.wrap(_iter0));
-
-
-
         oprot.writeFieldEnd();
+
         oprot.writeFieldStop();
         oprot.writeStructEnd();
         oprot.writeMessageEnd();
@@ -93,12 +90,13 @@ oprot.writeBinary(java.nio.ByteBuffer.wrap(_iter0));
     };
   }
 
-  private static reactor.core.publisher.Mono<com.facebook.swift.transport.payload.ServerResponsePayload>
+
+  private static reactor.core.publisher.Mono<com.facebook.thrift.payload.ServerResponsePayload>
     _dogetDataByKey0(
     DbMixedStackArguments.Reactive _delegate,
     String _name,
-    com.facebook.swift.transport.payload.ServerRequestPayload _payload,
-    java.util.List<com.facebook.swift.transport.payload.Reader> _readers,
+    com.facebook.thrift.payload.ServerRequestPayload _payload,
+    java.util.List<com.facebook.thrift.payload.Reader> _readers,
     java.util.List<com.facebook.swift.service.ThriftEventHandler> _eventHandlers) {
     final com.facebook.swift.service.ContextChain _chain = new com.facebook.swift.service.ContextChain(_eventHandlers, _name, _payload.getRequestContext());
           _chain.preRead();
@@ -109,31 +107,53 @@ oprot.writeBinary(java.nio.ByteBuffer.wrap(_iter0));
 
           _chain.postRead(_data);
 
-          return _delegate
+          reactor.core.publisher.Mono<com.facebook.thrift.payload.ServerResponsePayload> _internalResponse =
+            _delegate
             .getDataByKey0(key)
             .map(_response -> {
               _chain.preWrite(_response);
-                com.facebook.swift.transport.payload.ServerResponsePayload _serverResponsePayload =
-                    com.facebook.swift.transport.util.GeneratedUtil.createServerResponsePayload(
-                        _payload,
-                        _creategetDataByKey0Writer(_response, _chain, _payload.getMessageSeqId()));
+              com.facebook.thrift.payload.ServerResponsePayload _serverResponsePayload =
+                com.facebook.thrift.util.GeneratedUtil.createServerResponsePayload(
+                  _payload,
+                  _create_getDataByKey0_response_writer(_response, _chain, _payload.getMessageSeqId()));
 
                 return _serverResponsePayload;
             })
-            .<com.facebook.swift.transport.payload.ServerResponsePayload>onErrorResume(_t -> {
+            .switchIfEmpty(
+              reactor.core.publisher.Mono.fromSupplier(
+                () -> {
+                  org.apache.thrift.TApplicationException _tApplicationException =
+                    new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "method getDataByKey0 returned null");
+                  com.facebook.thrift.payload.Writer _exceptionWriter = com.facebook.thrift.util.GeneratedUtil.getTApplicationExceptionWriter("getDataByKey0", _tApplicationException, _chain, _payload.getMessageSeqId());
+                  return com.facebook.thrift.util.GeneratedUtil.createServerResponsePayload(_payload, _exceptionWriter);
+                }
+              )
+            )
+            .<com.facebook.thrift.payload.ServerResponsePayload>onErrorResume(_t -> {
                 _chain.preWriteException(_t);
-                com.facebook.swift.transport.payload.Writer _exceptionWriter = null;
+                com.facebook.thrift.payload.Writer _exceptionWriter = null;
 
-                com.facebook.swift.transport.payload.ServerResponsePayload _serverResponsePayload =
-                    com.facebook.swift.transport.util.GeneratedUtil.createServerResponsePayload(
+                // exception is not of user declared type
+                String _errorMessage = String.format("Internal error processing getDataByKey0: %s", _t.getMessage() == null ? "<null>" : _t.getMessage());
+                org.apache.thrift.TApplicationException _tApplicationException =
+                    new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, _errorMessage);
+                _tApplicationException.initCause(_t);
+                _exceptionWriter = com.facebook.thrift.util.GeneratedUtil.getTApplicationExceptionWriter("getDataByKey0", _tApplicationException, _chain, _payload.getMessageSeqId());
+                com.facebook.thrift.payload.ServerResponsePayload _serverResponsePayload =
+                    com.facebook.thrift.util.GeneratedUtil.createServerResponsePayload(
                         _payload,
                         _exceptionWriter);
 
                 return reactor.core.publisher.Mono.just(_serverResponsePayload);
             });
+          if (com.facebook.thrift.util.resources.RpcResources.isForceExecutionOffEventLoop()) {
+            _internalResponse = _internalResponse.publishOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
+          }
+
+          return _internalResponse;
   }
-  private static java.util.List<com.facebook.swift.transport.payload.Reader> _creategetDataByKey1Readers() {
-    java.util.List<com.facebook.swift.transport.payload.Reader> _readerList = new java.util.ArrayList<>();
+  private static java.util.List<com.facebook.thrift.payload.Reader> _create_getDataByKey1_request_readers() {
+    java.util.List<com.facebook.thrift.payload.Reader> _readerList = new java.util.ArrayList<>();
 
     
     _readerList.add(oprot -> {
@@ -149,23 +169,21 @@ oprot.writeBinary(java.nio.ByteBuffer.wrap(_iter0));
     return _readerList;
   }
 
-  private static com.facebook.swift.transport.payload.Writer _creategetDataByKey1Writer(
+  private static com.facebook.thrift.payload.Writer _create_getDataByKey1_response_writer(
       final Object _r,
       final com.facebook.swift.service.ContextChain _chain,
       final int _seqId) {
       return oprot -> {
       try {
         oprot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("getDataByKey1", TMessageType.REPLY, _seqId));
-        oprot.writeStructBegin(com.facebook.swift.transport.util.GeneratedUtil.TSTRUCT);
+        oprot.writeStructBegin(com.facebook.thrift.util.GeneratedUtil.TSTRUCT);
 
         
         byte[] _iter0 = (byte[])_r;
-        oprot.writeFieldBegin(com.facebook.swift.transport.util.GeneratedUtil.STRING_FIELD);
+        oprot.writeFieldBegin(com.facebook.thrift.util.GeneratedUtil.STRING_FIELD);
 oprot.writeBinary(java.nio.ByteBuffer.wrap(_iter0));
-
-
-
         oprot.writeFieldEnd();
+
         oprot.writeFieldStop();
         oprot.writeStructEnd();
         oprot.writeMessageEnd();
@@ -177,12 +195,13 @@ oprot.writeBinary(java.nio.ByteBuffer.wrap(_iter0));
     };
   }
 
-  private static reactor.core.publisher.Mono<com.facebook.swift.transport.payload.ServerResponsePayload>
+
+  private static reactor.core.publisher.Mono<com.facebook.thrift.payload.ServerResponsePayload>
     _dogetDataByKey1(
     DbMixedStackArguments.Reactive _delegate,
     String _name,
-    com.facebook.swift.transport.payload.ServerRequestPayload _payload,
-    java.util.List<com.facebook.swift.transport.payload.Reader> _readers,
+    com.facebook.thrift.payload.ServerRequestPayload _payload,
+    java.util.List<com.facebook.thrift.payload.Reader> _readers,
     java.util.List<com.facebook.swift.service.ThriftEventHandler> _eventHandlers) {
     final com.facebook.swift.service.ContextChain _chain = new com.facebook.swift.service.ContextChain(_eventHandlers, _name, _payload.getRequestContext());
           _chain.preRead();
@@ -193,35 +212,57 @@ oprot.writeBinary(java.nio.ByteBuffer.wrap(_iter0));
 
           _chain.postRead(_data);
 
-          return _delegate
+          reactor.core.publisher.Mono<com.facebook.thrift.payload.ServerResponsePayload> _internalResponse =
+            _delegate
             .getDataByKey1(key)
             .map(_response -> {
               _chain.preWrite(_response);
-                com.facebook.swift.transport.payload.ServerResponsePayload _serverResponsePayload =
-                    com.facebook.swift.transport.util.GeneratedUtil.createServerResponsePayload(
-                        _payload,
-                        _creategetDataByKey1Writer(_response, _chain, _payload.getMessageSeqId()));
+              com.facebook.thrift.payload.ServerResponsePayload _serverResponsePayload =
+                com.facebook.thrift.util.GeneratedUtil.createServerResponsePayload(
+                  _payload,
+                  _create_getDataByKey1_response_writer(_response, _chain, _payload.getMessageSeqId()));
 
                 return _serverResponsePayload;
             })
-            .<com.facebook.swift.transport.payload.ServerResponsePayload>onErrorResume(_t -> {
+            .switchIfEmpty(
+              reactor.core.publisher.Mono.fromSupplier(
+                () -> {
+                  org.apache.thrift.TApplicationException _tApplicationException =
+                    new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "method getDataByKey1 returned null");
+                  com.facebook.thrift.payload.Writer _exceptionWriter = com.facebook.thrift.util.GeneratedUtil.getTApplicationExceptionWriter("getDataByKey1", _tApplicationException, _chain, _payload.getMessageSeqId());
+                  return com.facebook.thrift.util.GeneratedUtil.createServerResponsePayload(_payload, _exceptionWriter);
+                }
+              )
+            )
+            .<com.facebook.thrift.payload.ServerResponsePayload>onErrorResume(_t -> {
                 _chain.preWriteException(_t);
-                com.facebook.swift.transport.payload.Writer _exceptionWriter = null;
+                com.facebook.thrift.payload.Writer _exceptionWriter = null;
 
-                com.facebook.swift.transport.payload.ServerResponsePayload _serverResponsePayload =
-                    com.facebook.swift.transport.util.GeneratedUtil.createServerResponsePayload(
+                // exception is not of user declared type
+                String _errorMessage = String.format("Internal error processing getDataByKey1: %s", _t.getMessage() == null ? "<null>" : _t.getMessage());
+                org.apache.thrift.TApplicationException _tApplicationException =
+                    new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.INTERNAL_ERROR, _errorMessage);
+                _tApplicationException.initCause(_t);
+                _exceptionWriter = com.facebook.thrift.util.GeneratedUtil.getTApplicationExceptionWriter("getDataByKey1", _tApplicationException, _chain, _payload.getMessageSeqId());
+                com.facebook.thrift.payload.ServerResponsePayload _serverResponsePayload =
+                    com.facebook.thrift.util.GeneratedUtil.createServerResponsePayload(
                         _payload,
                         _exceptionWriter);
 
                 return reactor.core.publisher.Mono.just(_serverResponsePayload);
             });
+          if (com.facebook.thrift.util.resources.RpcResources.isForceExecutionOffEventLoop()) {
+            _internalResponse = _internalResponse.publishOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
+          }
+
+          return _internalResponse;
   }
 
   @Override
-  public reactor.core.publisher.Mono<com.facebook.swift.transport.payload.ServerResponsePayload> singleRequestSingleResponse(com.facebook.swift.transport.payload.ServerRequestPayload _payload) {
+  public reactor.core.publisher.Mono<com.facebook.thrift.payload.ServerResponsePayload> singleRequestSingleResponse(com.facebook.thrift.payload.ServerRequestPayload _payload) {
     final String _name = _payload.getRequestRpcMetadata().getName();
 
-    reactor.core.publisher.Mono<com.facebook.swift.transport.payload.ServerResponsePayload> _result;
+    reactor.core.publisher.Mono<com.facebook.thrift.payload.ServerResponsePayload> _result;
     try {
       switch (_name) {
         case "getDataByKey0":
@@ -241,7 +282,7 @@ oprot.writeBinary(java.nio.ByteBuffer.wrap(_iter0));
     return _result;
   }
 
-  public java.util.Map<String, com.facebook.swift.transport.server.RpcServerHandler> getMethodMap() {
+  public java.util.Map<String, com.facebook.thrift.server.RpcServerHandler> getMethodMap() {
       return _methodMap;
   }
 

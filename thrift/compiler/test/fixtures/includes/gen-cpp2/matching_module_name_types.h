@@ -40,6 +40,13 @@ class MyStruct;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace matching_module_name {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -57,7 +64,8 @@ class MyStruct final  {
 
  public:
 
-  MyStruct() {}
+  MyStruct() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::matching_module_name::OtherStruct OtherStructField__arg);
@@ -74,29 +82,16 @@ class MyStruct final  {
  private:
   ::matching_module_name::OtherStruct OtherStructField;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool OtherStructField;
   } __isset = {};
-  bool operator==(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStruct& __x, const MyStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStruct&) const;
+  bool operator<(const MyStruct&) const;
 
   template <typename..., typename T = ::matching_module_name::OtherStruct>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> OtherStructField_ref() const& {
@@ -121,6 +116,7 @@ class MyStruct final  {
   ::matching_module_name::OtherStruct get_OtherStructField() &&;
 
   template <typename T_MyStruct_OtherStructField_struct_setter = ::matching_module_name::OtherStruct>
+  [[deprecated("Use `FOO.OtherStructField_ref() = BAR;` instead of `FOO.set_OtherStructField(BAR);`")]]
   ::matching_module_name::OtherStruct& set_OtherStructField(T_MyStruct_OtherStructField_struct_setter&& OtherStructField_) {
     OtherStructField = std::forward<T_MyStruct_OtherStructField_struct_setter>(OtherStructField_);
     __isset.OtherStructField = true;
@@ -140,7 +136,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 

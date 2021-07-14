@@ -7,21 +7,20 @@
 
 package test.fixtures.inheritance;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class MyNodeBlockingReactiveWrapper  extends test.fixtures.inheritance.MyRootBlockingReactiveWrapper
     implements MyNode.Reactive {
     private final MyNode _delegate;
-    private final reactor.core.scheduler.Scheduler _scheduler;
 
-    public MyNodeBlockingReactiveWrapper(MyNode _delegate, reactor.core.scheduler.Scheduler _scheduler) {
-        super(_delegate, _scheduler);
+    public MyNodeBlockingReactiveWrapper(MyNode _delegate) {
+        super(_delegate);
         this._delegate = _delegate;
-        this._scheduler = _scheduler;
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
@@ -33,7 +32,7 @@ public class MyNodeBlockingReactiveWrapper  extends test.fixtures.inheritance.My
                 } catch (Throwable _e) {
                     throw reactor.core.Exceptions.propagate(_e);
                 }
-            }).subscribeOn(_scheduler);
+            }).subscribeOn(com.facebook.thrift.util.resources.RpcResources.getOffLoopScheduler());
     }
 
 }

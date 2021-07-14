@@ -74,6 +74,7 @@ using to_gtest_types_t = typename to_gtest_types<Ts>::type;
   _THRIFT_INST_TESTSET_BATCH(Test, structs, 1); \
   _THRIFT_INST_TESTSET_BATCH(Test, structs, 2); \
   _THRIFT_INST_TESTSET_BATCH(Test, structs, 3); \
+  _THRIFT_INST_TESTSET_BATCH(Test, structs, 4); \
   _THRIFT_INST_TESTSET_BATCH(Test, structs, 5); \
   _THRIFT_INST_TESTSET_BATCH(Test, structs, 6); \
   _THRIFT_INST_TESTSET_BATCH(Test, structs, 7); \

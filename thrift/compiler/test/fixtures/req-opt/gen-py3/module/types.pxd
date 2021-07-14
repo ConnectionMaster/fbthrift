@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -39,7 +39,7 @@ from thrift.py3.common cimport (
 )
 from folly.optional cimport cOptional as __cOptional
 
-cimport module.types_fields as __fbthrift_types_fields
+cimport module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -57,11 +57,6 @@ cdef extern from "src/gen-cpp2/module_metadata.h" namespace "apache::thrift::det
         @staticmethod
         void gen(__fbthrift_cThriftMetadata &metadata)
 cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2":
-    cdef cppclass cFoo__isset "::cpp2::Foo::__isset":
-        bint myInteger
-        bint myString
-        bint myBools
-        bint myNumbers
 
     cdef cppclass cFoo "::cpp2::Foo":
         cFoo() except +
@@ -80,14 +75,13 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         string myString
         vector[cbool] myBools
         vector[cint32_t] myNumbers
-        cFoo__isset __isset
 
 
 
 
 cdef class Foo(thrift.py3.types.Struct):
     cdef shared_ptr[cFoo] _cpp_obj
-    cdef __fbthrift_types_fields.__Foo_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Foo_FieldsSetter _fields_setter
     cdef List__bool __fbthrift_cached_myBools
     cdef List__i32 __fbthrift_cached_myNumbers
 

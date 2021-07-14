@@ -38,9 +38,9 @@ typedef byte Byte
 typedef float Float
 typedef double Double
 // @lint-ignore THRIFTFORMAT (for autodeps)
-typedef map<string, string>
-  (cpp.type = "folly::F14FastMap<std::string, folly::fbstring>")
-  F14MapFollyString
+typedef map<string, string> (
+  cpp.type = "folly::F14FastMap<std::string, folly::fbstring>",
+) F14MapFollyString
 typedef list<i32> (cpp2.type = "std::vector<uint32_t>") Uint32List
 
 exception UnusedError {
@@ -144,6 +144,28 @@ struct easy {
   4: Integers an_int;
 } (anno1 = "foo", bar)
 
+struct PrivateCppRefField {
+  # (cpp.experimental.lazy) field is always private
+  1: optional easy field1 (cpp.ref, cpp.experimental.lazy);
+  2: optional easy field2 (cpp.ref_type = "shared", cpp.experimental.lazy);
+  3: optional easy field3 (
+    cpp.ref_type = "shared_const",
+    cpp.experimental.lazy,
+  );
+}
+
+struct Nested3 {
+  1: easy c;
+}
+
+struct Nested2 {
+  1: Nested3 b;
+}
+
+struct Nested1 {
+  1: Nested2 a;
+}
+
 struct Optionals {
   1: optional list<string> values;
 }
@@ -186,6 +208,7 @@ struct mixed {
   4: optional easy opt_easy_ref (cpp.ref = "True");
   5: required easy req_easy_ref (cpp.ref = "True");
   6: list<string> const_container_ref (cpp.ref_type = "shared_const");
+  7: optional string some_field (py3.name = "some_field_");
 }
 
 struct numerical {
@@ -279,6 +302,7 @@ struct ComplexRef {
   10: optional set<ComplexRef> set_const_shared_ref (
     cpp2.ref_type = "shared_const",
   );
+  11: optional ComplexRef recursive (cpp.box);
 }
 
 struct StructuredAnnotation {
@@ -288,11 +312,11 @@ struct StructuredAnnotation {
   5: StructuredAnnotation recurse (cpp.ref = "True");
 }
 
-@StructuredAnnotation {
+@StructuredAnnotation{
   first = {1.1: 2},
   second = 3,
   third = ["a", "b"],
-  recurse = StructuredAnnotation {third = ["3", "4"]},
+  recurse = StructuredAnnotation{third = ["3", "4"]},
 }
 service TestingService {
   string getName();
@@ -315,4 +339,5 @@ service TestingService {
 } (fun_times = "yes",single_quote = "'",double_quotes = '"""',py3.pass_context,)
 
 service TestingServiceChild extends TestingService {
+  stream<i32> stream_func();
 }

@@ -16,7 +16,11 @@
 
 #pragma once
 
+#include <variant>
+
 #include <folly/io/async/EventBaseAtomicNotificationQueue.h>
+
+#include <thrift/lib/cpp2/async/ReplyInfo.h>
 
 namespace apache {
 namespace thrift {
@@ -27,16 +31,15 @@ namespace thrift {
  */
 class IOWorkerContext {
  public:
-  virtual ~IOWorkerContext() {
-    *(alive_->wlock()) = false;
-  }
+  using ReplyQueue =
+      folly::EventBaseAtomicNotificationQueue<ReplyInfo, ReplyInfoConsumer>;
 
   /**
    * Get the reply queue.
    *
    * @returns reference to the queue.
    */
-  virtual folly::EventBase::EventBaseQueue& getReplyQueue() {
+  virtual ReplyQueue& getReplyQueue() {
     DCHECK(replyQueue_ != nullptr);
     return *replyQueue_.get();
   }
@@ -48,7 +51,8 @@ class IOWorkerContext {
    * @param eventBase EventBase to attach the queue.
    */
   void init(folly::EventBase& eventBase) {
-    replyQueue_ = std::make_unique<folly::EventBase::EventBaseQueue>();
+    eventBase_ = &eventBase;
+    replyQueue_ = std::make_unique<ReplyQueue>(ReplyInfoConsumer(eventBase));
     replyQueue_->setMaxReadAtOnce(0);
     eventBase.runInEventBaseThread(
         [queue = replyQueue_.get(), &evb = eventBase, alive = alive_] {
@@ -60,9 +64,22 @@ class IOWorkerContext {
         });
   }
 
+  virtual ~IOWorkerContext() {
+    *(alive_->wlock()) = false;
+
+    // Workaround destruction order fiasco for DuplexChannel where Cpp2Worker
+    // can be destroyed inline with the request, thus triggering queue's
+    // destruction while processing items from the same queue. Once
+    // DuplexChannel is deprecated, we should make being destructed inline.
+    if (eventBase_) {
+      eventBase_->runInEventBaseThread([queue = std::move(replyQueue_)] {});
+    }
+  }
+
  private:
+  folly::EventBase* eventBase_{nullptr};
   // A dedicated queue for server responses
-  std::unique_ptr<folly::EventBase::EventBaseQueue> replyQueue_;
+  std::unique_ptr<ReplyQueue> replyQueue_;
   // Needed to synchronize deallocating replyQueue_ and
   // calling startConsumingInternal() on eventbase loop.
   std::shared_ptr<folly::Synchronized<bool>> alive_{

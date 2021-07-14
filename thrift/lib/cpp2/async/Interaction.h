@@ -24,6 +24,11 @@
 
 namespace apache {
 namespace thrift {
+namespace detail {
+using InteractionTaskQueue = std::queue<std::pair<
+    std::unique_ptr<concurrency::Runnable>,
+    concurrency::ThreadManager::ExecutionScope>>;
+}
 
 class InteractionId {
  public:
@@ -46,86 +51,139 @@ class InteractionId {
     CHECK_EQ(id_, 0) << "Interactions must always be terminated";
   }
 
-  operator int64_t() const {
-    return id_;
-  }
+  operator int64_t() const { return id_; }
 
  private:
   InteractionId(int64_t id) : id_(id) {}
 
-  void release() {
-    id_ = 0;
-  }
+  void release() { id_ = 0; }
 
   int64_t id_;
 
   friend class RequestChannel;
 };
 
+enum class InteractionReleaseEvent {
+  NORMAL,
+  STREAM_TRANSFER,
+  STREAM_END,
+};
+
 class Tile {
  public:
-  virtual ~Tile() = default;
+  virtual ~Tile() { DCHECK_EQ(refCount_, 0); }
 
-  void __fbthrift_acquireRef(folly::EventBase& eb) {
+  // Only moves in arg when it returns true
+  virtual bool __fbthrift_maybeEnqueue(
+      std::unique_ptr<concurrency::Runnable>&& task,
+      const concurrency::ThreadManager::ExecutionScope& scope);
+
+ private:
+  void incRef(folly::EventBase& eb) {
     eb.dcheckIsInEventBaseThread();
     ++refCount_;
   }
-  void __fbthrift_releaseRef(folly::EventBase& eb);
+  void decRef(folly::EventBase& eb, InteractionReleaseEvent event);
 
- private:
-  size_t refCount_{1};
-  folly::Executor::KeepAlive<> destructionExecutor_;
-  friend class GeneratedAsyncProcessor;
+  size_t refCount_{0};
+  folly::Executor::KeepAlive<concurrency::ThreadManager> tm_;
   friend class TilePromise;
+  friend class TilePtr;
+  friend class TileStreamGuard;
 };
 
 class SerialInteractionTile : public Tile {
-  std::queue<std::shared_ptr<concurrency::Runnable>> taskQueue_;
-  friend class GeneratedAsyncProcessor;
+ public:
+  bool __fbthrift_maybeEnqueue(
+      std::unique_ptr<concurrency::Runnable>&& task,
+      const concurrency::ThreadManager::ExecutionScope& scope) override;
+
+ private:
+  detail::InteractionTaskQueue taskQueue_;
+  bool hasActiveRequest_{false};
   friend class Tile;
-  friend class TilePromise;
 };
 
 class TilePromise final : public Tile {
  public:
-  void addContinuation(std::shared_ptr<concurrency::Runnable> task) {
-    continuations_.push_back(std::move(task));
+  bool __fbthrift_maybeEnqueue(
+      std::unique_ptr<concurrency::Runnable>&& task,
+      const concurrency::ThreadManager::ExecutionScope& scope) override;
+
+  void fulfill(
+      Tile& tile, concurrency::ThreadManager& tm, folly::EventBase& eb);
+
+  void failWith(folly::exception_wrapper ew, const std::string& exCode);
+
+ private:
+  detail::InteractionTaskQueue continuations_;
+};
+
+class TilePtr {
+ public:
+  TilePtr() = default;
+  TilePtr(Tile* tile, folly::Executor::KeepAlive<folly::EventBase> eb)
+      : tile_(tile), eb_(std::move(eb)) {
+    tile_->incRef(*eb_);
   }
 
-  template <typename InteractionEventTask>
-  void
-  fulfill(Tile& tile, concurrency::ThreadManager& tm, folly::EventBase& eb) {
-    DCHECK(!continuations_.empty());
-
-    bool isSerial = dynamic_cast<SerialInteractionTile*>(this), first = true;
-    auto ka = tm.getKeepAlive(
-        concurrency::PRIORITY::NORMAL,
-        concurrency::ThreadManager::Source::EXISTING_INTERACTION);
-    for (auto& task : continuations_) {
-      if (!isSerial || std::exchange(first, false)) {
-        tile.__fbthrift_acquireRef(eb);
-        dynamic_cast<InteractionEventTask&>(*task).setTile(tile);
-        --refCount_;
-        ka->add([task = std::move(task)]() mutable { task->run(); });
-      } else {
-        static_cast<SerialInteractionTile&>(tile).taskQueue_.push(
-            std::move(task));
-      }
+  TilePtr(TilePtr&& that) noexcept
+      : tile_(std::exchange(that.tile_, nullptr)), eb_(std::move(that.eb_)) {}
+  TilePtr& operator=(TilePtr&& that) {
+    if (this != &that) {
+      release(InteractionReleaseEvent::NORMAL);
     }
-    continuations_.clear();
+    tile_ = std::exchange(that.tile_, nullptr);
+    eb_ = std::move(that.eb_);
+    return *this;
   }
 
-  template <typename EventTask>
-  void failWith(folly::exception_wrapper ew, const std::string& exCode) {
-    for (auto& task : continuations_) {
-      dynamic_cast<EventTask&>(*task).failWith(ew, exCode);
+  ~TilePtr() { release(InteractionReleaseEvent::NORMAL); }
+
+  explicit operator bool() const { return tile_; }
+
+  Tile* get() const { return tile_; }
+  Tile& operator*() const { return *tile_; }
+  Tile* operator->() const { return tile_; }
+
+ private:
+  void release(InteractionReleaseEvent event);
+
+  Tile* tile_{nullptr};
+  folly::Executor::KeepAlive<folly::EventBase> eb_;
+  friend class TileStreamGuard;
+};
+
+class TileStreamGuard {
+ public:
+  TileStreamGuard() = default;
+
+  TileStreamGuard(TileStreamGuard&& tile) noexcept = default;
+  TileStreamGuard& operator=(TileStreamGuard&& that) {
+    if (this != &that) {
+      tile_.release(InteractionReleaseEvent::STREAM_END);
     }
-    continuations_.clear();
+    tile_ = std::move(that.tile_);
+    return *this;
+  }
+
+  ~TileStreamGuard() { tile_.release(InteractionReleaseEvent::STREAM_END); }
+
+  // must call in eb thread
+  static TileStreamGuard transferFrom(TilePtr&& ptr) {
+    return TileStreamGuard(std::move(ptr));
   }
 
  private:
-  std::deque<std::shared_ptr<concurrency::Runnable>> continuations_;
-  friend class GeneratedAsyncProcessor;
+  explicit TileStreamGuard(TilePtr&& ptr);
+  TilePtr tile_;
+};
+
+class InteractionTask {
+ public:
+  virtual ~InteractionTask() = default;
+  virtual void setTile(TilePtr&&) = 0;
+  virtual void failWith(folly::exception_wrapper ew, std::string exCode) = 0;
 };
 
 } // namespace thrift

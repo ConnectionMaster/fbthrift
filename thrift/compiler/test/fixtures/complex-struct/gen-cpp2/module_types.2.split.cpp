@@ -36,6 +36,10 @@ void TccStructTraits<::cpp2::MyStruct>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(const MyStruct&) = default;
+MyStruct& MyStruct::operator=(const MyStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct() :
       MyIntField(0),
       myEnum( ::cpp2::MyEnum::MyValue1),
@@ -43,11 +47,78 @@ MyStruct::MyStruct() :
       MyByteField(0),
       MyShortField(0),
       MyLongField(0),
-      MyDoubleField(0) {}
+      MyDoubleField(0) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 MyStruct::~MyStruct() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(MyStruct&& other) noexcept  :
+    MyIntField(std::move(other.MyIntField)),
+    MyStringField(std::move(other.MyStringField)),
+    MyDataField(std::move(other.MyDataField)),
+    myEnum(std::move(other.myEnum)),
+    MyBoolField(std::move(other.MyBoolField)),
+    MyByteField(std::move(other.MyByteField)),
+    MyShortField(std::move(other.MyShortField)),
+    MyLongField(std::move(other.MyLongField)),
+    MyDoubleField(std::move(other.MyDoubleField)),
+    lDouble(std::move(other.lDouble)),
+    lShort(std::move(other.lShort)),
+    lInteger(std::move(other.lInteger)),
+    lLong(std::move(other.lLong)),
+    lString(std::move(other.lString)),
+    lBool(std::move(other.lBool)),
+    lByte(std::move(other.lByte)),
+    mShortString(std::move(other.mShortString)),
+    mIntegerString(std::move(other.mIntegerString)),
+    mStringMyStruct(std::move(other.mStringMyStruct)),
+    mStringBool(std::move(other.mStringBool)),
+    mIntegerInteger(std::move(other.mIntegerInteger)),
+    mIntegerBool(std::move(other.mIntegerBool)),
+    sShort(std::move(other.sShort)),
+    sMyStruct(std::move(other.sMyStruct)),
+    sLong(std::move(other.sLong)),
+    sString(std::move(other.sString)),
+    sByte(std::move(other.sByte)),
+    mListList(std::move(other.mListList)),
+    __isset(other.__isset) {}
+MyStruct& MyStruct::operator=(FOLLY_MAYBE_UNUSED MyStruct&& other) noexcept {
+    this->MyIntField = std::move(other.MyIntField);
+    this->MyStringField = std::move(other.MyStringField);
+    this->MyDataField = std::move(other.MyDataField);
+    this->myEnum = std::move(other.myEnum);
+    this->MyBoolField = std::move(other.MyBoolField);
+    this->MyByteField = std::move(other.MyByteField);
+    this->MyShortField = std::move(other.MyShortField);
+    this->MyLongField = std::move(other.MyLongField);
+    this->MyDoubleField = std::move(other.MyDoubleField);
+    this->lDouble = std::move(other.lDouble);
+    this->lShort = std::move(other.lShort);
+    this->lInteger = std::move(other.lInteger);
+    this->lLong = std::move(other.lLong);
+    this->lString = std::move(other.lString);
+    this->lBool = std::move(other.lBool);
+    this->lByte = std::move(other.lByte);
+    this->mShortString = std::move(other.mShortString);
+    this->mIntegerString = std::move(other.mIntegerString);
+    this->mStringMyStruct = std::move(other.mStringMyStruct);
+    this->mStringBool = std::move(other.mStringBool);
+    this->mIntegerInteger = std::move(other.mIntegerInteger);
+    this->mIntegerBool = std::move(other.mIntegerBool);
+    this->sShort = std::move(other.sShort);
+    this->sMyStruct = std::move(other.sMyStruct);
+    this->sLong = std::move(other.sLong);
+    this->sString = std::move(other.sString);
+    this->sByte = std::move(other.sByte);
+    this->mListList = std::move(other.mListList);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg, ::std::string MyStringField__arg, ::cpp2::MyDataItem MyDataField__arg, ::cpp2::MyEnum myEnum__arg, bool MyBoolField__arg, ::std::int8_t MyByteField__arg, ::std::int16_t MyShortField__arg, ::std::int64_t MyLongField__arg, double MyDoubleField__arg, ::std::vector<double> lDouble__arg, ::std::vector<::std::int16_t> lShort__arg, ::std::vector<::std::int32_t> lInteger__arg, ::std::vector<::std::int64_t> lLong__arg, ::std::vector<::std::string> lString__arg, ::std::vector<bool> lBool__arg, ::std::vector<::std::int8_t> lByte__arg, ::std::map<::std::int16_t, ::std::string> mShortString__arg, ::std::map<::std::int32_t, ::std::string> mIntegerString__arg, ::std::map<::std::string, ::cpp2::MyStruct> mStringMyStruct__arg, ::std::map<::std::string, bool> mStringBool__arg, ::std::map<::std::int32_t, ::std::int32_t> mIntegerInteger__arg, ::std::map<::std::int32_t, bool> mIntegerBool__arg, ::std::set<::std::int16_t> sShort__arg, ::std::set<::cpp2::MyStruct> sMyStruct__arg, ::std::set<::std::int64_t> sLong__arg, ::std::set<::std::string> sString__arg, ::std::set<::std::int8_t> sByte__arg, ::std::map<::std::vector<::std::int32_t>, ::std::vector<::std::int32_t>> mListList__arg) :
@@ -109,35 +180,36 @@ MyStruct::MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField
   __isset.mListList = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyStruct::__clear() {
   // clear all fields
-  MyIntField = 0;
-  MyStringField = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  myEnum =  ::cpp2::MyEnum::MyValue1;
-  MyBoolField = 0;
-  MyByteField = 0;
-  MyShortField = 0;
-  MyLongField = 0;
-  MyDoubleField = 0;
-  lDouble.clear();
-  lShort.clear();
-  lInteger.clear();
-  lLong.clear();
-  lString.clear();
-  lBool.clear();
-  lByte.clear();
-  mShortString.clear();
-  mIntegerString.clear();
-  mStringMyStruct.clear();
-  mStringBool.clear();
-  mIntegerInteger.clear();
-  mIntegerBool.clear();
-  sShort.clear();
-  sMyStruct.clear();
-  sLong.clear();
-  sString.clear();
-  sByte.clear();
-  mListList.clear();
+  this->MyIntField = 0;
+  this->MyStringField = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->myEnum =  ::cpp2::MyEnum::MyValue1;
+  this->MyBoolField = 0;
+  this->MyByteField = 0;
+  this->MyShortField = 0;
+  this->MyLongField = 0;
+  this->MyDoubleField = 0;
+  this->lDouble.clear();
+  this->lShort.clear();
+  this->lInteger.clear();
+  this->lLong.clear();
+  this->lString.clear();
+  this->lBool.clear();
+  this->lByte.clear();
+  this->mShortString.clear();
+  this->mIntegerString.clear();
+  this->mStringMyStruct.clear();
+  this->mStringBool.clear();
+  this->mIntegerInteger.clear();
+  this->mIntegerBool.clear();
+  this->sShort.clear();
+  this->sMyStruct.clear();
+  this->sLong.clear();
+  this->sString.clear();
+  this->sByte.clear();
+  this->mListList.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -570,13 +642,46 @@ void TccStructTraits<::cpp2::MyStructTypeDef>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStructTypeDef::MyStructTypeDef(const MyStructTypeDef&) = default;
+MyStructTypeDef& MyStructTypeDef::operator=(const MyStructTypeDef&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStructTypeDef::MyStructTypeDef() :
       myLongField(0),
-      myLongTypeDef(0) {}
+      myLongTypeDef(0) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 MyStructTypeDef::~MyStructTypeDef() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStructTypeDef::MyStructTypeDef(MyStructTypeDef&& other) noexcept  :
+    myLongField(std::move(other.myLongField)),
+    myLongTypeDef(std::move(other.myLongTypeDef)),
+    myStringField(std::move(other.myStringField)),
+    myStringTypedef(std::move(other.myStringTypedef)),
+    myMapField(std::move(other.myMapField)),
+    myMapTypedef(std::move(other.myMapTypedef)),
+    myListField(std::move(other.myListField)),
+    myListTypedef(std::move(other.myListTypedef)),
+    myMapListOfTypeDef(std::move(other.myMapListOfTypeDef)),
+    __isset(other.__isset) {}
+MyStructTypeDef& MyStructTypeDef::operator=(FOLLY_MAYBE_UNUSED MyStructTypeDef&& other) noexcept {
+    this->myLongField = std::move(other.myLongField);
+    this->myLongTypeDef = std::move(other.myLongTypeDef);
+    this->myStringField = std::move(other.myStringField);
+    this->myStringTypedef = std::move(other.myStringTypedef);
+    this->myMapField = std::move(other.myMapField);
+    this->myMapTypedef = std::move(other.myMapTypedef);
+    this->myListField = std::move(other.myListField);
+    this->myListTypedef = std::move(other.myListTypedef);
+    this->myMapListOfTypeDef = std::move(other.myMapListOfTypeDef);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStructTypeDef::MyStructTypeDef(apache::thrift::FragileConstructor, ::std::int64_t myLongField__arg, ::cpp2::longTypeDef myLongTypeDef__arg, ::std::string myStringField__arg, ::cpp2::stringTypedef myStringTypedef__arg, ::std::map<::std::int16_t, ::std::string> myMapField__arg, ::cpp2::mapTypedef myMapTypedef__arg, ::std::vector<double> myListField__arg, ::cpp2::listTypedef myListTypedef__arg, ::std::map<::std::int16_t, ::std::vector<::cpp2::listTypedef>> myMapListOfTypeDef__arg) :
@@ -600,17 +705,18 @@ MyStructTypeDef::MyStructTypeDef(apache::thrift::FragileConstructor, ::std::int6
   __isset.myMapListOfTypeDef = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyStructTypeDef::__clear() {
   // clear all fields
-  myLongField = 0;
-  myLongTypeDef = 0;
-  myStringField = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  myStringTypedef = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  myMapField.clear();
-  myMapTypedef.clear();
-  myListField.clear();
-  myListTypedef.clear();
-  myMapListOfTypeDef.clear();
+  this->myLongField = 0;
+  this->myLongTypeDef = 0;
+  this->myStringField = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->myStringTypedef = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->myMapField.clear();
+  this->myMapTypedef.clear();
+  this->myListField.clear();
+  this->myListTypedef.clear();
+  this->myMapListOfTypeDef.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -926,8 +1032,29 @@ void TccStructTraits<::cpp2::emptyXcep>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+emptyXcep::emptyXcep(const emptyXcep&) = default;
+emptyXcep& emptyXcep::operator=(const emptyXcep&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+emptyXcep::emptyXcep() {
+}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+emptyXcep::~emptyXcep() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+emptyXcep::emptyXcep(emptyXcep&& other) noexcept { (void)other; }
+emptyXcep& emptyXcep::operator=(FOLLY_MAYBE_UNUSED emptyXcep&& other) noexcept {
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 emptyXcep::emptyXcep(apache::thrift::FragileConstructor) {}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void emptyXcep::__clear() {
   // clear all fields
 }
@@ -990,12 +1117,39 @@ void TccStructTraits<::cpp2::complexException>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+complexException::complexException(const complexException&) = default;
+complexException& complexException::operator=(const complexException&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 complexException::complexException() :
-      errorEnum( ::cpp2::MyEnum::MyValue1) {}
+      errorEnum( ::cpp2::MyEnum::MyValue1) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 complexException::~complexException() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+complexException::complexException(complexException&& other) noexcept  :
+    message(std::move(other.message)),
+    listStrings(std::move(other.listStrings)),
+    errorEnum(std::move(other.errorEnum)),
+    unionError(std::move(other.unionError)),
+    structError(std::move(other.structError)),
+    lsMap(std::move(other.lsMap)),
+    __isset(other.__isset) {}
+complexException& complexException::operator=(FOLLY_MAYBE_UNUSED complexException&& other) noexcept {
+    this->message = std::move(other.message);
+    this->listStrings = std::move(other.listStrings);
+    this->errorEnum = std::move(other.errorEnum);
+    this->unionError = std::move(other.unionError);
+    this->structError = std::move(other.structError);
+    this->lsMap = std::move(other.lsMap);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 complexException::complexException(apache::thrift::FragileConstructor, ::std::string message__arg, ::std::vector<::std::string> listStrings__arg, ::cpp2::MyEnum errorEnum__arg, ::cpp2::MyUnion unionError__arg, ::cpp2::MyStruct structError__arg, ::std::map<::std::int64_t, ::std::string> lsMap__arg) :
@@ -1013,14 +1167,15 @@ complexException::complexException(apache::thrift::FragileConstructor, ::std::st
   __isset.lsMap = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void complexException::__clear() {
   // clear all fields
-  message = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  listStrings.clear();
-  errorEnum =  ::cpp2::MyEnum::MyValue1;
-  unionError.__clear();
-  structError.__clear();
-  lsMap.clear();
+  this->message = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->listStrings.clear();
+  this->errorEnum =  ::cpp2::MyEnum::MyValue1;
+  this->unionError.__clear();
+  this->structError.__clear();
+  this->lsMap.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

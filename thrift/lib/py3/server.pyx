@@ -208,12 +208,6 @@ cdef class ThriftServer:
     def set_workers_join_timeout(self, timeout):
         self.server.get().setWorkersJoinTimeout(seconds(<int64_t>timeout))
 
-    def set_ssl_handshake_worker_threads(self, num):
-        self.server.get().setNumSSLHandshakeWorkerThreads(num)
-
-    def get_ssl_handshake_worker_threads(self):
-        return self.server.get().getNumSSLHandshakeWorkerThreads()
-
     def get_ssl_policy(self):
         cdef cSSLPolicy cPolicy = self.server.get().getSSLPolicy()
         if cPolicy == SSLPolicy__DISABLED:
@@ -269,6 +263,12 @@ cdef class ThriftServer:
 
     def use_existing_socket(self, socket):
         self.server.get().useExistingSocket(socket)
+
+    def set_stop_workers_on_stop_listening(self, cbool stop_workers):
+        self.server.get().setStopWorkersOnStopListening(stop_workers)
+
+    def get_stop_workers_on_stop_listening(self):
+        return self.server.get().getStopWorkersOnStopListening()
 
 
 cdef class ConnectionContext:

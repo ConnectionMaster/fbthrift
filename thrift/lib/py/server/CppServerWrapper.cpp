@@ -32,6 +32,7 @@
 #include <thrift/lib/cpp2/protocol/BinaryProtocol.h>
 #include <thrift/lib/cpp2/protocol/CompactProtocol.h>
 #include <thrift/lib/cpp2/server/ThriftServer.h>
+#include <thrift/lib/cpp2/util/LegacyRequestExpiryGuard.h>
 #include <thrift/lib/py/server/CppContextData.h>
 #include <wangle/ssl/SSLContextConfig.h>
 
@@ -59,7 +60,7 @@ const std::string kHeaderEx = "uex";
 const std::string kHeaderExWhat = "uexw";
 
 object makePythonHeaders(
-    const std::map<std::string, std::string>& cppheaders,
+    const THeader::StringToStringMap& cppheaders,
     const Cpp2RequestContext* context) {
   object headers = dict();
   for (const auto& it : cppheaders) {
@@ -97,9 +98,7 @@ T getIntAttr(object& pyObject, const char* attrName) {
 
 class CallbackWrapper {
  public:
-  void call(object obj) {
-    callback_(obj);
-  }
+  void call(object obj) { callback_(obj); }
 
   void setCallback(folly::Function<void(object)>&& callback) {
     callback_ = std::move(callback);
@@ -126,9 +125,7 @@ class CppServerEventHandler : public TServerEventHandler {
   void callPythonHandler(TConnectionContext* ctx, const char* method) {
     if (!_Py_IsFinalizing()) {
       PyGILState_STATE state = PyGILState_Ensure();
-      SCOPE_EXIT {
-        PyGILState_Release(state);
-      };
+      SCOPE_EXIT { PyGILState_Release(state); };
 
       // This cast always succeeds because it is called from Cpp2Connection.
       Cpp2ConnContext* cpp2Ctx = dynamic_cast<Cpp2ConnContext*>(ctx);
@@ -146,33 +143,23 @@ class CppServerEventHandler : public TServerEventHandler {
 
 class PythonCallTimestamps : public TServerObserver::CallTimestamps {
  public:
-  void set_readEndNow() {
-    readEnd = clock::now();
-  }
+  void set_readEndNow() { readEnd = clock::now(); }
   uint64_t get_readEndUsec() const noexcept {
     return to_microseconds(readEnd.time_since_epoch());
   }
-  void set_processBeginNow() {
-    processBegin = clock::now();
-  }
+  void set_processBeginNow() { processBegin = clock::now(); }
   uint64_t get_processBeginUsec() const noexcept {
     return to_microseconds(processBegin.time_since_epoch());
   }
-  void set_processEndNow() {
-    processEnd = clock::now();
-  }
+  void set_processEndNow() { processEnd = clock::now(); }
   uint64_t get_processEndUsec() const noexcept {
     return to_microseconds(processEnd.time_since_epoch());
   }
-  void set_writeBeginNow() {
-    writeBegin = clock::now();
-  }
+  void set_writeBeginNow() { writeBegin = clock::now(); }
   uint64_t get_writeBeginUsec() const noexcept {
     return to_microseconds(writeBegin.time_since_epoch());
   }
-  void set_writeEndNow() {
-    writeEnd = clock::now();
-  }
+  void set_writeEndNow() { writeEnd = clock::now(); }
   uint64_t get_writeEndUsec() const noexcept {
     return to_microseconds(writeEnd.time_since_epoch());
   }
@@ -183,67 +170,33 @@ class CppServerObserver : public TServerObserver {
   explicit CppServerObserver(object serverObserver)
       : observer_(serverObserver) {}
 
-  void connAccepted() override {
-    this->call("connAccepted");
-  }
-  void connDropped() override {
-    this->call("connDropped");
-  }
-  void connRejected() override {
-    this->call("connRejected");
-  }
-  void tlsError() override {
-    this->call("tlsError");
-  }
-  void tlsComplete() override {
-    this->call("tlsComplete");
-  }
-  void tlsFallback() override {
-    this->call("tlsFallback");
-  }
-  void tlsResumption() override {
-    this->call("tlsResumption");
-  }
-  void taskKilled() override {
-    this->call("taskKilled");
-  }
-  void taskTimeout() override {
-    this->call("taskTimeout");
-  }
-  void serverOverloaded() override {
-    this->call("serverOverloaded");
-  }
-  void receivedRequest() override {
-    this->call("receivedRequest");
-  }
-  void queuedRequests(int32_t n) override {
-    this->call("queuedRequests", n);
-  }
-  void queueTimeout() override {
-    this->call("queueTimeout");
-  }
-  void sentReply() override {
-    this->call("sentReply");
-  }
-  void activeRequests(int32_t n) override {
-    this->call("activeRequests", n);
-  }
+  void connAccepted() override { this->call("connAccepted"); }
+  void connDropped() override { this->call("connDropped"); }
+  void connRejected() override { this->call("connRejected"); }
+  void tlsError() override { this->call("tlsError"); }
+  void tlsComplete() override { this->call("tlsComplete"); }
+  void tlsFallback() override { this->call("tlsFallback"); }
+  void tlsResumption() override { this->call("tlsResumption"); }
+  void taskKilled() override { this->call("taskKilled"); }
+  void taskTimeout() override { this->call("taskTimeout"); }
+  void serverOverloaded() override { this->call("serverOverloaded"); }
+  void receivedRequest() override { this->call("receivedRequest"); }
+  void queuedRequests(int32_t n) override { this->call("queuedRequests", n); }
+  void queueTimeout() override { this->call("queueTimeout"); }
+  void sentReply() override { this->call("sentReply"); }
+  void activeRequests(int32_t n) override { this->call("activeRequests", n); }
   void callCompleted(const CallTimestamps& runtimes) override {
     this->call(
         "callCompleted",
         reinterpret_cast<const PythonCallTimestamps&>(runtimes));
   }
-  void tlsWithClientCert() override {
-    this->call("tlsWithClientCert");
-  }
+  void tlsWithClientCert() override { this->call("tlsWithClientCert"); }
 
  private:
   template <class... Types>
   void call(const char* method_name, Types... args) {
     PyGILState_STATE state = PyGILState_Ensure();
-    SCOPE_EXIT {
-      PyGILState_Release(state);
-    };
+    SCOPE_EXIT { PyGILState_Release(state); };
 
     // check if the object has an attribute, because we want to be accepting
     // if we added a new listener callback and didn't yet update call the
@@ -289,143 +242,142 @@ class PythonAsyncProcessor : public AsyncProcessor {
       req->sendReply(std::unique_ptr<folly::IOBuf>());
     }
 
-    auto task = std::make_shared<apache::thrift::EventTask>(
-        [=,
-         buf = apache::thrift::LegacySerializedRequest(
-                   protType,
-                   context->getProtoSeqId(),
-                   context->getMethodName(),
-                   std::move(serializedRequest))
-                   .buffer](
-            apache::thrift::ResponseChannelRequest::UniquePtr req_up) mutable {
-          SCOPE_EXIT {
-            eb->runInEventBaseThread(
-                [req_up = std::move(req_up)]() mutable { req_up = {}; });
-          };
+    apache::thrift::LegacyRequestExpiryGuard rh{std::move(req), eb};
+    auto task = [=,
+                 buf = apache::thrift::LegacySerializedRequest(
+                           protType,
+                           context->getProtoSeqId(),
+                           context->getMethodName(),
+                           std::move(serializedRequest))
+                           .buffer,
+                 rh = std::move(rh)]() mutable {
+      auto req_up = std::move(rh.req);
+      SCOPE_EXIT {
+        rh.eb->runInEventBaseThread(
+            [req_up = std::move(req_up)]() mutable { req_up = {}; });
+      };
 
-          if (!oneway && !req_up->isActive()) {
-            return;
-          }
+      if (!oneway && !req_up->getShouldStartProcessing()) {
+        return;
+      }
 
-          folly::ByteRange input_range = buf->coalesce();
-          auto input_data = const_cast<unsigned char*>(input_range.data());
-          auto clientType = context->getHeader()->getClientType();
+      folly::ByteRange input_range = buf->coalesce();
+      auto input_data = const_cast<unsigned char*>(input_range.data());
+      auto clientType = context->getHeader()->getClientType();
 
-          {
-            PyGILState_STATE state = PyGILState_Ensure();
-            SCOPE_EXIT {
-              PyGILState_Release(state);
-            };
+      {
+        PyGILState_STATE state = PyGILState_Ensure();
+        SCOPE_EXIT { PyGILState_Release(state); };
 
 #if PY_MAJOR_VERSION == 2
-            auto input =
-                handle<>(PyBuffer_FromMemory(input_data, input_range.size()));
+        auto input =
+            handle<>(PyBuffer_FromMemory(input_data, input_range.size()));
 #else
-            auto input = handle<>(PyMemoryView_FromMemory(
-                reinterpret_cast<char*>(input_data),
-                input_range.size(),
-                PyBUF_READ));
+        auto input = handle<>(PyMemoryView_FromMemory(
+            reinterpret_cast<char*>(input_data),
+            input_range.size(),
+            PyBUF_READ));
 #endif
 
-            auto cd_ctor = adapter_->attr("CONTEXT_DATA");
-            object contextData = cd_ctor();
-            extract<CppContextData&>(contextData)().copyContextContents(
-                context);
+        auto cd_ctor = adapter_->attr("CONTEXT_DATA");
+        object contextData = cd_ctor();
+        extract<CppContextData&>(contextData)().copyContextContents(context);
 
-            auto cb_ctor = adapter_->attr("CALLBACK_WRAPPER");
-            object callbackWrapper = cb_ctor();
-            extract<CallbackWrapper&>(callbackWrapper)().setCallback(
-                [oneway, req_up = std::move(req_up), context, eb, contextData](
-                    object output) mutable {
-                  // Make sure the request is deleted in evb.
-                  SCOPE_EXIT {
-                    eb->runInEventBaseThread(
-                        [req_up = std::move(req_up)]() mutable {
-                          req_up = {};
-                        });
-                  };
+        auto cb_ctor = adapter_->attr("CALLBACK_WRAPPER");
+        object callbackWrapper = cb_ctor();
+        extract<CallbackWrapper&>(callbackWrapper)().setCallback(
+            [oneway,
+             req_up = std::move(req_up),
+             context,
+             eb = rh.eb,
+             contextData](object output) mutable {
+              // Make sure the request is deleted in evb.
+              SCOPE_EXIT {
+                eb->runInEventBaseThread(
+                    [req_up = std::move(req_up)]() mutable { req_up = {}; });
+              };
 
-                  // Always called from python so no need to grab GIL.
-                  try {
-                    std::unique_ptr<folly::IOBuf> outbuf;
-                    if (output.is_none()) {
-                      throw std::runtime_error(
-                          "Unexpected error in processor method");
-                    }
-                    PyObject* output_ptr = output.ptr();
+              // Always called from python so no need to grab GIL.
+              try {
+                std::unique_ptr<folly::IOBuf> outbuf;
+                if (output.is_none()) {
+                  throw std::runtime_error(
+                      "Unexpected error in processor method");
+                }
+                PyObject* output_ptr = output.ptr();
 #if PY_MAJOR_VERSION == 2
-                    if (PyString_Check(output_ptr)) {
-                      int len = extract<int>(output.attr("__len__")());
-                      if (len == 0) {
-                        return;
-                      }
-                      outbuf = folly::IOBuf::copyBuffer(
-                          extract<const char*>(output), len);
-                    } else
+                if (PyString_Check(output_ptr)) {
+                  int len = extract<int>(output.attr("__len__")());
+                  if (len == 0) {
+                    return;
+                  }
+                  outbuf = folly::IOBuf::copyBuffer(
+                      extract<const char*>(output), len);
+                } else
 #endif
-                        if (PyBytes_Check(output_ptr)) {
-                      int len = PyBytes_Size(output_ptr);
-                      if (len == 0) {
-                        return;
-                      }
-                      outbuf = folly::IOBuf::copyBuffer(
-                          PyBytes_AsString(output_ptr), len);
-                    } else {
-                      throw std::runtime_error(
-                          "Return from processor "
-                          "method is not string or bytes");
-                    }
+                    if (PyBytes_Check(output_ptr)) {
+                  int len = PyBytes_Size(output_ptr);
+                  if (len == 0) {
+                    return;
+                  }
+                  outbuf = folly::IOBuf::copyBuffer(
+                      PyBytes_AsString(output_ptr), len);
+                } else {
+                  throw std::runtime_error(
+                      "Return from processor "
+                      "method is not string or bytes");
+                }
 
-                    if (!req_up->isActive()) {
-                      return;
-                    }
-                    CppContextData& cppContextData =
-                        extract<CppContextData&>(contextData);
-                    if (!cppContextData.getHeaderEx().empty()) {
-                      context->getHeader()->setHeader(
-                          kHeaderEx, cppContextData.getHeaderEx());
-                    }
-                    if (!cppContextData.getHeaderExWhat().empty()) {
-                      context->getHeader()->setHeader(
-                          kHeaderExWhat, cppContextData.getHeaderExWhat());
-                    }
-                    auto q = THeader::transform(
-                        std::move(outbuf),
-                        context->getHeader()->getWriteTransforms());
-                    eb->runInEventBaseThread([req_up = std::move(req_up),
-                                              q = std::move(q)]() mutable {
+                if (!req_up->isActive()) {
+                  return;
+                }
+                CppContextData& cppContextData =
+                    extract<CppContextData&>(contextData);
+                if (!cppContextData.getHeaderEx().empty()) {
+                  context->getHeader()->setHeader(
+                      kHeaderEx, cppContextData.getHeaderEx());
+                }
+                if (!cppContextData.getHeaderExWhat().empty()) {
+                  context->getHeader()->setHeader(
+                      kHeaderExWhat, cppContextData.getHeaderExWhat());
+                }
+                auto q = THeader::transform(
+                    std::move(outbuf),
+                    context->getHeader()->getWriteTransforms());
+                eb->runInEventBaseThread(
+                    [req_up = std::move(req_up), q = std::move(q)]() mutable {
                       req_up->sendReply(std::move(q));
                     });
-                  } catch (const std::exception& e) {
-                    if (!oneway) {
-                      req_up->sendErrorWrapped(
-                          folly::make_exception_wrapper<TApplicationException>(
-                              folly::to<std::string>(
-                                  "Failed to read response from Python:",
-                                  e.what())),
-                          "python");
-                    }
-                  }
-                });
+              } catch (const std::exception& e) {
+                if (!oneway) {
+                  req_up->sendErrorWrapped(
+                      folly::make_exception_wrapper<TApplicationException>(
+                          folly::to<std::string>(
+                              "Failed to read response from Python:",
+                              e.what())),
+                      "python");
+                }
+              }
+            });
 
-            adapter_->attr("call_processor")(
-                input,
-                makePythonHeaders(context->getHeader()->getHeaders(), context),
-                int(clientType),
-                int(protType),
-                contextData,
-                callbackWrapper);
-          }
-        },
-        std::move(req),
-        eb,
-        oneway);
+        adapter_->attr("call_processor")(
+            input,
+            makePythonHeaders(context->getHeader()->getHeaders(), context),
+            int(clientType),
+            int(protType),
+            contextData,
+            callbackWrapper);
+      }
+    };
 
     using PriorityThreadManager =
         apache::thrift::concurrency::PriorityThreadManager;
     auto ptm = dynamic_cast<PriorityThreadManager*>(tm);
     if (ptm != nullptr) {
-      ptm->add(getMethodPriority(fname, context), std::move(task));
+      ptm->add(
+          getMethodPriority(fname, context),
+          std::make_shared<apache::thrift::concurrency::FunctionRunner>(
+              std::move(task)));
       return;
     }
     tm->add(std::move(task));
@@ -437,8 +389,7 @@ class PythonAsyncProcessor : public AsyncProcessor {
    * Ask python if no priority headers were supplied with the request
    */
   concurrency::PRIORITY getMethodPriority(
-      std::string const& fname,
-      Cpp2RequestContext* ctx = nullptr) {
+      std::string const& fname, Cpp2RequestContext* ctx = nullptr) {
     if (ctx) {
       auto requestPriority = ctx->getCallPriority();
       if (requestPriority != concurrency::PRIORITY::N_PRIORITIES) {
@@ -448,9 +399,7 @@ class PythonAsyncProcessor : public AsyncProcessor {
     }
 
     PyGILState_STATE state = PyGILState_Ensure();
-    SCOPE_EXIT {
-      PyGILState_Release(state);
-    };
+    SCOPE_EXIT { PyGILState_Release(state); };
 
     try {
       return static_cast<concurrency::PRIORITY>(
@@ -471,9 +420,7 @@ class PythonAsyncProcessor : public AsyncProcessor {
 
   void getPythonOnewayMethods() {
     PyGILState_STATE state = PyGILState_Ensure();
-    SCOPE_EXIT {
-      PyGILState_Release(state);
-    };
+    SCOPE_EXIT { PyGILState_Release(state); };
     object ret = adapter_->attr("oneway_methods")();
     if (ret.is_none()) {
       LOG(ERROR) << "Unexpected error in processor method";
@@ -496,6 +443,12 @@ class PythonAsyncProcessorFactory : public AsyncProcessorFactory {
 
   std::unique_ptr<apache::thrift::AsyncProcessor> getProcessor() override {
     return std::make_unique<PythonAsyncProcessor>(adapter_);
+  }
+
+  // TODO(T89004867): Call onStartServing() and onStopServing() hooks for
+  // non-C++ thrift servers
+  std::vector<apache::thrift::ServiceHandler*> getServiceHandlers() override {
+    return {};
   }
 
  private:
@@ -522,20 +475,23 @@ class CppServerWrapper : public ThriftServer {
     setObserver(std::make_shared<CppServerObserver>(observer));
   }
 
-  object getAddress() {
-    return makePythonAddress(ThriftServer::getAddress());
-  }
+  object getAddress() { return makePythonAddress(ThriftServer::getAddress()); }
 
   void loop() {
     PyThreadState* save_state = PyEval_SaveThread();
-    SCOPE_EXIT {
-      PyEval_RestoreThread(save_state);
-    };
+    SCOPE_EXIT { PyEval_RestoreThread(save_state); };
 
     // Thrift main loop.  This will run indefinitely, until stop() is
     // called.
 
     getServeEventBase()->loopForever();
+  }
+
+  void setup() {
+    PyThreadState* save_state = PyEval_SaveThread();
+    SCOPE_EXIT { PyEval_RestoreThread(save_state); };
+
+    ThriftServer::setup();
   }
 
   void setCppSSLConfig(object sslConfig) {
@@ -580,7 +536,7 @@ class CppServerWrapper : public ThriftServer {
     setSSLPolicy(extract<SSLPolicy>(sslConfig.attr("ssl_policy")));
 
     auto ticketFilePath = getStringAttrSafe(sslConfig, "ticket_file_path");
-    ThriftServer::watchTicketPathForChanges(ticketFilePath, true);
+    ThriftServer::watchTicketPathForChanges(ticketFilePath);
   }
 
   void setCppFastOpenOptions(object enabledObj, object tfoMaxQueueObj) {
@@ -630,9 +586,7 @@ class CppServerWrapper : public ThriftServer {
     // only once thrift is all cleaned up.
 
     PyThreadState* save_state = PyEval_SaveThread();
-    SCOPE_EXIT {
-      PyEval_RestoreThread(save_state);
-    };
+    SCOPE_EXIT { PyEval_RestoreThread(save_state); };
     ThriftServer::cleanUp();
   }
 
@@ -651,8 +605,8 @@ class CppServerWrapper : public ThriftServer {
         std::make_shared<CppServerEventHandler>(serverEventHandler));
   }
 
-  void setNewSimpleThreadManager(size_t count, size_t, bool enableTaskStats) {
-    auto tm = ThreadManager::newSimpleThreadManager(count, enableTaskStats);
+  void setNewSimpleThreadManager(size_t count, size_t) {
+    auto tm = ThreadManager::newSimpleThreadManager(count);
     auto poolThreadName = getCPUWorkerThreadName();
     if (!poolThreadName.empty()) {
       tm->setNamePrefix(poolThreadName);
@@ -663,11 +617,8 @@ class CppServerWrapper : public ThriftServer {
     setThreadManager(std::move(tm));
   }
 
-  void setNewPriorityQueueThreadManager(
-      size_t numThreads,
-      bool enableTaskStats) {
-    auto tm = ThreadManager::newPriorityQueueThreadManager(
-        numThreads, enableTaskStats);
+  void setNewPriorityQueueThreadManager(size_t numThreads) {
+    auto tm = ThreadManager::newPriorityQueueThreadManager(numThreads);
     auto poolThreadName = getCPUWorkerThreadName();
     if (!poolThreadName.empty()) {
       tm->setNamePrefix(poolThreadName);
@@ -684,11 +635,9 @@ class CppServerWrapper : public ThriftServer {
       size_t important,
       size_t normal,
       size_t best_effort,
-      bool enableTaskStats,
       size_t) {
     auto tm = PriorityThreadManager::newPriorityThreadManager(
-        {{high_important, high, important, normal, best_effort}},
-        enableTaskStats);
+        {{high_important, high, important, normal, best_effort}});
     tm->enableCodel(getEnableCodel());
     auto poolThreadName = getCPUWorkerThreadName();
     if (!poolThreadName.empty()) {
@@ -734,11 +683,6 @@ class CppServerWrapper : public ThriftServer {
         numCPUWorkerThreads, AttributeSource::OVERRIDE);
   }
 
-  void setNumSSLHandshakeWorkerThreads(size_t nSSLHandshakeThreads) {
-    BaseThriftServer::setNumSSLHandshakeWorkerThreads(
-        nSSLHandshakeThreads, AttributeSource::OVERRIDE);
-  }
-
   void setEnableCodel(bool enableCodel) {
     BaseThriftServer::setEnableCodel(enableCodel, AttributeSource::OVERRIDE);
   }
@@ -771,7 +715,10 @@ BOOST_PYTHON_MODULE(CppServerWrapper) {
   class_<CallbackWrapper, boost::noncopyable>("CallbackWrapper")
       .def("call", &CallbackWrapper::call);
 
-  class_<CppServerWrapper, boost::noncopyable>("CppServerWrapper")
+  class_<ThriftServer, boost::noncopyable>("ThriftServer");
+
+  class_<CppServerWrapper, bases<ThriftServer>, boost::noncopyable>(
+      "CppServerWrapper")
       // methods added or customized for the python implementation
       .def("setAdapter", &CppServerWrapper::setAdapter)
       .def(
@@ -783,6 +730,7 @@ BOOST_PYTHON_MODULE(CppServerWrapper) {
       .def("setIdleTimeout", &CppServerWrapper::setIdleTimeout)
       .def("setTaskExpireTime", &CppServerWrapper::setTaskExpireTime)
       .def("getAddress", &CppServerWrapper::getAddress)
+      .def("getPort", &CppServerWrapper::getPort)
       .def("loop", &CppServerWrapper::loop)
       .def("cleanUp", &CppServerWrapper::cleanUp)
       .def(
@@ -791,13 +739,11 @@ BOOST_PYTHON_MODULE(CppServerWrapper) {
       .def(
           "setNewSimpleThreadManager",
           &CppServerWrapper::setNewSimpleThreadManager,
-          (arg("count"),
-           arg("pendingTaskCountMax"),
-           arg("enableTaskStats") = false))
+          (arg("count"), arg("pendingTaskCountMax")))
       .def(
           "setNewPriorityQueueThreadManager",
           &CppServerWrapper::setNewPriorityQueueThreadManager,
-          (arg("numThreads"), arg("enableTaskStats") = false))
+          (arg("numThreads")))
       .def(
           "setNewPriorityThreadManager",
           &CppServerWrapper::setNewPriorityThreadManager,
@@ -806,7 +752,6 @@ BOOST_PYTHON_MODULE(CppServerWrapper) {
            arg("important"),
            arg("normal"),
            arg("best_effort"),
-           arg("enableTaskStats") = false,
            arg("maxQueueLen") = 0))
       .def("setCppSSLConfig", &CppServerWrapper::setCppSSLConfig)
       .def("setCppSSLCacheOptions", &CppServerWrapper::setCppSSLCacheOptions)
@@ -825,6 +770,7 @@ BOOST_PYTHON_MODULE(CppServerWrapper) {
       .def("stop", &CppServerWrapper::stop)
       .def("setMaxConnections", &CppServerWrapper::setMaxConnections)
       .def("getMaxConnections", &CppServerWrapper::getMaxConnections)
+      .def("setEnabled", &CppServerWrapper::setEnabled)
 
       .def("getLoad", &CppServerWrapper::getLoad)
       .def("getActiveRequests", &CppServerWrapper::getActiveRequests)

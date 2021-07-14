@@ -184,8 +184,7 @@ class EvbStreamCallback final : public StreamClientCallback,
   // as soon as the eventbase scope is done.
   template <typename F>
   void eventBaseRunHelper(
-      folly::Executor::KeepAlive<folly::EventBase> runEvb,
-      F&& fn) {
+      folly::Executor::KeepAlive<folly::EventBase> runEvb, F&& fn) {
     incRef();
     // cannot call folly::makeGuard inside the lambda captures below, because it
     // triggers a GCC 8 bug (https://fburl.com/e0kv48hu)
@@ -212,9 +211,7 @@ class EvbStreamCallback final : public StreamClientCallback,
     }
   }
 
-  void incRef() {
-    refCount_.fetch_add(1, std::memory_order_relaxed);
-  }
+  void incRef() { refCount_.fetch_add(1, std::memory_order_relaxed); }
 
   void decRef() {
     if (refCount_.fetch_sub(1, std::memory_order_acq_rel) == 1) {
@@ -235,15 +232,14 @@ class EvbStreamCallback final : public StreamClientCallback,
 } // namespace
 
 ThreadBoundAdaptorChannel::ThreadBoundAdaptorChannel(
-    folly::EventBase* evb,
-    std::shared_ptr<RequestChannel> threadSafeChannel)
+    folly::EventBase* evb, std::shared_ptr<RequestChannel> threadSafeChannel)
     : threadSafeChannel_(std::move(threadSafeChannel)), evb_(evb) {
   DCHECK(threadSafeChannel_->getEventBase() == nullptr);
 }
 
 void ThreadBoundAdaptorChannel::sendRequestResponse(
     const RpcOptions& options,
-    ManagedStringView&& methodName,
+    MethodMetadata&& methodMetadata,
     SerializedRequest&& request,
     std::shared_ptr<transport::THeader> header,
     RequestClientCallback::Ptr cob) {
@@ -252,7 +248,7 @@ void ThreadBoundAdaptorChannel::sendRequestResponse(
 
   threadSafeChannel_->sendRequestResponse(
       options,
-      std::move(methodName),
+      std::move(methodMetadata),
       std::move(request),
       std::move(header),
       std::move(cob));
@@ -260,7 +256,7 @@ void ThreadBoundAdaptorChannel::sendRequestResponse(
 
 void ThreadBoundAdaptorChannel::sendRequestNoResponse(
     const RpcOptions& options,
-    ManagedStringView&& methodName,
+    MethodMetadata&& methodMetadata,
     SerializedRequest&& request,
     std::shared_ptr<transport::THeader> header,
     RequestClientCallback::Ptr cob) {
@@ -269,7 +265,7 @@ void ThreadBoundAdaptorChannel::sendRequestNoResponse(
 
   threadSafeChannel_->sendRequestNoResponse(
       options,
-      std::move(methodName),
+      std::move(methodMetadata),
       std::move(request),
       std::move(header),
       std::move(cob));
@@ -277,7 +273,7 @@ void ThreadBoundAdaptorChannel::sendRequestNoResponse(
 
 void ThreadBoundAdaptorChannel::sendRequestStream(
     const RpcOptions& options,
-    ManagedStringView&& methodName,
+    MethodMetadata&& methodMetadata,
     SerializedRequest&& request,
     std::shared_ptr<transport::THeader> header,
     StreamClientCallback* cob) {
@@ -285,7 +281,7 @@ void ThreadBoundAdaptorChannel::sendRequestStream(
 
   threadSafeChannel_->sendRequestStream(
       options,
-      std::move(methodName),
+      std::move(methodMetadata),
       std::move(request),
       std::move(header),
       std::move(cob));
@@ -293,7 +289,7 @@ void ThreadBoundAdaptorChannel::sendRequestStream(
 
 void ThreadBoundAdaptorChannel::sendRequestSink(
     const RpcOptions& /* options */,
-    ManagedStringView&& /* methodName */,
+    MethodMetadata&& /* methodName */,
     SerializedRequest&& /* request */,
     std::shared_ptr<transport::THeader> /* header */,
     SinkClientCallback* /* cob */) {

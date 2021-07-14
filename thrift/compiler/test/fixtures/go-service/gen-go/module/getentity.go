@@ -822,6 +822,11 @@ type getEntityProcessorGetEntity struct {
   handler GetEntity
 }
 
+func (p *GetEntityGetEntityResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *getEntityProcessorGetEntity) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := GetEntityGetEntityArgs{}
   if err := args.Read(iprot); err != nil {
@@ -870,6 +875,11 @@ func (p *getEntityProcessorGetEntity) Run(argStruct thrift.Struct) (thrift.Writa
 
 type getEntityProcessorGetBool struct {
   handler GetEntity
+}
+
+func (p *GetEntityGetBoolResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *getEntityProcessorGetBool) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -921,6 +931,11 @@ type getEntityProcessorGetByte struct {
   handler GetEntity
 }
 
+func (p *GetEntityGetByteResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *getEntityProcessorGetByte) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := GetEntityGetByteArgs{}
   if err := args.Read(iprot); err != nil {
@@ -968,6 +983,11 @@ func (p *getEntityProcessorGetByte) Run(argStruct thrift.Struct) (thrift.Writabl
 
 type getEntityProcessorGetI16 struct {
   handler GetEntity
+}
+
+func (p *GetEntityGetI16Result) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *getEntityProcessorGetI16) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -1019,6 +1039,11 @@ type getEntityProcessorGetI32 struct {
   handler GetEntity
 }
 
+func (p *GetEntityGetI32Result) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *getEntityProcessorGetI32) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := GetEntityGetI32Args{}
   if err := args.Read(iprot); err != nil {
@@ -1066,6 +1091,11 @@ func (p *getEntityProcessorGetI32) Run(argStruct thrift.Struct) (thrift.Writable
 
 type getEntityProcessorGetI64 struct {
   handler GetEntity
+}
+
+func (p *GetEntityGetI64Result) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *getEntityProcessorGetI64) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -1117,6 +1147,11 @@ type getEntityProcessorGetDouble struct {
   handler GetEntity
 }
 
+func (p *GetEntityGetDoubleResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *getEntityProcessorGetDouble) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := GetEntityGetDoubleArgs{}
   if err := args.Read(iprot); err != nil {
@@ -1164,6 +1199,11 @@ func (p *getEntityProcessorGetDouble) Run(argStruct thrift.Struct) (thrift.Writa
 
 type getEntityProcessorGetString struct {
   handler GetEntity
+}
+
+func (p *GetEntityGetStringResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *getEntityProcessorGetString) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -1215,6 +1255,11 @@ type getEntityProcessorGetBinary struct {
   handler GetEntity
 }
 
+func (p *GetEntityGetBinaryResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *getEntityProcessorGetBinary) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := GetEntityGetBinaryArgs{}
   if err := args.Read(iprot); err != nil {
@@ -1262,6 +1307,11 @@ func (p *getEntityProcessorGetBinary) Run(argStruct thrift.Struct) (thrift.Writa
 
 type getEntityProcessorGetMap struct {
   handler GetEntity
+}
+
+func (p *GetEntityGetMapResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *getEntityProcessorGetMap) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -1313,6 +1363,11 @@ type getEntityProcessorGetSet struct {
   handler GetEntity
 }
 
+func (p *GetEntityGetSetResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *getEntityProcessorGetSet) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := GetEntityGetSetArgs{}
   if err := args.Read(iprot); err != nil {
@@ -1362,6 +1417,11 @@ type getEntityProcessorGetList struct {
   handler GetEntity
 }
 
+func (p *GetEntityGetListResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *getEntityProcessorGetList) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := GetEntityGetListArgs{}
   if err := args.Read(iprot); err != nil {
@@ -1409,6 +1469,11 @@ func (p *getEntityProcessorGetList) Run(argStruct thrift.Struct) (thrift.Writabl
 
 type getEntityProcessorGetLegacyStuff struct {
   handler GetEntity
+}
+
+func (p *GetEntityGetLegacyStuffResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *getEntityProcessorGetLegacyStuff) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -1590,7 +1655,7 @@ func (p *GetEntityGetEntityArgs) String() string {
 //  - Success
 type GetEntityGetEntityResult struct {
   thrift.IResponse
-  Success *GetEntityResponse `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *GetEntityResponse `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetEntityResult() *GetEntityGetEntityResult {
@@ -1782,7 +1847,7 @@ func (p *GetEntityGetBoolArgs) String() string {
 //  - Success
 type GetEntityGetBoolResult struct {
   thrift.IResponse
-  Success *bool `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *bool `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetBoolResult() *GetEntityGetBoolResult {
@@ -1974,7 +2039,7 @@ func (p *GetEntityGetByteArgs) String() string {
 //  - Success
 type GetEntityGetByteResult struct {
   thrift.IResponse
-  Success *int8 `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *int8 `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetByteResult() *GetEntityGetByteResult {
@@ -2167,7 +2232,7 @@ func (p *GetEntityGetI16Args) String() string {
 //  - Success
 type GetEntityGetI16Result struct {
   thrift.IResponse
-  Success *int16 `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *int16 `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetI16Result() *GetEntityGetI16Result {
@@ -2359,7 +2424,7 @@ func (p *GetEntityGetI32Args) String() string {
 //  - Success
 type GetEntityGetI32Result struct {
   thrift.IResponse
-  Success *int32 `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *int32 `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetI32Result() *GetEntityGetI32Result {
@@ -2551,7 +2616,7 @@ func (p *GetEntityGetI64Args) String() string {
 //  - Success
 type GetEntityGetI64Result struct {
   thrift.IResponse
-  Success *int64 `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *int64 `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetI64Result() *GetEntityGetI64Result {
@@ -2743,7 +2808,7 @@ func (p *GetEntityGetDoubleArgs) String() string {
 //  - Success
 type GetEntityGetDoubleResult struct {
   thrift.IResponse
-  Success *float64 `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *float64 `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetDoubleResult() *GetEntityGetDoubleResult {
@@ -2935,7 +3000,7 @@ func (p *GetEntityGetStringArgs) String() string {
 //  - Success
 type GetEntityGetStringResult struct {
   thrift.IResponse
-  Success *string `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *string `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetStringResult() *GetEntityGetStringResult {
@@ -3127,7 +3192,7 @@ func (p *GetEntityGetBinaryArgs) String() string {
 //  - Success
 type GetEntityGetBinaryResult struct {
   thrift.IResponse
-  Success []byte `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success []byte `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetBinaryResult() *GetEntityGetBinaryResult {
@@ -3312,7 +3377,7 @@ func (p *GetEntityGetMapArgs) String() string {
 //  - Success
 type GetEntityGetMapResult struct {
   thrift.IResponse
-  Success map[string]string `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success map[string]string `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetMapResult() *GetEntityGetMapResult {
@@ -3526,7 +3591,7 @@ func (p *GetEntityGetSetArgs) String() string {
 //  - Success
 type GetEntityGetSetResult struct {
   thrift.IResponse
-  Success []string `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success []string `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetSetResult() *GetEntityGetSetResult {
@@ -3739,7 +3804,7 @@ func (p *GetEntityGetListArgs) String() string {
 //  - Success
 type GetEntityGetListResult struct {
   thrift.IResponse
-  Success []string `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success []string `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetListResult() *GetEntityGetListResult {
@@ -4075,7 +4140,7 @@ func (p *GetEntityGetLegacyStuffArgs) String() string {
 //  - Success
 type GetEntityGetLegacyStuffResult struct {
   thrift.IResponse
-  Success *int32 `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *int32 `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewGetEntityGetLegacyStuffResult() *GetEntityGetLegacyStuffResult {

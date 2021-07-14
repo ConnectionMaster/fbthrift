@@ -45,13 +45,9 @@ class TransportUpgradeCompatibilityTest : public testing::TestWithParam<bool> {
 };
 
 INSTANTIATE_TEST_CASE_P(
-    NoUpgrade,
-    TransportUpgradeCompatibilityTest,
-    testing::Values(false));
+    NoUpgrade, TransportUpgradeCompatibilityTest, testing::Values(false));
 INSTANTIATE_TEST_CASE_P(
-    Upgrade,
-    TransportUpgradeCompatibilityTest,
-    testing::Values(true));
+    Upgrade, TransportUpgradeCompatibilityTest, testing::Values(true));
 
 TEST_P(TransportUpgradeCompatibilityTest, RequestResponse_Simple) {
   compatibilityTest_->TestRequestResponse_Simple();
@@ -149,7 +145,7 @@ TEST_P(TransportUpgradeCompatibilityTest, RequestResponse_Connection_CloseNow) {
       EXPECT_TRUE(false) << "future_add should have thrown";
     } catch (TTransportException& ex) {
       EXPECT_EQ(TTransportException::UNKNOWN, ex.getType());
-      EXPECT_STREQ("Channel is !good()", ex.what());
+      EXPECT_PRED_FORMAT2(IsSubstring, "Channel is !good()", ex.what());
     }
   });
 }
@@ -162,9 +158,13 @@ TEST_P(TransportUpgradeCompatibilityTest, RequestResponse_ResponseSizeTooBig) {
   compatibilityTest_->TestRequestResponse_ResponseSizeTooBig();
 }
 
-TEST_P(TransportUpgradeCompatibilityTest, RequestResponse_Checksumming) {
-  SKIP_IF(GetParam() == false)
-      << "Checksum not implemented for header transport";
+// TODO(T90625074)
+TEST_P(
+    TransportUpgradeCompatibilityTest, DISABLED_RequestResponse_Checksumming) {
+  // Checksum not implemented for header transport
+  if (!GetParam()) {
+    return;
+  }
   compatibilityTest_->TestRequestResponse_Checksumming();
 }
 
@@ -189,8 +189,10 @@ TEST_P(TransportUpgradeCompatibilityTest, Oneway_ServerQueueTimeout) {
 }
 
 TEST_P(TransportUpgradeCompatibilityTest, Oneway_Checksumming) {
-  SKIP_IF(GetParam() == false)
-      << "Checksum not implemented for header transport";
+  // Checksum not implemented for header transport
+  if (!GetParam()) {
+    return;
+  }
   compatibilityTest_->TestOneway_Checksumming();
 }
 
@@ -216,9 +218,7 @@ class CloseCallbackTest : public CloseCallback {
     EXPECT_FALSE(closed_);
     closed_ = true;
   }
-  bool isClosed() {
-    return closed_;
-  }
+  bool isClosed() { return closed_; }
 
  private:
   bool closed_{false};

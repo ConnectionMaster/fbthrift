@@ -133,6 +133,7 @@ add_library(
   PluggableFunction.cpp
   async/AsyncClient.cpp
   async/AsyncProcessor.cpp
+  async/AsyncProcessorHelper.cpp
   async/ClientChannel.cpp
   async/ClientSinkBridge.cpp
   async/ClientStreamBridge.cpp
@@ -147,10 +148,12 @@ add_library(
   async/Interaction.cpp
   async/PooledRequestChannel.cpp
   async/ReconnectingRequestChannel.cpp
+  async/RequestCallback.cpp
   async/RequestChannel.cpp
   async/ResponseChannel.cpp
   async/RetryingRequestChannel.cpp
   async/RocketClientChannel.cpp
+  async/RpcOptions.cpp
   async/RpcTypes.cpp
   async/ServerGeneratorStream.cpp
   async/ServerSinkBridge.cpp
@@ -161,22 +164,23 @@ add_library(
   security/extensions/ThriftParametersClientExtension.cpp
   security/extensions/ThriftParametersContext.cpp
   security/extensions/Types.cpp
+  server/AdaptiveConcurrency.cpp
   server/BaseThriftServer.cpp
   server/Cpp2ConnContext.cpp
   server/Cpp2Connection.cpp
   server/Cpp2Worker.cpp
   server/LoggingEvent.cpp
   server/LoggingEventHelper.cpp
+  server/MonitoringMethodNames.cpp
   server/RequestDebugLog.cpp
   server/RequestsRegistry.cpp
   server/ServerInstrumentation.cpp
+  server/ThriftProcessor.cpp
   server/ThriftServer.cpp
-  server/admission_strategy/AdmissionStrategy.cpp
   server/peeking/TLSHelper.cpp
   transport/core/RpcMetadataUtil.cpp
   transport/core/ThriftClient.cpp
   transport/core/ThriftClientCallback.cpp
-  transport/core/ThriftProcessor.cpp
   transport/core/ThriftRequest.cpp
   transport/rocket/PayloadUtils.cpp
   transport/rocket/Types.cpp
@@ -207,6 +211,7 @@ add_dependencies(
   thriftcpp2
   rpcmetadata
   thriftmetadata
+  RocketUpgrade-cpp2-target
 )
 target_link_libraries(
   thriftcpp2

@@ -68,9 +68,11 @@ void TccStructTraits<::cpp2::MyDataItem>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyDataItem::MyDataItem(apache::thrift::FragileConstructor) {}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyDataItem::__clear() {
   // clear all fields
 }
@@ -133,16 +135,45 @@ void TccStructTraits<::cpp2::MyStruct>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(const MyStruct&) = default;
+MyStruct& MyStruct::operator=(const MyStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct() :
       MyIntField(0),
       myEnum( ::cpp2::MyEnum::MyValue1),
       oneway(0),
       readonly(0),
-      idempotent(0) {}
+      idempotent(0) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 MyStruct::~MyStruct() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(MyStruct&& other) noexcept  :
+    MyIntField(std::move(other.MyIntField)),
+    MyStringField(std::move(other.MyStringField)),
+    MyDataField(std::move(other.MyDataField)),
+    myEnum(std::move(other.myEnum)),
+    oneway(std::move(other.oneway)),
+    readonly(std::move(other.readonly)),
+    idempotent(std::move(other.idempotent)),
+    __isset(other.__isset) {}
+MyStruct& MyStruct::operator=(FOLLY_MAYBE_UNUSED MyStruct&& other) noexcept {
+    this->MyIntField = std::move(other.MyIntField);
+    this->MyStringField = std::move(other.MyStringField);
+    this->MyDataField = std::move(other.MyDataField);
+    this->myEnum = std::move(other.myEnum);
+    this->oneway = std::move(other.oneway);
+    this->readonly = std::move(other.readonly);
+    this->idempotent = std::move(other.idempotent);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg, ::std::string MyStringField__arg, ::cpp2::MyDataItem MyDataField__arg, ::cpp2::MyEnum myEnum__arg, bool oneway__arg, bool readonly__arg, bool idempotent__arg) :
@@ -162,14 +193,15 @@ MyStruct::MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField
   __isset.idempotent = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyStruct::__clear() {
   // clear all fields
-  MyIntField = 0;
-  MyStringField = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  myEnum =  ::cpp2::MyEnum::MyValue1;
-  oneway = 0;
-  readonly = 0;
-  idempotent = 0;
+  this->MyIntField = 0;
+  this->MyStringField = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->myEnum =  ::cpp2::MyEnum::MyValue1;
+  this->oneway = 0;
+  this->readonly = 0;
+  this->idempotent = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

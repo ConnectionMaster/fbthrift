@@ -215,6 +215,13 @@ class SomeStruct;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace facebook { namespace ns { namespace qwerty {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class SomeStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -233,7 +240,8 @@ class SomeStruct final  {
  public:
 
   SomeStruct() :
-      fieldA(0) {}
+      fieldA(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   SomeStruct(apache::thrift::FragileConstructor, ::std::int32_t fieldA__arg);
@@ -250,29 +258,16 @@ class SomeStruct final  {
  private:
   ::std::int32_t fieldA;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool fieldA;
   } __isset = {};
-  bool operator==(const SomeStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const SomeStruct& __x, const SomeStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const SomeStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const SomeStruct& __x, const SomeStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const SomeStruct& __x, const SomeStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const SomeStruct& __x, const SomeStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const SomeStruct&) const;
+  bool operator<(const SomeStruct&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> fieldA_ref() const& {
@@ -298,6 +293,7 @@ class SomeStruct final  {
     return fieldA;
   }
 
+  [[deprecated("Use `FOO.fieldA_ref() = BAR;` instead of `FOO.set_fieldA(BAR);`")]]
   ::std::int32_t& set_fieldA(::std::int32_t fieldA_) {
     fieldA = fieldA_;
     __isset.fieldA = true;
@@ -317,7 +313,7 @@ class SomeStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< SomeStruct >;
+  friend class ::apache::thrift::Cpp2Ops<SomeStruct>;
   friend void swap(SomeStruct& a, SomeStruct& b);
 };
 

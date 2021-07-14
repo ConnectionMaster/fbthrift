@@ -256,10 +256,7 @@ bool THeader::isFramed(CLIENT_TYPE type) {
 }
 
 unique_ptr<IOBuf> THeader::removeNonHeader(
-    IOBufQueue* queue,
-    size_t& needed,
-    CLIENT_TYPE type,
-    uint32_t sz) {
+    IOBufQueue* queue, size_t& needed, CLIENT_TYPE type, uint32_t sz) {
   switch (type) {
     case THRIFT_FRAMED_DEPRECATED:
       protoId_ = T_BINARY_PROTOCOL;
@@ -437,8 +434,7 @@ static string readString(RWPrivateCursor& c) {
 }
 
 static void readInfoHeaders(
-    RWPrivateCursor& c,
-    THeader::StringToStringMap& headers_) {
+    RWPrivateCursor& c, THeader::StringToStringMap& headers_) {
   // Process key-value headers
   uint32_t numKVHeaders = readVarint<int32_t>(c);
   // continue until we reach (paded) end of packet
@@ -453,8 +449,7 @@ static void readInfoHeaders(
 }
 
 unique_ptr<IOBuf> THeader::readHeaderFormat(
-    unique_ptr<IOBuf> buf,
-    StringToStringMap& persistentReadHeaders) {
+    unique_ptr<IOBuf> buf, StringToStringMap& persistentReadHeaders) {
   readTrans_.clear(); // Clear out any previous transforms.
   readHeaders_.clear(); // Clear out any previous headers.
 
@@ -540,8 +535,7 @@ unique_ptr<IOBuf> THeader::readHeaderFormat(
 }
 
 static unique_ptr<IOBuf> decompressCodec(
-    IOBuf const& buf,
-    folly::io::CodecType codec) {
+    IOBuf const& buf, folly::io::CodecType codec) {
   try {
     return folly::io::getCodec(codec)->uncompress(&buf);
   } catch (std::exception const& e) {
@@ -552,8 +546,7 @@ static unique_ptr<IOBuf> decompressCodec(
 }
 
 unique_ptr<IOBuf> THeader::untransform(
-    unique_ptr<IOBuf> buf,
-    std::vector<uint16_t>& readTrans) {
+    unique_ptr<IOBuf> buf, std::vector<uint16_t>& readTrans) {
   for (vector<uint16_t>::const_reverse_iterator it = readTrans.rbegin();
        it != readTrans.rend();
        ++it) {
@@ -564,20 +557,9 @@ unique_ptr<IOBuf> THeader::untransform(
       case ZLIB_TRANSFORM:
         buf = decompressCodec(*buf, CodecType::ZLIB);
         break;
-      case SNAPPY_TRANSFORM:
-        if (THRIFT_HAVE_LIBSNAPPY > 0) {
-          assert(folly::io::hasCodec(CodecType::SNAPPY));
-          buf = decompressCodec(*buf, CodecType::SNAPPY);
-        }
-        break;
       case ZSTD_TRANSFORM:
         buf = decompressCodec(*buf, CodecType::ZSTD);
         break;
-      case QLZ_TRANSFORM:
-        throw TApplicationException(
-            TApplicationException::MISSING_RESULT,
-            "QuickLZ is not supported anymore due to a"
-            " critical flaw in the library");
       default:
         throw TApplicationException(
             TApplicationException::MISSING_RESULT,
@@ -620,14 +602,6 @@ unique_ptr<IOBuf> THeader::transform(
         }
         buf = compressCodec(*buf, CodecType::ZLIB);
         break;
-      case SNAPPY_TRANSFORM:
-        if (THRIFT_HAVE_LIBSNAPPY <= 0 || dataSize < minCompressBytes) {
-          it = writeTrans.erase(it);
-          continue;
-        }
-        assert(folly::io::hasCodec(CodecType::SNAPPY));
-        buf = compressCodec(*buf, CodecType::SNAPPY);
-        break;
       case ZSTD_TRANSFORM:
         if (dataSize < minCompressBytes) {
           it = writeTrans.erase(it);
@@ -635,11 +609,6 @@ unique_ptr<IOBuf> THeader::transform(
         }
         buf = compressCodec(*buf, CodecType::ZSTD, 1);
         break;
-      case QLZ_TRANSFORM:
-        throw TTransportException(
-            TTransportException::CORRUPTED_DATA,
-            "QuickLZ is not supported anymore due to a"
-            " critical flaw in the library");
       default:
         throw TTransportException(
             TTransportException::CORRUPTED_DATA,
@@ -649,6 +618,24 @@ unique_ptr<IOBuf> THeader::transform(
   }
 
   return buf;
+}
+
+void THeader::setTransform(uint16_t transId) {
+  for (auto& trans : writeTrans_) {
+    if (trans == transId) {
+      return;
+    }
+  }
+  writeTrans_.push_back(transId);
+}
+
+void THeader::setReadTransform(uint16_t transId) {
+  for (auto& trans : readTrans_) {
+    if (trans == transId) {
+      return;
+    }
+  }
+  readTrans_.push_back(transId);
 }
 
 void THeader::copyMetadataFrom(const THeader& src) {
@@ -692,8 +679,7 @@ static void flushInfoHeaders(
     // Write key-value headers count
     pkt += writeVarint32(headerCount, pkt);
     // Write info headers
-    map<string, string>::const_iterator it;
-    for (it = headers.begin(); it != headers.end(); ++it) {
+    for (auto it = headers.begin(); it != headers.end(); ++it) {
       writeString(pkt, it->first); // key
       writeString(pkt, it->second); // value
     }
@@ -712,10 +698,7 @@ void THeader::setHeader(const std::string& key, std::string&& value) {
 }
 
 void THeader::setHeader(
-    const char* key,
-    size_t keyLength,
-    const char* value,
-    size_t valueLength) {
+    const char* key, size_t keyLength, const char* value, size_t valueLength) {
   writeHeaders_.emplace(std::make_pair(
       std::string(key, keyLength), std::string(value, valueLength)));
 }
@@ -758,6 +741,42 @@ size_t THeader::getMaxWriteHeadersSize(
 
 void THeader::clearHeaders() {
   writeHeaders_.clear();
+}
+
+bool THeader::isWriteHeadersEmpty() {
+  return writeHeaders_.empty();
+}
+
+THeader::StringToStringMap& THeader::mutableWriteHeaders() {
+  return writeHeaders_;
+}
+THeader::StringToStringMap THeader::releaseWriteHeaders() {
+  return std::move(writeHeaders_);
+}
+
+THeader::StringToStringMap THeader::extractAllWriteHeaders() {
+  auto headers = std::move(writeHeaders_);
+  if (extraWriteHeaders_ != nullptr) {
+    headers.insert(extraWriteHeaders_->begin(), extraWriteHeaders_->end());
+  }
+  return headers;
+}
+
+const THeader::StringToStringMap& THeader::getWriteHeaders() const {
+  return writeHeaders_;
+}
+
+void THeader::setReadHeader(const std::string& key, std::string&& value) {
+  readHeaders_[key] = std::move(value);
+}
+const THeader::StringToStringMap& THeader::getHeaders() const {
+  return readHeaders_;
+}
+
+THeader::StringToStringMap THeader::releaseHeaders() {
+  THeader::StringToStringMap headers;
+  readHeaders_.swap(headers);
+  return headers;
 }
 
 string THeader::getPeerIdentity() {
@@ -987,10 +1006,10 @@ std::chrono::milliseconds THeader::getClientQueueTimeout() const {
   }
 }
 
-folly::Optional<std::string> THeader::clientId() const {
+const folly::Optional<std::string>& THeader::clientId() const {
   return clientId_;
 }
-folly::Optional<std::string> THeader::serviceTraceMeta() const {
+const folly::Optional<std::string>& THeader::serviceTraceMeta() const {
   return serviceTraceMeta_;
 }
 

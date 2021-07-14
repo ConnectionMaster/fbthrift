@@ -14,6 +14,10 @@ std::unique_ptr<apache::thrift::AsyncProcessor> EmptyServiceSvIf::getProcessor()
   return std::make_unique<EmptyServiceAsyncProcessor>(this);
 }
 
+EmptyServiceSvIf::CreateMethodMetadataResult EmptyServiceSvIf::createMethodMetadata() {
+  return ::apache::thrift::detail::ap::createMethodMetadataMap<EmptyServiceAsyncProcessor>();
+}
+
 
 
 
@@ -29,20 +33,14 @@ void EmptyServiceAsyncProcessor::processSerializedCompressedRequest(apache::thri
   apache::thrift::detail::ap::process(this, std::move(req), std::move(serializedRequest), protType, context, eb, tm);
 }
 
-std::shared_ptr<folly::RequestContext> EmptyServiceAsyncProcessor::getBaseContextForRequest() {
-  return iface_->getBaseContextForRequest();
+void EmptyServiceAsyncProcessor::processSerializedCompressedRequestWithMetadata(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, const apache::thrift::AsyncProcessorFactory::MethodMetadata& methodMetadata, apache::thrift::protocol::PROTOCOL_TYPES protType, apache::thrift::Cpp2RequestContext* context, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  apache::thrift::detail::ap::process(this, std::move(req), std::move(serializedRequest), methodMetadata, protType, context, eb, tm);
 }
 
-const EmptyServiceAsyncProcessor::ProcessMap& EmptyServiceAsyncProcessor::getBinaryProtocolProcessMap() {
-  return binaryProcessMap_;
+const EmptyServiceAsyncProcessor::ProcessMap& EmptyServiceAsyncProcessor::getOwnProcessMap() {
+  return kOwnProcessMap_;
 }
 
-const EmptyServiceAsyncProcessor::ProcessMap EmptyServiceAsyncProcessor::binaryProcessMap_ {};
-
-const EmptyServiceAsyncProcessor::ProcessMap& EmptyServiceAsyncProcessor::getCompactProtocolProcessMap() {
-  return compactProcessMap_;
-}
-
-const EmptyServiceAsyncProcessor::ProcessMap EmptyServiceAsyncProcessor::compactProcessMap_ {};
+const EmptyServiceAsyncProcessor::ProcessMap EmptyServiceAsyncProcessor::kOwnProcessMap_ {};
 
 }}} // some::valid::ns

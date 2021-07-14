@@ -18,14 +18,34 @@ public class LegacyServiceReactiveBlockingWrapper
     this._delegate = _delegate;
   }
 
-  @java.lang.Override
-  public void close() {
-    _delegate.close();
+  public LegacyServiceReactiveBlockingWrapper(org.apache.thrift.ProtocolId _protocolId, reactor.core.publisher.Mono<? extends com.facebook.thrift.client.RpcClient> _rpcClient, Map<String, String> _headers, Map<String, String> _persistentHeaders) {
+    this(new LegacyServiceReactiveClient(_protocolId, _rpcClient, _headers, _persistentHeaders));
   }
 
   @java.lang.Override
-  public Map<String, List<Integer>> getPoints(final Set<String> key,final long legacyStuff) throws org.apache.thrift.TException {
+  public void close() {
+    _delegate.dispose();
+  }
+
+  @java.lang.Override
+  public Map<String, List<Integer>> getPoints( final Set<String> key, final long legacyStuff) throws org.apache.thrift.TException {
       return _delegate.getPoints(key, legacyStuff).block();
+  }
+
+  @java.lang.Override
+  public Map<String, List<Integer>> getPoints(
+        final Set<String> key,
+        final long legacyStuff,
+        com.facebook.thrift.client.RpcOptions rpcOptions) throws org.apache.thrift.TException {
+      return _delegate.getPoints(key, legacyStuff).block();
+  }
+
+  @java.lang.Override
+  public com.facebook.thrift.client.ResponseWrapper<Map<String, List<Integer>>> getPointsWrapper(
+    final Set<String> key,
+    final long legacyStuff,
+    com.facebook.thrift.client.RpcOptions rpcOptions) throws org.apache.thrift.TException {
+      return _delegate.getPointsWrapper(key, legacyStuff, rpcOptions).block();
   }
 
 }

@@ -278,7 +278,7 @@ void reset_field<::apache::thrift::fixtures::types::ForwardUsageRoot>(
       obj.ForwardUsageStruct_ref().copy_from(default_inst<::apache::thrift::fixtures::types::ForwardUsageRoot>().ForwardUsageStruct_ref());
       return;
     case 1:
-      obj.ForwardUsageByRef.reset();
+      obj.ForwardUsageByRef_ref().reset();
       return;
   }
 }
@@ -382,6 +382,32 @@ void reset_field<::apache::thrift::fixtures::types::AllocatorAware2>(
   switch (index) {
     case 0:
       obj.not_a_container_ref().copy_from(default_inst<::apache::thrift::fixtures::types::AllocatorAware2>().not_a_container_ref());
+      return;
+  }
+}
+
+template<>
+void reset_field<::apache::thrift::fixtures::types::TypedefStruct>(
+    ::apache::thrift::fixtures::types::TypedefStruct& obj, uint16_t index) {
+  switch (index) {
+    case 0:
+      obj.i32_field_ref().copy_from(default_inst<::apache::thrift::fixtures::types::TypedefStruct>().i32_field_ref());
+      return;
+    case 1:
+      obj.IntTypedef_field_ref().copy_from(default_inst<::apache::thrift::fixtures::types::TypedefStruct>().IntTypedef_field_ref());
+      return;
+    case 2:
+      obj.UintTypedef_field_ref().copy_from(default_inst<::apache::thrift::fixtures::types::TypedefStruct>().UintTypedef_field_ref());
+      return;
+  }
+}
+
+template<>
+void reset_field<::apache::thrift::fixtures::types::StructWithDoubleUnderscores>(
+    ::apache::thrift::fixtures::types::StructWithDoubleUnderscores& obj, uint16_t index) {
+  switch (index) {
+    case 0:
+      obj.__field_ref().copy_from(default_inst<::apache::thrift::fixtures::types::StructWithDoubleUnderscores>().__field_ref());
       return;
   }
 }
@@ -609,6 +635,26 @@ const std::unordered_map<std::string_view, std::string_view>& PyStructTraits<
 template<>
 const std::unordered_map<std::string_view, std::string_view>& PyStructTraits<
     ::apache::thrift::fixtures::types::AllocatorAware2>::namesmap() {
+  static const folly::Indestructible<NamesMap> map {
+    {
+    }
+  };
+  return *map;
+}
+
+template<>
+const std::unordered_map<std::string_view, std::string_view>& PyStructTraits<
+    ::apache::thrift::fixtures::types::TypedefStruct>::namesmap() {
+  static const folly::Indestructible<NamesMap> map {
+    {
+    }
+  };
+  return *map;
+}
+
+template<>
+const std::unordered_map<std::string_view, std::string_view>& PyStructTraits<
+    ::apache::thrift::fixtures::types::StructWithDoubleUnderscores>::namesmap() {
   static const folly::Indestructible<NamesMap> map {
     {
     }

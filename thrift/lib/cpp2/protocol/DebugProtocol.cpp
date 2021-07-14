@@ -32,8 +32,7 @@ namespace apache {
 namespace thrift {
 
 DebugProtocolWriter::DebugProtocolWriter(
-    ExternalBufferSharing /*sharing*/,
-    Options options)
+    ExternalBufferSharing /*sharing*/, Options options)
     : out_(nullptr, 0), options_(options) {}
 
 namespace {
@@ -152,8 +151,7 @@ void DebugProtocolWriter::endItem() {
 }
 
 void DebugProtocolWriter::setOutput(
-    folly::IOBufQueue* storage,
-    size_t maxGrowth) {
+    folly::IOBufQueue* storage, size_t maxGrowth) {
   // Allocate 16KB at a time; leave some room for the IOBuf overhead
   constexpr size_t kDesiredGrowth = (1 << 14) - 64;
   out_.reset(storage, std::min(kDesiredGrowth, maxGrowth));
@@ -164,21 +162,19 @@ void DebugProtocolWriter::setOutput(folly::io::QueueAppender&& output) {
 }
 
 uint32_t DebugProtocolWriter::writeMessageBegin(
-    const std::string& name,
-    MessageType messageType,
-    int32_t /*seqid*/) {
+    const std::string& name, MessageType messageType, int32_t /*seqid*/) {
   std::string mtype;
   switch (messageType) {
-    case T_CALL:
+    case MessageType::T_CALL:
       mtype = "call";
       break;
-    case T_REPLY:
+    case MessageType::T_REPLY:
       mtype = "reply";
       break;
-    case T_EXCEPTION:
+    case MessageType::T_EXCEPTION:
       mtype = "exn";
       break;
-    case T_ONEWAY:
+    case MessageType::T_ONEWAY:
       mtype = "oneway";
       break;
   }
@@ -209,9 +205,7 @@ uint32_t DebugProtocolWriter::writeStructEnd() {
 }
 
 uint32_t DebugProtocolWriter::writeFieldBegin(
-    const char* name,
-    TType fieldType,
-    int16_t fieldId) {
+    const char* name, TType fieldType, int16_t fieldId) {
   writeIndented("{:0d}: {} ({}) = ", fieldId, name, fieldTypeName(fieldType));
   return 0;
 }
@@ -224,9 +218,7 @@ uint32_t DebugProtocolWriter::writeFieldStop() {
 }
 
 uint32_t DebugProtocolWriter::writeMapBegin(
-    TType keyType,
-    TType valueType,
-    uint32_t size) {
+    TType keyType, TType valueType, uint32_t size) {
   startItem();
   writePlain(
       "map<{},{}>[{}] {{\n",
@@ -339,9 +331,7 @@ uint32_t DebugProtocolWriter::serializedMessageSize(
 }
 
 uint32_t DebugProtocolWriter::serializedFieldSize(
-    const char* /*name*/,
-    TType /*fieldName*/,
-    int16_t /*fieldId*/) {
+    const char* /*name*/, TType /*fieldName*/, int16_t /*fieldId*/) {
   return 0;
 }
 
@@ -350,9 +340,7 @@ uint32_t DebugProtocolWriter::serializedStructSize(const char* /*name*/) {
 }
 
 uint32_t DebugProtocolWriter::serializedSizeMapBegin(
-    TType /*keyType*/,
-    TType /*valType*/,
-    uint32_t /*size*/) {
+    TType /*keyType*/, TType /*valType*/, uint32_t /*size*/) {
   return 0;
 }
 
@@ -361,8 +349,7 @@ uint32_t DebugProtocolWriter::serializedSizeMapEnd() {
 }
 
 uint32_t DebugProtocolWriter::serializedSizeListBegin(
-    TType /*elemType*/,
-    uint32_t /*size*/) {
+    TType /*elemType*/, uint32_t /*size*/) {
   return 0;
 }
 
@@ -371,8 +358,7 @@ uint32_t DebugProtocolWriter::serializedSizeListEnd() {
 }
 
 uint32_t DebugProtocolWriter::serializedSizeSetBegin(
-    TType /*elemType*/,
-    uint32_t /*size*/) {
+    TType /*elemType*/, uint32_t /*size*/) {
   return 0;
 }
 

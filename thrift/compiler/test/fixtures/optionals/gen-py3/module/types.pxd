@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -39,7 +39,7 @@ from thrift.py3.common cimport (
 )
 from folly.optional cimport cOptional as __cOptional
 
-cimport module.types_fields as __fbthrift_types_fields
+cimport module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -69,11 +69,6 @@ cdef extern from "src/gen-cpp2/module_metadata.h" namespace "apache::thrift::det
         @staticmethod
         void gen(__fbthrift_cThriftMetadata &metadata)
 cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2":
-    cdef cppclass cColor__isset "::cpp2::Color::__isset":
-        bint red
-        bint green
-        bint blue
-        bint alpha
 
     cdef cppclass cColor "::cpp2::Color":
         cColor() except +
@@ -92,14 +87,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         double green
         double blue
         double alpha
-        cColor__isset __isset
 
-    cdef cppclass cVehicle__isset "::cpp2::Vehicle::__isset":
-        bint color
-        bint licensePlate
-        bint description
-        bint name
-        bint hasAC
 
     cdef cppclass cVehicle "::cpp2::Vehicle":
         cVehicle() except +
@@ -120,19 +108,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         string description
         string name
         cbool hasAC
-        cVehicle__isset __isset
 
-    cdef cppclass cPerson__isset "::cpp2::Person::__isset":
-        bint id
-        bint name
-        bint age
-        bint address
-        bint favoriteColor
-        bint friends
-        bint bestFriend
-        bint petNames
-        bint afraidOfAnimal
-        bint vehicles
 
     cdef cppclass cPerson "::cpp2::Person":
         cPerson() except +
@@ -163,14 +139,13 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         cmap[cAnimal,string] petNames
         cAnimal afraidOfAnimal
         vector[cVehicle] vehicles
-        cPerson__isset __isset
 
 
 
 
 cdef class Color(thrift.py3.types.Struct):
     cdef shared_ptr[cColor] _cpp_obj
-    cdef __fbthrift_types_fields.__Color_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Color_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cColor])
@@ -179,7 +154,7 @@ cdef class Color(thrift.py3.types.Struct):
 
 cdef class Vehicle(thrift.py3.types.Struct):
     cdef shared_ptr[cVehicle] _cpp_obj
-    cdef __fbthrift_types_fields.__Vehicle_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Vehicle_FieldsSetter _fields_setter
     cdef Color __fbthrift_cached_color
 
     @staticmethod
@@ -189,7 +164,7 @@ cdef class Vehicle(thrift.py3.types.Struct):
 
 cdef class Person(thrift.py3.types.Struct):
     cdef shared_ptr[cPerson] _cpp_obj
-    cdef __fbthrift_types_fields.__Person_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Person_FieldsSetter _fields_setter
     cdef Color __fbthrift_cached_favoriteColor
     cdef Set__i64 __fbthrift_cached_friends
     cdef Map__Animal_string __fbthrift_cached_petNames

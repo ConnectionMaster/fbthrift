@@ -45,8 +45,9 @@ enum CLIENT_TYPE {
   THRIFT_ROCKET_CLIENT_TYPE = 6,
   THRIFT_HTTP_GET_CLIENT_TYPE = 7,
   THRIFT_UNFRAMED_COMPACT_DEPRECATED = 8,
+  THRIFT_HTTP2_CLIENT_TYPE = 9,
   // This MUST always be last and have the largest value!
-  THRIFT_UNKNOWN_CLIENT_TYPE = 9,
+  THRIFT_UNKNOWN_CLIENT_TYPE = 10,
 };
 
 #define CLIENT_TYPES_LEN THRIFT_UNKNOWN_CLIENT_TYPE
@@ -146,38 +147,22 @@ class THeader {
 
   explicit THeader(int options = 0);
 
-  virtual void setClientType(CLIENT_TYPE ct) {
-    this->clientType_ = ct;
-  }
+  virtual void setClientType(CLIENT_TYPE ct) { this->clientType_ = ct; }
   // Force using specified client type when using legacy client types
   // i.e. sniffing out client type is disabled.
-  void forceClientType(bool enable) {
-    forceClientType_ = enable;
-  }
-  CLIENT_TYPE getClientType() const {
-    return clientType_;
-  }
+  void forceClientType(bool enable) { forceClientType_ = enable; }
+  CLIENT_TYPE getClientType() const { return clientType_; }
 
-  uint16_t getProtocolId() const {
-    return protoId_;
-  }
-  void setProtocolId(uint16_t protoId) {
-    this->protoId_ = protoId;
-  }
+  uint16_t getProtocolId() const { return protoId_; }
+  void setProtocolId(uint16_t protoId) { this->protoId_ = protoId; }
 
   int8_t getProtocolVersion() const;
-  void setProtocolVersion(uint8_t ver) {
-    this->protoVersion_ = ver;
-  }
+  void setProtocolVersion(uint8_t ver) { this->protoVersion_ = ver; }
 
   virtual void resetProtocol();
 
-  uint16_t getFlags() const {
-    return flags_;
-  }
-  void setFlags(uint16_t flags) {
-    flags_ = flags;
-  }
+  uint16_t getFlags() const { return flags_; }
+  void setFlags(uint16_t flags) { flags_ = flags; }
 
   // Info headers
   typedef std::map<std::string, std::string> StringToStringMap;
@@ -189,8 +174,7 @@ class THeader {
    * @return Just the data section in an IOBuf
    */
   std::unique_ptr<folly::IOBuf> readHeaderFormat(
-      std::unique_ptr<folly::IOBuf>,
-      StringToStringMap& persistentReadHeaders);
+      std::unique_ptr<folly::IOBuf>, StringToStringMap& persistentReadHeaders);
 
   /**
    * Untransform the data based on the received header flags
@@ -201,8 +185,7 @@ class THeader {
    * @return IOBuf output data section
    */
   static std::unique_ptr<folly::IOBuf> untransform(
-      std::unique_ptr<folly::IOBuf>,
-      std::vector<uint16_t>& readTrans);
+      std::unique_ptr<folly::IOBuf>, std::vector<uint16_t>& readTrans);
 
   /**
    * Transform the data based on our write transform flags
@@ -226,33 +209,13 @@ class THeader {
     return folly::to_narrow(transforms.size());
   }
 
-  void setTransform(uint16_t transId) {
-    for (auto& trans : writeTrans_) {
-      if (trans == transId) {
-        return;
-      }
-    }
-    writeTrans_.push_back(transId);
-  }
-
-  void setReadTransform(uint16_t transId) {
-    for (auto& trans : readTrans_) {
-      if (trans == transId) {
-        return;
-      }
-    }
-    readTrans_.push_back(transId);
-  }
-
+  void setTransform(uint16_t transId);
+  void setReadTransform(uint16_t transId);
   void setTransforms(const std::vector<uint16_t>& trans) {
     writeTrans_ = trans;
   }
-  const std::vector<uint16_t>& getTransforms() const {
-    return readTrans_;
-  }
-  std::vector<uint16_t>& getWriteTransforms() {
-    return writeTrans_;
-  }
+  const std::vector<uint16_t>& getTransforms() const { return readTrans_; }
+  std::vector<uint16_t>& getWriteTransforms() { return writeTrans_; }
 
   void setClientMetadata(const ClientMetadata& clientMetadata);
   std::optional<ClientMetadata> extractClientMetadata();
@@ -261,75 +224,40 @@ class THeader {
   void setHeader(const std::string& key, const std::string& value);
   void setHeader(const std::string& key, std::string&& value);
   void setHeader(
-      const char* key,
-      size_t keyLength,
-      const char* value,
-      size_t valueLength);
+      const char* key, size_t keyLength, const char* value, size_t valueLength);
   void setHeaders(StringToStringMap&&);
   void clearHeaders();
-  bool isWriteHeadersEmpty() {
-    return writeHeaders_.empty();
-  }
-
-  StringToStringMap& mutableWriteHeaders() {
-    return writeHeaders_;
-  }
-  StringToStringMap releaseWriteHeaders() {
-    return std::move(writeHeaders_);
-  }
-
-  StringToStringMap extractAllWriteHeaders() {
-    auto headers = std::move(writeHeaders_);
-    if (extraWriteHeaders_ != nullptr) {
-      headers.insert(extraWriteHeaders_->begin(), extraWriteHeaders_->end());
-    }
-    return headers;
-  }
-
-  const StringToStringMap& getWriteHeaders() const {
-    return writeHeaders_;
-  }
+  bool isWriteHeadersEmpty();
+  StringToStringMap& mutableWriteHeaders();
+  StringToStringMap releaseWriteHeaders();
+  StringToStringMap extractAllWriteHeaders();
+  const StringToStringMap& getWriteHeaders() const;
 
   // these work with read headers
   void setReadHeaders(StringToStringMap&&);
-  void setReadHeader(const std::string& key, std::string&& value) {
-    readHeaders_[key] = std::move(value);
-  }
+  void setReadHeader(const std::string& key, std::string&& value);
   void eraseReadHeader(const std::string& key);
-  const StringToStringMap& getHeaders() const {
-    return readHeaders_;
-  }
-
-  StringToStringMap releaseHeaders() {
-    StringToStringMap headers;
-    readHeaders_.swap(headers);
-    return headers;
-  }
+  const StringToStringMap& getHeaders() const;
+  StringToStringMap releaseHeaders();
 
   void setExtraWriteHeaders(StringToStringMap* extraWriteHeaders) {
     extraWriteHeaders_ = extraWriteHeaders;
   }
-  StringToStringMap* getExtraWriteHeaders() const {
-    return extraWriteHeaders_;
-  }
+  StringToStringMap* getExtraWriteHeaders() const { return extraWriteHeaders_; }
 
   std::string getPeerIdentity();
   void setIdentity(const std::string& identity);
 
   // accessors for seqId
-  uint32_t getSequenceNumber() const {
-    return seqId_;
-  }
-  void setSequenceNumber(uint32_t sid) {
-    this->seqId_ = sid;
-  }
+  uint32_t getSequenceNumber() const { return seqId_; }
+  void setSequenceNumber(uint32_t sid) { this->seqId_ = sid; }
 
   enum TRANSFORMS {
     NONE = 0x00,
     ZLIB_TRANSFORM = 0x01,
-    HMAC_TRANSFORM = 0x02, // Deprecated and no longer supported
-    SNAPPY_TRANSFORM = 0x03,
-    QLZ_TRANSFORM = 0x04, // Deprecated and no longer supported
+    // HMAC_TRANSFORM = 0x02, Deprecated and no longer supported
+    // SNAPPY_TRANSFORM = 0x03, Deprecated and no longer supported
+    // QLZ_TRANSFORM = 0x04, Deprecated and no longer supported
     ZSTD_TRANSFORM = 0x05,
 
     // DO NOT USE. Sentinel value for enum count. Always keep as last value.
@@ -381,21 +309,13 @@ class THeader {
     return compressionConfig_;
   }
 
-  void setCrc32c(folly::Optional<uint32_t> crc32c) {
-    crc32c_ = crc32c;
-  }
+  void setCrc32c(folly::Optional<uint32_t> crc32c) { crc32c_ = crc32c; }
 
-  folly::Optional<uint32_t> getCrc32c() const {
-    return crc32c_;
-  }
+  folly::Optional<uint32_t> getCrc32c() const { return crc32c_; }
 
-  void setServerLoad(folly::Optional<int64_t> load) {
-    serverLoad_ = load;
-  }
+  void setServerLoad(folly::Optional<int64_t> load) { serverLoad_ = load; }
 
-  folly::Optional<int64_t> getServerLoad() const {
-    return serverLoad_;
-  }
+  folly::Optional<int64_t> getServerLoad() const { return serverLoad_; }
 
   apache::thrift::concurrency::PRIORITY getCallPriority();
 
@@ -406,8 +326,8 @@ class THeader {
 
   std::chrono::milliseconds getClientQueueTimeout() const;
 
-  folly::Optional<std::string> clientId() const;
-  folly::Optional<std::string> serviceTraceMeta() const;
+  const folly::Optional<std::string>& clientId() const;
+  const folly::Optional<std::string>& serviceTraceMeta() const;
 
   void setHttpClientParser(
       std::shared_ptr<apache::thrift::util::THttpClientParser>);
@@ -423,6 +343,11 @@ class THeader {
       const TRANSFORMS transform);
 
   static CLIENT_TYPE tryGetClientType(const folly::IOBuf& data);
+
+  void setRoutingData(std::shared_ptr<void> data) {
+    routingData_ = std::move(data);
+  }
+  std::shared_ptr<void> releaseRoutingData() { return std::move(routingData_); }
 
   // 0 and 16th bits must be 0 to differentiate from framed & unframed
   static const uint32_t HEADER_MAGIC = 0x0FFF0000;
@@ -463,15 +388,12 @@ class THeader {
       class ProtocolClass,
       protocol::PROTOCOL_TYPES ProtocolID>
   std::unique_ptr<folly::IOBuf> removeUnframed(
-      folly::IOBufQueue* queue,
-      size_t& needed);
+      folly::IOBufQueue* queue, size_t& needed);
   std::unique_ptr<folly::IOBuf> removeHttpServer(folly::IOBufQueue* queue);
   std::unique_ptr<folly::IOBuf> removeHttpClient(
-      folly::IOBufQueue* queue,
-      size_t& needed);
+      folly::IOBufQueue* queue, size_t& needed);
   std::unique_ptr<folly::IOBuf> removeFramed(
-      uint32_t sz,
-      folly::IOBufQueue* queue);
+      uint32_t sz, folly::IOBufQueue* queue);
 
   // Http client parser
   std::shared_ptr<apache::thrift::util::THttpClientParser> httpClientParser_;
@@ -508,6 +430,8 @@ class THeader {
 
   bool allowBigFrames_;
   folly::Optional<CompressionConfig> compressionConfig_;
+
+  std::shared_ptr<void> routingData_;
 
   /**
    * Returns the maximum number of bytes that write k/v headers can take

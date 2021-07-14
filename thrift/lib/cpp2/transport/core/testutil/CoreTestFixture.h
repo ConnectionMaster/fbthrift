@@ -22,13 +22,13 @@
 #include <folly/io/IOBufQueue.h>
 #include <folly/io/async/EventBase.h>
 #include <folly/io/async/EventBaseLocal.h>
-#include <thrift/lib/cpp2/transport/core/ThriftProcessor.h>
+#include <thrift/lib/cpp2/server/ThriftProcessor.h>
+#include <thrift/lib/cpp2/server/ThriftServer.h>
 #include <thrift/lib/cpp2/transport/core/testutil/FakeChannel.h>
 #include <thrift/lib/cpp2/transport/core/testutil/FakeThreadManager.h>
-#include <thrift/lib/cpp2/transport/core/testutil/ServerConfigsMock.h>
 #include <thrift/lib/cpp2/transport/core/testutil/TestServiceMock.h>
-#include <thrift/lib/thrift/gen-cpp2/RpcMetadata_types.h>
 #include <thrift/lib/cpp2/transport/core/testutil/gen-cpp2/TestService.tcc>
+#include <thrift/lib/thrift/gen-cpp2/RpcMetadata_types.h>
 
 namespace apache {
 namespace thrift {
@@ -61,21 +61,23 @@ class CoreTestFixture : public testing::Test {
   static int32_t deserializeSumTwoNumbers(folly::IOBuf* buf);
 
   static RequestRpcMetadata makeMetadata(
-      std::string name,
-      int32_t seqId = 0,
-      RpcKind kind = RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE);
+      std::string name, RpcKind kind = RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE);
 
   // Deserialize the exception if possible, return false otherwise.
   static bool deserializeException(
-      folly::IOBuf* buf,
-      TApplicationException* tae);
+      folly::IOBuf* buf, TApplicationException* tae);
 
   std::unique_ptr<Cpp2ConnContext> newCpp2ConnContext();
 
  protected:
-  apache::thrift::server::ServerConfigsMock serverConfigs_;
-  testing::StrictMock<testutil::testservice::TestServiceMock> service_;
-  std::shared_ptr<FakeThreadManager> threadManager_;
+  // The thrift server is only used by ThriftProcessor. We don't actually spin
+  // up a server.
+  ThriftServer server_;
+  std::shared_ptr<testing::StrictMock<testutil::testservice::TestServiceMock>>
+      service_ = std::make_shared<
+          testing::StrictMock<testutil::testservice::TestServiceMock>>();
+  std::shared_ptr<FakeThreadManager> threadManager_ =
+      std::make_shared<FakeThreadManager>();
   ThriftProcessor processor_;
   folly::EventBase eventBase_;
   std::shared_ptr<FakeChannel> channel_;

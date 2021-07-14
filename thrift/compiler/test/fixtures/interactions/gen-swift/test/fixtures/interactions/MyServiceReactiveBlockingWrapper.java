@@ -18,9 +18,13 @@ public class MyServiceReactiveBlockingWrapper
     this._delegate = _delegate;
   }
 
+  public MyServiceReactiveBlockingWrapper(org.apache.thrift.ProtocolId _protocolId, reactor.core.publisher.Mono<? extends com.facebook.thrift.client.RpcClient> _rpcClient, Map<String, String> _headers, Map<String, String> _persistentHeaders) {
+    this(new MyServiceReactiveClient(_protocolId, _rpcClient, _headers, _persistentHeaders));
+  }
+
   @java.lang.Override
   public void close() {
-    _delegate.close();
+    _delegate.dispose();
   }
 
   @java.lang.Override
@@ -28,4 +32,27 @@ public class MyServiceReactiveBlockingWrapper
       _delegate.foo().block();
   }
 
+  @java.lang.Override
+  public void foo(
+        com.facebook.thrift.client.RpcOptions rpcOptions) throws org.apache.thrift.TException {
+      _delegate.foo().block();
+  }
+
+  @java.lang.Override
+  public com.facebook.thrift.client.ResponseWrapper<Void> fooWrapper(
+    com.facebook.thrift.client.RpcOptions rpcOptions) throws org.apache.thrift.TException {
+      return _delegate.fooWrapper(rpcOptions).block();
+  }
+
+  public MyInteraction createMyInteraction() {
+      throw new UnsupportedOperationException("Interactions are not yet supported on ReactiveBlockingWrapper Interfaces!");
+  }
+
+  public MyInteractionFast createMyInteractionFast() {
+      throw new UnsupportedOperationException("Interactions are not yet supported on ReactiveBlockingWrapper Interfaces!");
+  }
+
+  public SerialInteraction createSerialInteraction() {
+      throw new UnsupportedOperationException("Interactions are not yet supported on ReactiveBlockingWrapper Interfaces!");
+  }
 }

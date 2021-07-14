@@ -124,7 +124,7 @@ trait MyServiceClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -133,7 +133,7 @@ trait MyServiceClientBase {
         $result = MyService_foo_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("foo failed: sequence id is out of order");
         }
       }
@@ -383,7 +383,7 @@ class MyService_MyInteraction extends \ThriftClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -392,7 +392,7 @@ class MyService_MyInteraction extends \ThriftClientBase {
         $result = MyService_MyInteraction_frobnicate_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("frobnicate failed: sequence id is out of order");
         }
       }
@@ -583,7 +583,7 @@ class MyService_MyInteractionFast extends \ThriftClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -592,7 +592,7 @@ class MyService_MyInteractionFast extends \ThriftClientBase {
         $result = MyService_MyInteractionFast_frobnicate_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("frobnicate failed: sequence id is out of order");
         }
       }
@@ -783,7 +783,7 @@ class MyService_SerialInteraction extends \ThriftClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -792,7 +792,7 @@ class MyService_SerialInteraction extends \ThriftClientBase {
         $result = MyService_SerialInteraction_frobnicate_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("frobnicate failed: sequence id is out of order");
         }
       }
@@ -845,11 +845,20 @@ class MyService_foo_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_foo_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.foo_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -884,11 +893,20 @@ class MyService_foo_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_foo_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.MyService_foo_result",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -923,11 +941,20 @@ class MyService_MyInteraction_frobnicate_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_MyInteraction_frobnicate_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.frobnicate_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -970,11 +997,33 @@ class MyService_MyInteraction_frobnicate_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_MyInteraction_frobnicate_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.MyService_MyInteraction_frobnicate_result",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 0,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I32_TYPE,
+                )
+              ),
+              "name" => "success",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1009,11 +1058,20 @@ class MyService_MyInteraction_ping_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_MyInteraction_ping_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.ping_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1048,11 +1106,20 @@ class MyService_MyInteractionFast_frobnicate_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_MyInteractionFast_frobnicate_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.frobnicate_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1095,11 +1162,33 @@ class MyService_MyInteractionFast_frobnicate_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_MyInteractionFast_frobnicate_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.MyService_MyInteractionFast_frobnicate_result",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 0,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I32_TYPE,
+                )
+              ),
+              "name" => "success",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1134,11 +1223,20 @@ class MyService_MyInteractionFast_ping_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_MyInteractionFast_ping_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.ping_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1173,11 +1271,20 @@ class MyService_SerialInteraction_frobnicate_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_SerialInteraction_frobnicate_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.frobnicate_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1212,11 +1319,20 @@ class MyService_SerialInteraction_frobnicate_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'MyService_SerialInteraction_frobnicate_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.MyService_SerialInteraction_frobnicate_result",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1227,10 +1343,10 @@ class MyService_SerialInteraction_frobnicate_result implements \IThriftStruct {
 }
 
 class MyServiceStaticMetadata implements \IThriftServiceStaticMetadata {
-  public static function getServiceMetadata(): \tmeta_ThriftService {
+  public static function getServiceMetadata()[]: \tmeta_ThriftService {
     return tmeta_ThriftService::fromShape(
       shape(
-        "name" => "MyService",
+        "name" => "module.MyService",
         "functions" => vec[
           tmeta_ThriftFunction::fromShape(
             shape(
@@ -1246,7 +1362,37 @@ class MyServiceStaticMetadata implements \IThriftServiceStaticMetadata {
       )
     );
   }
-  public static function getAllStructuredAnnotations(): \TServiceAnnotations {
+
+  public static function getServiceMetadataResponse()[]: \tmeta_ThriftServiceMetadataResponse {
+    return \tmeta_ThriftServiceMetadataResponse::fromShape(
+      shape(
+        'context' => \tmeta_ThriftServiceContext::fromShape(
+          shape(
+            'service_info' => self::getServiceMetadata(),
+            'module' => \tmeta_ThriftModuleContext::fromShape(
+              shape(
+                'name' => 'module',
+              )
+            ),
+          )
+        ),
+        'metadata' => \tmeta_ThriftMetadata::fromShape(
+          shape(
+            'enums' => dict[
+            ],
+            'structs' => dict[
+            ],
+            'exceptions' => dict[
+            ],
+            'services' => dict[
+            ],
+          )
+        ),
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TServiceAnnotations {
     return shape(
       'service' => dict[],
       'functions' => dict[

@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
+#include <algorithm>
+#include <atomic>
+#include <optional>
+#include <thread>
+
 #include <folly/ThreadLocal.h>
+#include <folly/experimental/coro/BlockingWait.h>
 #include <folly/io/async/AsyncSocket.h>
 #include <folly/io/async/EventBase.h>
 #include <folly/io/async/Request.h>
@@ -37,9 +43,6 @@
 #include <thrift/lib/cpp2/transport/core/RequestStateMachine.h>
 #include <thrift/lib/cpp2/transport/rocket/server/RocketRoutingHandler.h>
 #include <thrift/lib/cpp2/util/ScopedServerInterfaceThread.h>
-#include <algorithm>
-#include <atomic>
-#include <thread>
 
 using namespace apache::thrift;
 using namespace apache::thrift::concurrency;
@@ -56,12 +59,8 @@ class InstrumentationRequestPayload : public folly::RequestData {
   }
   explicit InstrumentationRequestPayload(std::unique_ptr<folly::IOBuf> buf)
       : buf_(std::move(buf)) {}
-  bool hasCallback() override {
-    return false;
-  }
-  const folly::IOBuf* getPayload() {
-    return buf_.get();
-  }
+  bool hasCallback() override { return false; }
+  const folly::IOBuf* getPayload() { return buf_.get(); }
 
  private:
   std::unique_ptr<folly::IOBuf> buf_;
@@ -77,9 +76,10 @@ class InstrumentationTestProcessor
    * Intercepts and clones incoming payload buffers, then passes them down to
    * method handlers.
    */
-  void processSerializedCompressedRequest(
+  void processSerializedCompressedRequestWithMetadata(
       ResponseChannelRequest::UniquePtr req,
       apache::thrift::SerializedCompressedRequest&& serializedRequest,
+      const MethodMetadata& methodMetadata,
       apache::thrift::protocol::PROTOCOL_TYPES protType,
       apache::thrift::Cpp2RequestContext* context,
       folly::EventBase* eb,
@@ -89,9 +89,10 @@ class InstrumentationTestProcessor
         std::make_unique<InstrumentationRequestPayload>(
             serializedRequest.clone().uncompress().buffer));
     InstrumentationTestServiceAsyncProcessor::
-        processSerializedCompressedRequest(
+        processSerializedCompressedRequestWithMetadata(
             std::move(req),
             std::move(serializedRequest),
+            methodMetadata,
             protType,
             context,
             eb,
@@ -165,8 +166,8 @@ class TestInterface : public InstrumentationTestServiceSvIf {
     }
   }
 
-  folly::coro::Task<void> co_wait(int value, bool busyWait, bool shallowRC)
-      override {
+  folly::coro::Task<void> co_wait(
+      int value, bool busyWait, bool shallowRC) override {
     std::unique_ptr<folly::ShallowCopyRequestContextScopeGuard> g;
     if (shallowRC) {
       g = std::make_unique<folly::ShallowCopyRequestContextScopeGuard>();
@@ -179,6 +180,8 @@ class TestInterface : public InstrumentationTestServiceSvIf {
     }
     co_await finished_;
   }
+
+  folly::coro::Task<void> co_noop() override { co_return; }
 
   std::unique_ptr<apache::thrift::AsyncProcessor> getProcessor() override {
     return std::make_unique<InstrumentationTestProcessor>(this);
@@ -206,20 +209,19 @@ class DebuggingFrameHandler : public rocket::SetupFrameHandler {
         reqRegistry_([] { return new RequestsRegistry(0, 0, 0); }) {
     auto tf =
         std::make_shared<PosixThreadFactory>(PosixThreadFactory::ATTACHED);
-    tm_ = std::make_shared<SimpleThreadManager>(1, false);
+    tm_ = std::make_shared<SimpleThreadManager>(1);
     tm_->setNamePrefix("DebugInterface");
     tm_->threadFactory(move(tf));
     tm_->start();
   }
-  folly::Optional<rocket::ProcessorInfo> tryHandle(
+  std::optional<rocket::ProcessorInfo> tryHandle(
       const RequestSetupMetadata& meta) override {
     if (meta.interfaceKind_ref().has_value() &&
         meta.interfaceKind_ref().value() == InterfaceKind::DEBUGGING) {
-      auto info = rocket::ProcessorInfo{
-          debug_.getProcessor(), tm_, origServer_, reqRegistry_.get()};
-      return folly::Optional<rocket::ProcessorInfo>(std::move(info));
+      return rocket::ProcessorInfo{
+          debug_, tm_, origServer_, reqRegistry_.get()};
     }
-    return folly::Optional<rocket::ProcessorInfo>();
+    return std::nullopt;
   }
 
  private:
@@ -230,8 +232,7 @@ class DebuggingFrameHandler : public rocket::SetupFrameHandler {
 };
 
 namespace {
-static uint32_t getCurrentServerTickCallCount = 0;
-static uint64_t currentTick = 0;
+static std::atomic<uint64_t> currentTick = 0;
 
 THRIFT_PLUGGABLE_FUNC_SET(
     std::unique_ptr<apache::thrift::rocket::SetupFrameHandler>,
@@ -241,42 +242,41 @@ THRIFT_PLUGGABLE_FUNC_SET(
 }
 
 THRIFT_PLUGGABLE_FUNC_SET(uint64_t, getCurrentServerTick) {
-  ++getCurrentServerTickCallCount;
   return currentTick;
 }
+
+std::set<std::string> excludeFromRecentRequestsCount;
+THRIFT_PLUGGABLE_FUNC_SET(
+    bool, includeInRecentRequestsCount, const std::string_view methodName) {
+  return !excludeFromRecentRequestsCount.count(std::string{methodName});
+}
+
 } // namespace
 
 class RequestInstrumentationTest : public testing::Test {
  protected:
   RequestInstrumentationTest() {}
 
-  void SetUp() override {
-    impl_ = std::make_unique<Impl>();
-  }
+  void SetUp() override { impl_ = std::make_unique<Impl>(); }
 
-  std::shared_ptr<TestInterface> handler() {
-    return impl_->handler_;
-  }
+  std::shared_ptr<TestInterface> handler() { return impl_->handler_; }
   apache::thrift::ScopedServerInterfaceThread& server() {
     return impl_->server_;
   }
-  ThriftServer* thriftServer() {
-    return impl_->thriftServer_;
-  }
+  ThriftServer* thriftServer() { return impl_->thriftServer_; }
 
   ThriftServer::ServerSnapshot getServerSnapshot() {
     return thriftServer()->getServerSnapshot().get();
   }
 
-  std::vector<ThriftServer::RequestSnapshot> getRequestSnapshots(
-      size_t reqNum) {
-    SCOPE_EXIT {
-      handler()->stopRequests();
-    };
+  ThriftServer::ServerSnapshot waitForRequestsThenSnapshot(size_t reqNum) {
+    SCOPE_EXIT { handler()->stopRequests(); };
     handler()->waitForRequests(reqNum);
+    return getServerSnapshot();
+  }
 
-    auto serverReqSnapshots = std::move(getServerSnapshot().second);
-
+  ThriftServer::RequestSnapshots getRequestSnapshots(size_t reqNum) {
+    auto serverReqSnapshots = waitForRequestsThenSnapshot(reqNum).requests;
     EXPECT_EQ(serverReqSnapshots.size(), reqNum);
     return serverReqSnapshots;
   }
@@ -311,6 +311,27 @@ class RequestInstrumentationTest : public testing::Test {
           return apache::thrift::RocketClientChannel::newChannelWithMetadata(
               std::move(socket), std::move(meta));
         });
+  }
+
+  template <typename ClientChannelT>
+  auto makeSingleSocketClient(folly::EventBase* eventBase) {
+    struct ViaEventBaseDeleter {
+      folly::Executor::KeepAlive<folly::EventBase> ka_;
+
+      void operator()(InstrumentationTestServiceAsyncClient* client) const {
+        ka_->add([client] { delete client; });
+      }
+    };
+    ClientChannel::Ptr channel;
+    eventBase->runInEventBaseThreadAndWait([&] {
+      auto socket =
+          folly::AsyncSocket::newSocket(eventBase, server().getAddress());
+      channel = ClientChannelT::newChannel(std::move(socket));
+    });
+    return std::
+        unique_ptr<InstrumentationTestServiceAsyncClient, ViaEventBaseDeleter>{
+            new InstrumentationTestServiceAsyncClient(std::move(channel)),
+            {folly::Executor::getKeepAliveToken(eventBase)}};
   }
 
   auto rpcOptionsFromHeaders(
@@ -483,6 +504,68 @@ TEST_F(RequestInstrumentationTest, simpleHeaderRequestTest) {
   }
 }
 
+TEST_F(RequestInstrumentationTest, ConnectionSnapshotsTest) {
+  auto getLocalAddressOf = [&](auto& client) {
+    auto& clientChannel = dynamic_cast<ClientChannel&>(*client.getChannel());
+    auto transport = clientChannel.getTransport();
+    EXPECT_NE(transport, nullptr);
+    return transport->getLocalAddress();
+  };
+
+  {
+    folly::ScopedEventBaseThread eventBaseThread;
+    auto evb = eventBaseThread.getEventBase();
+    auto client1 = makeSingleSocketClient<RocketClientChannel>(evb);
+    auto client2 = makeSingleSocketClient<RocketClientChannel>(evb);
+    auto client3 = makeSingleSocketClient<RocketClientChannel>(evb);
+    auto headerClient = makeSingleSocketClient<HeaderClientChannel>(evb);
+
+    for (size_t i = 0; i < 10; ++i) {
+      client1->semifuture_sendRequest();
+    }
+    for (size_t i = 0; i < 20; ++i) {
+      client2->semifuture_sendRequest();
+    }
+    client3->semifuture_sendStreamingRequest();
+    // Header connections are not counted towards connection snapshots
+    headerClient->semifuture_sendRequest();
+
+    auto serverSnapshot = waitForRequestsThenSnapshot(32);
+    EXPECT_EQ(serverSnapshot.requests.size(), 32);
+    auto& connections = serverSnapshot.connections;
+    EXPECT_EQ(connections.size(), 3);
+
+    auto client1Snapshot = connections.find(getLocalAddressOf(*client1));
+    ASSERT_NE(client1Snapshot, connections.end());
+    EXPECT_EQ(client1Snapshot->second.numActiveRequests, 10);
+
+    auto client2Snapshot = connections.find(getLocalAddressOf(*client2));
+    ASSERT_NE(client2Snapshot, connections.end());
+    EXPECT_EQ(client2Snapshot->second.numActiveRequests, 20);
+
+    auto client3Snapshot = connections.find(getLocalAddressOf(*client3));
+    ASSERT_NE(client3Snapshot, connections.end());
+    EXPECT_EQ(client3Snapshot->second.numActiveRequests, 1);
+
+    handler()->stopRequests();
+    // Wait for requests to be marked as completed
+    while (thriftServer()->getActiveRequests() > 0) {
+      std::this_thread::yield();
+    }
+  }
+
+  // Client-side connections are closed. The server-side sockets may not be
+  // closed yet! Let's give it some leeway.
+  auto deadline = std::chrono::steady_clock::now() + 1s;
+  while (deadline > std::chrono::steady_clock::now()) {
+    if (getServerSnapshot().connections.empty()) {
+      break;
+    }
+    std::this_thread::yield();
+  }
+  EXPECT_TRUE(getServerSnapshot().connections.empty());
+}
+
 class RequestInstrumentationTestP
     : public RequestInstrumentationTest,
       public ::testing::WithParamInterface<std::tuple<int, int, bool>> {
@@ -573,7 +656,6 @@ TEST_F(
 
 TEST_F(RequestInstrumentationTest, snapshotRecentRequestCountsTest) {
   currentTick = 0;
-  getCurrentServerTickCallCount = 0;
   folly::Baton baton;
   handler()->setCallback([&](TestInterface*) { baton.post(); });
 
@@ -590,9 +672,50 @@ TEST_F(RequestInstrumentationTest, snapshotRecentRequestCountsTest) {
   baton.wait();
 
   auto snapshot = getServerSnapshot();
-  EXPECT_EQ(snapshot.first[0], 1);
-  EXPECT_EQ(snapshot.first[100], 1);
+  // arrived requests
+  EXPECT_EQ(snapshot.recentCounters[0].first, 1);
+  EXPECT_EQ(snapshot.recentCounters[100].first, 1);
 }
+
+class RecentRequestsTest : public RequestInstrumentationTest,
+                           public ::testing::WithParamInterface<bool> {
+ protected:
+  bool rocket;
+  void SetUp() override {
+    rocket = GetParam();
+    RequestInstrumentationTest::SetUp();
+  }
+};
+
+TEST_P(RecentRequestsTest, Exclude) {
+  auto client = rocket ? makeRocketClient() : makeHeaderClient();
+  auto debugClient = makeDebugClient();
+
+  auto g = folly::makeGuard([] { excludeFromRecentRequestsCount.clear(); });
+  excludeFromRecentRequestsCount.insert("runCallback");
+
+  client->sync_runCallback();
+  client->sync_runCallback2();
+  auto f = client->semifuture_sendRequest();
+  handler()->waitForRequests(1);
+  auto snapshot = getServerSnapshot();
+  // there were 3 requests that arrived but one should be excluded
+  int expectedArrived = 2;
+  EXPECT_EQ(snapshot.recentCounters.at(0).first, expectedArrived);
+  // there is one active request
+  EXPECT_EQ(snapshot.recentCounters.at(0).second, 1);
+
+  handler()->stopRequests();
+  f.wait();
+
+  snapshot = getServerSnapshot();
+  EXPECT_EQ(snapshot.recentCounters.at(0).first, expectedArrived);
+  // there are no active requests
+  EXPECT_EQ(snapshot.recentCounters.at(0).second, 0);
+}
+
+INSTANTIATE_TEST_CASE_P(
+    RecentRequestsTest, RecentRequestsTest, testing::Values(true, false));
 
 class RequestInstrumentationTestWithFinishedDebugPayload
     : public RequestInstrumentationTest {
@@ -633,7 +756,7 @@ TEST_F(
   }
 
   // record and sort snapshots
-  auto reqSnapshots = getServerSnapshot().second;
+  auto reqSnapshots = getServerSnapshot().requests;
   baton3.post();
   std::vector<int> idxs;
   idxs.resize(reqSnapshots.size());
@@ -664,8 +787,14 @@ class ServerInstrumentationTest : public testing::Test {};
 TEST_F(ServerInstrumentationTest, simpleServerTest) {
   ThriftServer serverNotServing;
   ScopedServerInterfaceThread server0(std::make_shared<TestInterface>());
+  // We need to make sure server is really serving, the simplest way is
+  // to wait for the first request to be completed.
+  folly::coro::blockingWait(
+      server0.newClient<InstrumentationTestServiceAsyncClient>()->co_noop());
   {
     ScopedServerInterfaceThread server1(std::make_shared<TestInterface>());
+    folly::coro::blockingWait(
+        server1.newClient<InstrumentationTestServiceAsyncClient>()->co_noop());
     EXPECT_EQ(
         instrumentation::getServerCount(
             instrumentation::kThriftServerTrackerKey),
@@ -691,7 +820,7 @@ TEST_P(RequestInstrumentationTestP, FinishedRequests) {
     size_t expected = std::min(reqNum, finishedRequestsLimit);
     int i = 0;
     while (i < 5 &&
-           thriftServer()->getServerSnapshot().get().second.size() !=
+           thriftServer()->getServerSnapshot().get().requests.size() !=
                expected) {
       sleep(1);
       i++;
@@ -700,7 +829,7 @@ TEST_P(RequestInstrumentationTestP, FinishedRequests) {
   }
 
   auto serverSnapshot = thriftServer()->getServerSnapshot().get();
-  auto serverReqSnapshots = serverSnapshot.second;
+  auto serverReqSnapshots = serverSnapshot.requests;
   EXPECT_EQ(serverReqSnapshots.size(), std::min(reqNum, finishedRequestsLimit));
   for (auto& req : serverReqSnapshots) {
     EXPECT_EQ(req.getMethodName(), "sendRequest");
@@ -741,7 +870,7 @@ class RegistryTests : public testing::TestWithParam<std::tuple<size_t, bool>> {
     MockRequest(
         RequestsRegistry::DebugStub& stub,
         std::shared_ptr<RequestsRegistry> registry)
-        : registry_(registry) {
+        : registry_(registry), stateMachine_(true, controller_) {
       new (&stub) RequestsRegistry::DebugStub(
           *registry,
           *this,
@@ -752,23 +881,34 @@ class RegistryTests : public testing::TestWithParam<std::tuple<size_t, bool>> {
           stateMachine_);
     }
 
-    auto registry() {
-      return registry_;
-    }
+    auto registry() { return registry_; }
 
-    MOCK_CONST_METHOD0(isActive, bool());
-    MOCK_METHOD0(cancel, void());
-    MOCK_CONST_METHOD0(isOneway, bool());
-    MOCK_METHOD0(tryStartProcessing, bool());
-    MOCK_METHOD3(
+    MOCK_METHOD(bool, isActive, (), (const, override));
+    MOCK_METHOD(bool, isOneway, (), (const, override));
+    MOCK_METHOD(bool, includeEnvelope, (), (const, override));
+    MOCK_METHOD(bool, tryStartProcessing, (), (override));
+    MOCK_METHOD(
+        void,
         sendReply,
-        void(
-            std::unique_ptr<folly::IOBuf>&&,
-            MessageChannel::SendCallback*,
-            folly::Optional<uint32_t>));
-    MOCK_METHOD2(sendErrorWrapped, void(folly::exception_wrapper, std::string));
+        (ResponsePayload&&,
+         MessageChannel::SendCallback*,
+         folly::Optional<uint32_t>),
+        (override));
+    MOCK_METHOD(
+        void,
+        sendException,
+        (ResponsePayload&&, MessageChannel::SendCallback*),
+        (override));
+    MOCK_METHOD(
+        void,
+        sendErrorWrapped,
+        (folly::exception_wrapper, std::string),
+        (override));
 
    private:
+    folly::observer::SimpleObservable<AdaptiveConcurrencyController::Config>
+        oConfig{AdaptiveConcurrencyController::Config{}};
+    AdaptiveConcurrencyController controller_{oConfig.getObserver()};
     RequestStateMachine stateMachine_;
   };
 };
@@ -802,8 +942,7 @@ INSTANTIATE_TEST_CASE_P(
     RegistryTestsSequence,
     RegistryTests,
     testing::Combine(
-        testing::Values(0, 1, 2, 10),
-        testing::Values(true, false)));
+        testing::Values(0, 1, 2, 10), testing::Values(true, false)));
 
 TEST(RegistryTests, RootId) {
   RequestsRegistry registry(0, 0, 0);
@@ -870,9 +1009,7 @@ TEST_P(MaxRequestsTest, Bypass) {
 }
 
 INSTANTIATE_TEST_CASE_P(
-    MaxRequestsTestsSequence,
-    MaxRequestsTest,
-    testing::Values(true, false));
+    MaxRequestsTestsSequence, MaxRequestsTest, testing::Values(true, false));
 
 class TimestampsTest
     : public RequestInstrumentationTest,
@@ -880,8 +1017,8 @@ class TimestampsTest
  protected:
   bool rocket;
   bool forceTimestamps;
-  server::TServerObserver::CallTimestamps timestamps;
-  folly::Baton<> baton;
+  std::optional<server::TServerObserver::CallTimestamps> timestamps;
+  std::optional<folly::Baton<>> timestampObserverComplete;
   struct Observer : public server::TServerObserver {
     explicit Observer(folly::Function<void(const CallTimestamps&)>&& f)
         : server::TServerObserver(1), f_(std::move(f)) {}
@@ -896,7 +1033,9 @@ class TimestampsTest
       if (forceTimestamps) {
         ts.setObserver(std::make_shared<Observer>([&](auto& t) {
           timestamps = t;
-          baton.post();
+          if (timestampObserverComplete) {
+            timestampObserverComplete->post();
+          }
         }));
       }
     });
@@ -925,6 +1064,7 @@ void validateTimestamps(
 } // namespace
 
 TEST_P(TimestampsTest, Basic) {
+  timestampObserverComplete.emplace();
   auto client = rocket ? makeRocketClient() : makeHeaderClient();
   auto now = std::chrono::steady_clock::now();
   handler()->setCallback([&](TestInterface* ti) {
@@ -934,16 +1074,47 @@ TEST_P(TimestampsTest, Basic) {
   });
   client->sync_runCallback();
   if (forceTimestamps) {
-    baton.try_wait_for(1s);
-    EXPECT_GT(timestamps.processEnd, now);
-    EXPECT_GT(timestamps.writeBegin, timestamps.processEnd);
-    EXPECT_GT(timestamps.writeEnd, timestamps.writeBegin);
+    timestampObserverComplete->try_wait_for(1s);
+    EXPECT_GT(timestamps->processEnd, now);
+    EXPECT_GT(timestamps->writeBegin, timestamps->processEnd);
+    EXPECT_GT(timestamps->writeEnd, timestamps->writeBegin);
   }
+}
+
+TEST_P(TimestampsTest, QueueTimeout) {
+  if (!forceTimestamps) {
+    return;
+  }
+  auto client = rocket ? makeRocketClient() : makeHeaderClient();
+
+  // force queue timeout by blocking CPU worker
+  folly::Baton<> receivedBlockingCall;
+  folly::Baton<> done;
+  handler()->setCallback([&](TestInterface*) {
+    receivedBlockingCall.post();
+    done.wait();
+  });
+  auto blockingCall = client->semifuture_runCallback();
+  receivedBlockingCall.wait();
+  auto guard = folly::makeGuard([&] {
+    done.post();
+    std::move(blockingCall).get();
+  });
+
+  try {
+    RpcOptions rpcOptions;
+    rpcOptions.setQueueTimeout(std::chrono::milliseconds(1));
+    client->sync_runCallback(rpcOptions);
+    FAIL() << "Expected exception to be thrown";
+  } catch (const TApplicationException& ex) {
+    ASSERT_EQ(ex.getType(), TApplicationException::TIMEOUT);
+  }
+  // callCompleted should not be called for requests which timed out the queue.
+  EXPECT_FALSE(timestamps.has_value());
 }
 
 INSTANTIATE_TEST_CASE_P(
     TimestampsTestSequence,
     TimestampsTest,
     testing::Combine(
-        testing::Values(true, false),
-        testing::Values(true, false)));
+        testing::Values(true, false), testing::Values(true, false)));

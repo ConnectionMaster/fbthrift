@@ -7,6 +7,7 @@
 
 package test.fixtures.exceptions;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class RaiserAsyncReactiveWrapper 
@@ -19,28 +20,28 @@ public class RaiserAsyncReactiveWrapper
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<Void> doBland() {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.doBland());
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.doBland());
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<Void> doRaise() {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.doRaise());
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.doRaise());
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<String> get200() {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.get200());
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.get200());
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<String> get500() {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.get500());
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.get500());
     }
 
 }

@@ -34,19 +34,11 @@ using PreprocessResult =
     folly::Optional<boost::variant<AppClientException, AppServerException>>;
 
 class Cpp2ConnContext;
+class AdaptiveConcurrencyController;
 
 namespace server {
 
-struct PreprocessParams {
-  PreprocessParams(
-      const transport::THeader::StringToStringMap& headersIn,
-      const std::string& methodIn,
-      const Cpp2ConnContext& connContextIn)
-      : headers(headersIn), method(methodIn), connContext(connContextIn) {}
-  const transport::THeader::StringToStringMap& headers;
-  const std::string& method;
-  const Cpp2ConnContext& connContext;
-};
+struct PreprocessParams;
 
 /**
  * This class provides a set of abstract functions that the ThriftProcessor can
@@ -75,6 +67,11 @@ class ServerConfigs {
   // @see BaseThriftServer::getObserver function.
   virtual server::TServerObserver* getObserver() const = 0;
 
+  // @see BaseThriftServer::getAdaptiveConcurrencyController function.
+  virtual AdaptiveConcurrencyController& getAdaptiveConcurrencyController() = 0;
+  virtual const AdaptiveConcurrencyController&
+  getAdaptiveConcurrencyController() const = 0;
+
   // @see BaseThriftServer::getNumIOWorkerThreads function.
   virtual size_t getNumIOWorkerThreads() const = 0;
 
@@ -83,8 +80,7 @@ class ServerConfigs {
 
   // @see BaseThriftServer::getLoad function.
   virtual int64_t getLoad(
-      const std::string& counter = "",
-      bool check_custom = true) const = 0;
+      const std::string& counter = "", bool check_custom = true) const = 0;
 
   // @see ThriftServer::checkOverload function.
   virtual folly::Optional<std::string> checkOverload(
@@ -96,6 +92,9 @@ class ServerConfigs {
 
   // @see ThriftServer::getTosReflect function.
   virtual bool getTosReflect() const = 0;
+
+  // @see ThriftServer::getListenerTos function.
+  virtual uint32_t getListenerTos() const = 0;
 
   /**
    * Disables tracking of number of active requests in the server.
@@ -134,9 +133,35 @@ class ServerConfigs {
     }
   }
 
+  virtual bool getStarted() const { return true; }
+
+  bool getEnabled() const { return enabled_.load(); }
+
+  void setEnabled(bool enabled) { enabled_ = enabled; }
+
+  const std::unordered_set<std::string>& getInternalMethods() const {
+    return internalMethods_;
+  }
+
+  void setInternalMethods(std::unordered_set<std::string> internalMethods) {
+    internalMethods_ = std::move(internalMethods);
+  }
+
+  bool getRejectRequestsUntilStarted() const {
+    return rejectRequestsUntilStarted_;
+  }
+
+  void setRejectRequestsUntilStarted(bool rejectRequestsUntilStarted) {
+    rejectRequestsUntilStarted_ = rejectRequestsUntilStarted;
+  }
+
  private:
   std::atomic<int32_t> activeRequests_{0};
+
   bool disableActiveRequestsTracking_{false};
+  bool rejectRequestsUntilStarted_{false};
+  std::atomic<bool> enabled_{true};
+  std::unordered_set<std::string> internalMethods_;
 };
 
 } // namespace server

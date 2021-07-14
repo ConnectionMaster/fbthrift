@@ -38,9 +38,7 @@ using namespace apache::thrift::concurrency;
 
 class ThreadManagerTest : public testing::Test {
  public:
-  ~ThreadManagerTest() override {
-    ThreadManager::setObserver(nullptr);
-  }
+  ~ThreadManagerTest() override { ThreadManager::setGlobalObserver(nullptr); }
 
  private:
   gflags::FlagSaver flagsaver_;
@@ -117,7 +115,7 @@ static void loadTest(size_t numTasks, int64_t timeout, size_t numWorkers) {
   std::condition_variable cond;
   size_t tasksLeft = numTasks;
 
-  auto threadManager = ThreadManager::newSimpleThreadManager(numWorkers, true);
+  auto threadManager = ThreadManager::newSimpleThreadManager(numWorkers);
   auto threadFactory = std::make_shared<PosixThreadFactory>();
   threadManager->threadFactory(threadFactory);
   threadManager->start();
@@ -187,42 +185,6 @@ static void loadTest(size_t numTasks, int64_t timeout, size_t numWorkers) {
 
   // Fail if the test took 10% more time than the ideal time
   EXPECT_LT(overheadPct, 0.10);
-
-  // Get the task stats
-  std::chrono::microseconds waitTimeUs;
-  std::chrono::microseconds runTimeUs;
-  threadManager->getStats(waitTimeUs, runTimeUs, numTasks * 2);
-
-  // Compute the best possible average wait time
-  int64_t fullIterations = numTasks / numWorkers;
-  int64_t tasksOnLastIteration = numTasks % numWorkers;
-  auto expectedTotalWaitTimeMs = std::chrono::milliseconds(
-      numWorkers * ((fullIterations * (fullIterations - 1)) / 2) * timeout +
-      tasksOnLastIteration * fullIterations * timeout);
-  auto idealAvgWaitUs =
-      std::chrono::microseconds(expectedTotalWaitTimeMs) / numTasks;
-
-  LOG(INFO) << "avg wait time: " << waitTimeUs.count() << "us "
-            << "avg run time: " << runTimeUs.count() << "us "
-            << "ideal wait time: " << idealAvgWaitUs.count() << "us";
-
-  const auto doubleMilliToMicro = [](double val) {
-    return std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::duration<double, std::milli>(val));
-  };
-  // Verify that the average run time was more than the timeout, but not
-  // more than 10% over.
-  EXPECT_GE(runTimeUs, std::chrono::milliseconds(timeout));
-  EXPECT_LT(runTimeUs, doubleMilliToMicro(timeout * 1.10));
-  // Verify that the average wait time was within 10% of the ideal wait time.
-  // The calculation for ideal average wait time assumes all tasks were started
-  // instantaneously, in reality, starting 1000 tasks takes some non-zero amount
-  // of time, so later tasks will actually end up waiting for *less* than the
-  // ideal wait time. Account for this by accepting an actual avg wait time that
-  // is less than ideal avg wait time by up to the time it took to start all the
-  // tasks.
-  EXPECT_GE(waitTimeUs, idealAvgWaitUs - doubleMilliToMicro(taskStartTime));
-  EXPECT_LT(waitTimeUs, doubleMilliToMicro(idealAvgWaitUs.count() * 1.10));
 }
 
 TEST_F(ThreadManagerTest, LoadTest) {
@@ -553,9 +515,7 @@ TEST_F(ThreadManagerTest, RequestContext) {
    public:
     explicit TestData(int data) : data(data) {}
 
-    bool hasCallback() override {
-      return false;
-    }
+    bool hasCallback() override { return false; }
 
     int data;
   };
@@ -612,8 +572,8 @@ class TestObserver : public ThreadManager::Observer {
       : timesCalled(0), timeout(timeout), expectedName(expectedName) {}
 
   void preRun(folly::RequestContext*) override {}
-  void postRun(folly::RequestContext*, const ThreadManager::RunStats& stats)
-      override {
+  void postRun(
+      folly::RequestContext*, const ThreadManager::RunStats& stats) override {
     EXPECT_EQ(expectedName, stats.threadPoolName);
 
     // Note: Technically could fail if system clock changes.
@@ -638,9 +598,7 @@ class FailThread : public PthreadThread {
       std::shared_ptr<Runnable> runnable)
       : PthreadThread(policy, priority, stackSize, detached, runnable) {}
 
-  void start() override {
-    throw 2;
-  }
+  void start() override { throw 2; }
 };
 
 class FailThreadFactory : public PosixThreadFactory {
@@ -704,7 +662,7 @@ TEST_F(ThreadManagerTest, ThreadStartFailureTest) {
 
 TEST_F(ThreadManagerTest, ObserverTest) {
   auto observer = std::make_shared<TestObserver>(1000, "foo");
-  ThreadManager::setObserver(observer);
+  ThreadManager::setGlobalObserver(observer);
 
   std::mutex mutex;
   std::condition_variable cond;
@@ -731,8 +689,8 @@ TEST_F(ThreadManagerTest, ObserverAssignedAfterStart) {
     MyObserver(std::string name, std::shared_ptr<std::string> tgt)
         : name_(std::move(name)), tgt_(std::move(tgt)) {}
     void preRun(folly::RequestContext*) override {}
-    void postRun(folly::RequestContext*, const ThreadManager::RunStats&)
-        override {
+    void postRun(
+        folly::RequestContext*, const ThreadManager::RunStats&) override {
       *tgt_ = name_;
     }
 
@@ -748,7 +706,7 @@ TEST_F(ThreadManagerTest, ObserverAssignedAfterStart) {
   tm->start();
   // set the observer w/ observable side-effect
   auto tgt = std::make_shared<std::string>();
-  ThreadManager::setObserver(std::make_shared<MyObserver>("bar", tgt));
+  ThreadManager::setGlobalObserver(std::make_shared<MyObserver>("bar", tgt));
   // add a task - observable side-effect should trigger
   tm->add(std::make_shared<MyTask>());
   tm->join();
@@ -826,8 +784,7 @@ TEST_F(ThreadManagerTest, PriorityThreadManagerWorkerCount) {
 }
 
 TEST_F(ThreadManagerTest, PriorityQueueThreadManagerExecutor) {
-  auto threadManager =
-      ThreadManager::newPriorityQueueThreadManager(1, true /*stats*/);
+  auto threadManager = ThreadManager::newPriorityQueueThreadManager(1);
   threadManager->start();
   folly::Baton<> reqSyncBaton;
   folly::Baton<> reqDoneBaton;
@@ -856,11 +813,10 @@ TEST_F(ThreadManagerTest, PriorityQueueThreadManagerExecutor) {
 
 std::array<std::function<std::shared_ptr<ThreadManager>()>, 3> factories = {
     std::bind(
-        (std::shared_ptr<ThreadManager>(*)(size_t, bool))
-            ThreadManager::newSimpleThreadManager,
-        1,
-        false),
-    std::bind(ThreadManager::newPriorityQueueThreadManager, 1, false),
+        (std::shared_ptr<ThreadManager>(*)(
+            size_t))ThreadManager::newSimpleThreadManager,
+        1),
+    std::bind(ThreadManager::newPriorityQueueThreadManager, 1),
     []() -> std::shared_ptr<apache::thrift::concurrency::ThreadManager> {
       return PriorityThreadManager::newPriorityThreadManager({{
           1 /*HIGH_IMPORTANT*/,
@@ -901,6 +857,4 @@ TEST_P(JoinTest, Join) {
 }
 
 INSTANTIATE_TEST_CASE_P(
-    ThreadManagerTest,
-    JoinTest,
-    ::testing::ValuesIn(factories));
+    ThreadManagerTest, JoinTest, ::testing::ValuesIn(factories));

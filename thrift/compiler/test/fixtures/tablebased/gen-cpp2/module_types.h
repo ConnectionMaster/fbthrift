@@ -162,6 +162,13 @@ typedef std::unique_ptr<folly::IOBuf> IOBufPtr;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace test { namespace fixtures { namespace tablebased {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class TrivialTypesStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -185,11 +192,11 @@ class TrivialTypesStruct final  {
   [[deprecated("This constructor is deprecated")]]
   TrivialTypesStruct(apache::thrift::FragileConstructor, ::std::int32_t fieldA__arg, ::std::string fieldB__arg, ::std::string fieldC__arg, ::test::fixtures::tablebased::IOBufPtr fieldD__arg, ::test::fixtures::tablebased::ExampleEnum fieldE__arg);
 
-  TrivialTypesStruct(TrivialTypesStruct&&) = default;
+  TrivialTypesStruct(TrivialTypesStruct&&) noexcept;
   TrivialTypesStruct(const TrivialTypesStruct& src);
 
 
-  TrivialTypesStruct& operator=(TrivialTypesStruct&&) = default;
+  TrivialTypesStruct& operator=(TrivialTypesStruct&&) noexcept;
   TrivialTypesStruct& operator=(const TrivialTypesStruct& src);
   void __clear();
 
@@ -206,7 +213,7 @@ class TrivialTypesStruct final  {
  private:
   ::test::fixtures::tablebased::ExampleEnum fieldE;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool fieldA;
@@ -215,24 +222,11 @@ class TrivialTypesStruct final  {
     bool fieldD;
     bool fieldE;
   } __isset = {};
-  bool operator==(const TrivialTypesStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const TrivialTypesStruct& __x, const TrivialTypesStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const TrivialTypesStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const TrivialTypesStruct& __x, const TrivialTypesStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const TrivialTypesStruct& __x, const TrivialTypesStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const TrivialTypesStruct& __x, const TrivialTypesStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const TrivialTypesStruct&) const;
+  bool operator<(const TrivialTypesStruct&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::optional_field_ref<const T&> fieldA_ref() const& {
@@ -343,6 +337,7 @@ class TrivialTypesStruct final  {
   }
   ::std::int32_t* get_fieldA() && = delete;
 
+  [[deprecated("Use `FOO.fieldA_ref() = BAR;` instead of `FOO.set_fieldA(BAR);`")]]
   ::std::int32_t& set_fieldA(::std::int32_t fieldA_) {
     fieldA = fieldA_;
     __isset.fieldA = true;
@@ -359,6 +354,7 @@ class TrivialTypesStruct final  {
   ::std::string* get_fieldB() && = delete;
 
   template <typename T_TrivialTypesStruct_fieldB_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.fieldB_ref() = BAR;` instead of `FOO.set_fieldB(BAR);`")]]
   ::std::string& set_fieldB(T_TrivialTypesStruct_fieldB_struct_setter&& fieldB_) {
     fieldB = std::forward<T_TrivialTypesStruct_fieldB_struct_setter>(fieldB_);
     __isset.fieldB = true;
@@ -375,6 +371,7 @@ class TrivialTypesStruct final  {
   ::std::string* get_fieldC() && = delete;
 
   template <typename T_TrivialTypesStruct_fieldC_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.fieldC_ref() = BAR;` instead of `FOO.set_fieldC(BAR);`")]]
   ::std::string& set_fieldC(T_TrivialTypesStruct_fieldC_struct_setter&& fieldC_) {
     fieldC = std::forward<T_TrivialTypesStruct_fieldC_struct_setter>(fieldC_);
     __isset.fieldC = true;
@@ -391,6 +388,7 @@ class TrivialTypesStruct final  {
   ::test::fixtures::tablebased::IOBufPtr* get_fieldD() && = delete;
 
   template <typename T_TrivialTypesStruct_fieldD_struct_setter = ::test::fixtures::tablebased::IOBufPtr>
+  [[deprecated("Use `FOO.fieldD_ref() = BAR;` instead of `FOO.set_fieldD(BAR);`")]]
   ::test::fixtures::tablebased::IOBufPtr& set_fieldD(T_TrivialTypesStruct_fieldD_struct_setter&& fieldD_) {
     fieldD = std::forward<T_TrivialTypesStruct_fieldD_struct_setter>(fieldD_);
     __isset.fieldD = true;
@@ -401,6 +399,7 @@ class TrivialTypesStruct final  {
     return fieldE;
   }
 
+  [[deprecated("Use `FOO.fieldE_ref() = BAR;` instead of `FOO.set_fieldE(BAR);`")]]
   ::test::fixtures::tablebased::ExampleEnum& set_fieldE(::test::fixtures::tablebased::ExampleEnum fieldE_) {
     fieldE = fieldE_;
     __isset.fieldE = true;
@@ -420,7 +419,7 @@ class TrivialTypesStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< TrivialTypesStruct >;
+  friend class ::apache::thrift::Cpp2Ops<TrivialTypesStruct>;
   friend void swap(TrivialTypesStruct& a, TrivialTypesStruct& b);
   friend constexpr ptrdiff_t (::apache::thrift::detail::fieldOffset<TrivialTypesStruct>)(std::int16_t fieldIndex);
   friend constexpr ptrdiff_t (::apache::thrift::detail::issetOffset<TrivialTypesStruct>)(std::int16_t fieldIndex);
@@ -435,6 +434,13 @@ uint32_t TrivialTypesStruct::read(Protocol_* iprot) {
 
 }}} // test::fixtures::tablebased
 namespace test { namespace fixtures { namespace tablebased {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ContainerStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -458,14 +464,13 @@ class ContainerStruct final  {
   [[deprecated("This constructor is deprecated")]]
   ContainerStruct(apache::thrift::FragileConstructor, ::std::vector<::std::int32_t> fieldA__arg, std::list<::std::int32_t> fieldB__arg, std::deque<::std::int32_t> fieldC__arg, folly::fbvector<::std::int32_t> fieldD__arg, folly::small_vector<::std::int32_t> fieldE__arg, folly::sorted_vector_set<::std::int32_t> fieldF__arg, folly::sorted_vector_map<::std::int32_t, ::std::string> fieldG__arg, ::std::vector<::test::fixtures::tablebased::TrivialTypesStruct> fieldH__arg);
 
-  ContainerStruct(ContainerStruct&&) = default;
+  ContainerStruct(ContainerStruct&&) noexcept;
 
-  ContainerStruct(const ContainerStruct&) = default;
+  ContainerStruct(const ContainerStruct& src);
 
 
-  ContainerStruct& operator=(ContainerStruct&&) = default;
-
-  ContainerStruct& operator=(const ContainerStruct&) = default;
+  ContainerStruct& operator=(ContainerStruct&&) noexcept;
+  ContainerStruct& operator=(const ContainerStruct& src);
   void __clear();
 
   ~ContainerStruct();
@@ -487,7 +492,7 @@ class ContainerStruct final  {
  private:
   ::std::vector<::test::fixtures::tablebased::TrivialTypesStruct> fieldH;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool fieldA;
@@ -499,24 +504,11 @@ class ContainerStruct final  {
     bool fieldG;
     bool fieldH;
   } __isset = {};
-  bool operator==(const ContainerStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ContainerStruct& __x, const ContainerStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ContainerStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ContainerStruct& __x, const ContainerStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ContainerStruct& __x, const ContainerStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ContainerStruct& __x, const ContainerStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ContainerStruct&) const;
+  bool operator<(const ContainerStruct&) const;
 
   template <typename..., typename T = ::std::vector<::std::int32_t>>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> fieldA_ref() const& {
@@ -681,6 +673,7 @@ class ContainerStruct final  {
   ::std::vector<::std::int32_t> get_fieldA() &&;
 
   template <typename T_ContainerStruct_fieldA_struct_setter = ::std::vector<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldA_ref() = BAR;` instead of `FOO.set_fieldA(BAR);`")]]
   ::std::vector<::std::int32_t>& set_fieldA(T_ContainerStruct_fieldA_struct_setter&& fieldA_) {
     fieldA = std::forward<T_ContainerStruct_fieldA_struct_setter>(fieldA_);
     __isset.fieldA = true;
@@ -690,6 +683,7 @@ class ContainerStruct final  {
   std::list<::std::int32_t> get_fieldB() &&;
 
   template <typename T_ContainerStruct_fieldB_struct_setter = std::list<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldB_ref() = BAR;` instead of `FOO.set_fieldB(BAR);`")]]
   std::list<::std::int32_t>& set_fieldB(T_ContainerStruct_fieldB_struct_setter&& fieldB_) {
     fieldB = std::forward<T_ContainerStruct_fieldB_struct_setter>(fieldB_);
     __isset.fieldB = true;
@@ -699,6 +693,7 @@ class ContainerStruct final  {
   std::deque<::std::int32_t> get_fieldC() &&;
 
   template <typename T_ContainerStruct_fieldC_struct_setter = std::deque<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldC_ref() = BAR;` instead of `FOO.set_fieldC(BAR);`")]]
   std::deque<::std::int32_t>& set_fieldC(T_ContainerStruct_fieldC_struct_setter&& fieldC_) {
     fieldC = std::forward<T_ContainerStruct_fieldC_struct_setter>(fieldC_);
     __isset.fieldC = true;
@@ -708,6 +703,7 @@ class ContainerStruct final  {
   folly::fbvector<::std::int32_t> get_fieldD() &&;
 
   template <typename T_ContainerStruct_fieldD_struct_setter = folly::fbvector<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldD_ref() = BAR;` instead of `FOO.set_fieldD(BAR);`")]]
   folly::fbvector<::std::int32_t>& set_fieldD(T_ContainerStruct_fieldD_struct_setter&& fieldD_) {
     fieldD = std::forward<T_ContainerStruct_fieldD_struct_setter>(fieldD_);
     __isset.fieldD = true;
@@ -717,6 +713,7 @@ class ContainerStruct final  {
   folly::small_vector<::std::int32_t> get_fieldE() &&;
 
   template <typename T_ContainerStruct_fieldE_struct_setter = folly::small_vector<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldE_ref() = BAR;` instead of `FOO.set_fieldE(BAR);`")]]
   folly::small_vector<::std::int32_t>& set_fieldE(T_ContainerStruct_fieldE_struct_setter&& fieldE_) {
     fieldE = std::forward<T_ContainerStruct_fieldE_struct_setter>(fieldE_);
     __isset.fieldE = true;
@@ -726,6 +723,7 @@ class ContainerStruct final  {
   folly::sorted_vector_set<::std::int32_t> get_fieldF() &&;
 
   template <typename T_ContainerStruct_fieldF_struct_setter = folly::sorted_vector_set<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldF_ref() = BAR;` instead of `FOO.set_fieldF(BAR);`")]]
   folly::sorted_vector_set<::std::int32_t>& set_fieldF(T_ContainerStruct_fieldF_struct_setter&& fieldF_) {
     fieldF = std::forward<T_ContainerStruct_fieldF_struct_setter>(fieldF_);
     __isset.fieldF = true;
@@ -735,6 +733,7 @@ class ContainerStruct final  {
   folly::sorted_vector_map<::std::int32_t, ::std::string> get_fieldG() &&;
 
   template <typename T_ContainerStruct_fieldG_struct_setter = folly::sorted_vector_map<::std::int32_t, ::std::string>>
+  [[deprecated("Use `FOO.fieldG_ref() = BAR;` instead of `FOO.set_fieldG(BAR);`")]]
   folly::sorted_vector_map<::std::int32_t, ::std::string>& set_fieldG(T_ContainerStruct_fieldG_struct_setter&& fieldG_) {
     fieldG = std::forward<T_ContainerStruct_fieldG_struct_setter>(fieldG_);
     __isset.fieldG = true;
@@ -744,6 +743,7 @@ class ContainerStruct final  {
   ::std::vector<::test::fixtures::tablebased::TrivialTypesStruct> get_fieldH() &&;
 
   template <typename T_ContainerStruct_fieldH_struct_setter = ::std::vector<::test::fixtures::tablebased::TrivialTypesStruct>>
+  [[deprecated("Use `FOO.fieldH_ref() = BAR;` instead of `FOO.set_fieldH(BAR);`")]]
   ::std::vector<::test::fixtures::tablebased::TrivialTypesStruct>& set_fieldH(T_ContainerStruct_fieldH_struct_setter&& fieldH_) {
     fieldH = std::forward<T_ContainerStruct_fieldH_struct_setter>(fieldH_);
     __isset.fieldH = true;
@@ -763,7 +763,7 @@ class ContainerStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ContainerStruct >;
+  friend class ::apache::thrift::Cpp2Ops<ContainerStruct>;
   friend void swap(ContainerStruct& a, ContainerStruct& b);
   friend constexpr ptrdiff_t (::apache::thrift::detail::fieldOffset<ContainerStruct>)(std::int16_t fieldIndex);
   friend constexpr ptrdiff_t (::apache::thrift::detail::issetOffset<ContainerStruct>)(std::int16_t fieldIndex);
@@ -778,6 +778,13 @@ uint32_t ContainerStruct::read(Protocol_* iprot) {
 
 }}} // test::fixtures::tablebased
 namespace test { namespace fixtures { namespace tablebased {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ExampleUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -803,7 +810,7 @@ class ExampleUnion final  {
   ExampleUnion()
       : type_(Type::__EMPTY__) {}
 
-  ExampleUnion(ExampleUnion&& rhs)
+  ExampleUnion(ExampleUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -850,7 +857,7 @@ class ExampleUnion final  {
     }
   }
 
-  ExampleUnion& operator=(ExampleUnion&& rhs) {
+  ExampleUnion& operator=(ExampleUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -910,24 +917,9 @@ class ExampleUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const ExampleUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ExampleUnion& __x, const ExampleUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ExampleUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ExampleUnion& __x, const ExampleUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ExampleUnion& __x, const ExampleUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ExampleUnion& __x, const ExampleUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const ExampleUnion&) const;
+  bool operator<(const ExampleUnion&) const;
 
   ::test::fixtures::tablebased::ContainerStruct& set_fieldA(::test::fixtures::tablebased::ContainerStruct const &t) {
     __clear();
@@ -971,22 +963,26 @@ class ExampleUnion final  {
     return value_.fieldB;
   }
 
-  ::test::fixtures::tablebased::ContainerStruct const & get_fieldA() const {
-    assert(type_ == Type::fieldA);
+  ::test::fixtures::tablebased::ContainerStruct const& get_fieldA() const {
+    if (type_ != Type::fieldA) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.fieldA;
   }
 
-  ::test::fixtures::tablebased::TrivialTypesStruct const & get_fieldB() const {
-    assert(type_ == Type::fieldB);
+  ::test::fixtures::tablebased::TrivialTypesStruct const& get_fieldB() const {
+    if (type_ != Type::fieldB) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.fieldB;
   }
 
-  ::test::fixtures::tablebased::ContainerStruct & mutable_fieldA() {
+  ::test::fixtures::tablebased::ContainerStruct& mutable_fieldA() {
     assert(type_ == Type::fieldA);
     return value_.fieldA;
   }
 
-  ::test::fixtures::tablebased::TrivialTypesStruct & mutable_fieldB() {
+  ::test::fixtures::tablebased::TrivialTypesStruct& mutable_fieldB() {
     assert(type_ == Type::fieldB);
     return value_.fieldB;
   }
@@ -1062,7 +1058,7 @@ class ExampleUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ExampleUnion >;
+  friend class ::apache::thrift::Cpp2Ops<ExampleUnion>;
   friend void swap(ExampleUnion& a, ExampleUnion& b);
   friend constexpr ptrdiff_t (::apache::thrift::detail::unionTypeOffset<ExampleUnion>)();
 };

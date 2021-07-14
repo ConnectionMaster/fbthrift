@@ -34,7 +34,14 @@ class FooEx;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
-class FooEx final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT FooEx final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -42,6 +49,12 @@ class FooEx final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = FooEx;
@@ -51,38 +64,28 @@ class FooEx final : public apache::thrift::TException {
 
  public:
 
-  FooEx() {}
+  FooEx();
+
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   FooEx(apache::thrift::FragileConstructor);
 
-  FooEx(FooEx&&) = default;
+  FooEx(FooEx&&) noexcept;
 
-  FooEx(const FooEx&) = default;
+  FooEx(const FooEx& src);
 
 
-  FooEx& operator=(FooEx&&) = default;
-
-  FooEx& operator=(const FooEx&) = default;
+  FooEx& operator=(FooEx&&) noexcept;
+  FooEx& operator=(const FooEx& src);
   void __clear();
-  bool operator==(const FooEx& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const FooEx& __x, const FooEx& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const FooEx& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const FooEx& __x, const FooEx& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const FooEx& __x, const FooEx& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const FooEx& __x, const FooEx& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  ~FooEx() override;
+
+
+ public:
+
+  bool operator==(const FooEx&) const;
+  bool operator<(const FooEx&) const;
 
   template <class Protocol_>
   uint32_t read(Protocol_* iprot);
@@ -101,7 +104,7 @@ class FooEx final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< FooEx >;
+  friend class ::apache::thrift::Cpp2Ops<FooEx>;
   friend void swap(FooEx& a, FooEx& b);
 };
 

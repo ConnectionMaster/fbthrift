@@ -23,6 +23,7 @@
 #include <folly/Try.h>
 #include <folly/executors/GlobalExecutor.h>
 #include <thrift/lib/cpp2/async/ClientBufferedStream.h>
+#include <thrift/lib/cpp2/async/RpcTypes.h>
 #include <thrift/lib/cpp2/async/ServerGeneratorStream.h>
 #include <thrift/lib/cpp2/async/ServerPublisherStream.h>
 #include <thrift/lib/cpp2/async/StreamCallbacks.h>
@@ -81,7 +82,7 @@ class ServerStream {
       "conditions in production code.")]] //
   ClientBufferedStream<T>
   toClientStreamUnsafeDoNotUse(
-      folly::EventBase* evb = folly::getEventBase(),
+      folly::EventBase* evb = folly::getUnsafeMutableGlobalEventBase(),
       int32_t bufferSize = 100) &&;
 
   apache::thrift::detail::ServerStreamFactory operator()(
@@ -108,7 +109,7 @@ struct ResponseAndServerStream {
   ServerStream<StreamElement> stream;
 };
 struct ResponseAndServerStreamFactory {
-  folly::IOBufQueue response;
+  apache::thrift::LegacySerializedResponse response;
   apache::thrift::detail::ServerStreamFactory stream;
 };
 

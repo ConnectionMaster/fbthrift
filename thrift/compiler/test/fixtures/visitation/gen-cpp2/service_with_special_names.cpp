@@ -14,28 +14,66 @@ std::unique_ptr<apache::thrift::AsyncProcessor> service_with_special_namesSvIf::
   return std::make_unique<service_with_special_namesAsyncProcessor>(this);
 }
 
+service_with_special_namesSvIf::CreateMethodMetadataResult service_with_special_namesSvIf::createMethodMetadata() {
+  return ::apache::thrift::detail::ap::createMethodMetadataMap<service_with_special_namesAsyncProcessor>();
+}
+
 
 ::std::int32_t service_with_special_namesSvIf::get() {
   apache::thrift::detail::si::throw_app_exn_unimplemented("get");
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_get() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return get();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_get.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return get();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_get() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_get(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_get.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_get(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_get(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_get();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_get.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_get.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_get();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_get();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(get());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::getter() {
@@ -43,22 +81,56 @@ void service_with_special_namesSvIf::async_tm_get(std::unique_ptr<apache::thrift
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_getter() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return getter();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_getter.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return getter();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_getter() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_getter(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_getter.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_getter(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_getter(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_getter();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_getter.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_getter.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_getter();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_getter();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(getter());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::lists() {
@@ -66,22 +138,56 @@ void service_with_special_namesSvIf::async_tm_getter(std::unique_ptr<apache::thr
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_lists() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return lists();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_lists.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return lists();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_lists() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_lists(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_lists.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_lists(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_lists(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_lists();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_lists.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_lists.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_lists();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_lists();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(lists());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::maps() {
@@ -89,22 +195,56 @@ void service_with_special_namesSvIf::async_tm_lists(std::unique_ptr<apache::thri
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_maps() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return maps();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_maps.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return maps();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_maps() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_maps(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_maps.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_maps(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_maps(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_maps();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_maps.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_maps.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_maps();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_maps();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(maps());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::name() {
@@ -112,22 +252,56 @@ void service_with_special_namesSvIf::async_tm_maps(std::unique_ptr<apache::thrif
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_name() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return name();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_name.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return name();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_name() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_name(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_name.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_name(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_name(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_name();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_name.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_name.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_name();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_name();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(name());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::name_to_value() {
@@ -135,22 +309,56 @@ void service_with_special_namesSvIf::async_tm_name(std::unique_ptr<apache::thrif
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_name_to_value() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return name_to_value();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_name_to_value.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return name_to_value();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_name_to_value() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_name_to_value(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_name_to_value.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_name_to_value(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_name_to_value(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_name_to_value();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_name_to_value.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_name_to_value.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_name_to_value();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_name_to_value();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(name_to_value());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::names() {
@@ -158,22 +366,56 @@ void service_with_special_namesSvIf::async_tm_name_to_value(std::unique_ptr<apac
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_names() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return names();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_names.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return names();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_names() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_names(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_names.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_names(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_names(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_names();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_names.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_names.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_names();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_names();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(names());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::prefix_tree() {
@@ -181,22 +423,56 @@ void service_with_special_namesSvIf::async_tm_names(std::unique_ptr<apache::thri
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_prefix_tree() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return prefix_tree();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_prefix_tree.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return prefix_tree();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_prefix_tree() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_prefix_tree(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_prefix_tree.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_prefix_tree(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_prefix_tree(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_prefix_tree();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_prefix_tree.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_prefix_tree.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_prefix_tree();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_prefix_tree();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(prefix_tree());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::sets() {
@@ -204,22 +480,56 @@ void service_with_special_namesSvIf::async_tm_prefix_tree(std::unique_ptr<apache
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_sets() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return sets();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_sets.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return sets();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_sets() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_sets(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_sets.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_sets(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_sets(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_sets();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_sets.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_sets.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_sets();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_sets();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(sets());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::setter() {
@@ -227,22 +537,56 @@ void service_with_special_namesSvIf::async_tm_sets(std::unique_ptr<apache::thrif
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_setter() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return setter();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_setter.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return setter();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_setter() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_setter(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_setter.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_setter(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_setter(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_setter();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_setter.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_setter.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_setter();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_setter();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(setter());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::str() {
@@ -250,22 +594,56 @@ void service_with_special_namesSvIf::async_tm_setter(std::unique_ptr<apache::thr
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_str() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return str();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_str.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return str();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_str() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_str(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_str.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_str(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_str(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_str();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_str.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_str.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_str();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_str();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(str());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::strings() {
@@ -273,22 +651,56 @@ void service_with_special_namesSvIf::async_tm_str(std::unique_ptr<apache::thrift
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_strings() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return strings();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_strings.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return strings();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_strings() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_strings(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_strings.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_strings(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_strings(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_strings();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_strings.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_strings.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_strings();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_strings();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(strings());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::type() {
@@ -296,22 +708,56 @@ void service_with_special_namesSvIf::async_tm_strings(std::unique_ptr<apache::th
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_type() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return type();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_type.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return type();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_type() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_type(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_type.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_type(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_type(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_type();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_type.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_type.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_type();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_type();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(type());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::value() {
@@ -319,22 +765,56 @@ void service_with_special_namesSvIf::async_tm_type(std::unique_ptr<apache::thrif
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_value() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return value();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_value.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return value();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_value() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_value(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_value.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_value(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_value(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_value();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_value.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_value.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_value();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_value();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(value());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::value_to_name() {
@@ -342,22 +822,56 @@ void service_with_special_namesSvIf::async_tm_value(std::unique_ptr<apache::thri
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_value_to_name() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return value_to_name();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_value_to_name.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return value_to_name();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_value_to_name() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_value_to_name(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_value_to_name.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_value_to_name(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_value_to_name(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_value_to_name();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_value_to_name.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_value_to_name.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_value_to_name();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_value_to_name();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(value_to_name());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::values() {
@@ -365,22 +879,56 @@ void service_with_special_namesSvIf::async_tm_value_to_name(std::unique_ptr<apac
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_values() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return values();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_values.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return values();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_values() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_values(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_values.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_values(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_values(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_values();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_values.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_values.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_values();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_values();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(values());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::id() {
@@ -388,22 +936,56 @@ void service_with_special_namesSvIf::async_tm_values(std::unique_ptr<apache::thr
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_id() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return id();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_id.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return id();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_id() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_id(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_id.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_id(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_id(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_id();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_id.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_id.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_id();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_id();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(id());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::ids() {
@@ -411,22 +993,56 @@ void service_with_special_namesSvIf::async_tm_id(std::unique_ptr<apache::thrift:
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_ids() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return ids();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_ids.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return ids();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_ids() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_ids(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_ids.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_ids(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_ids(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_ids();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_ids.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_ids.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_ids();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_ids();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(ids());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::descriptor() {
@@ -434,22 +1050,56 @@ void service_with_special_namesSvIf::async_tm_ids(std::unique_ptr<apache::thrift
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_descriptor() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return descriptor();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_descriptor.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return descriptor();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_descriptor() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_descriptor(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_descriptor.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_descriptor(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_descriptor(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_descriptor();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_descriptor.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_descriptor.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_descriptor();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_descriptor();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(descriptor());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::descriptors() {
@@ -457,22 +1107,56 @@ void service_with_special_namesSvIf::async_tm_descriptor(std::unique_ptr<apache:
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_descriptors() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return descriptors();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_descriptors.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return descriptors();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_descriptors() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_descriptors(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_descriptors.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_descriptors(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_descriptors(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_descriptors();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_descriptors.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_descriptors.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_descriptors();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_descriptors();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(descriptors());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::key() {
@@ -480,22 +1164,56 @@ void service_with_special_namesSvIf::async_tm_descriptors(std::unique_ptr<apache
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_key() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return key();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_key.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return key();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_key() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_key(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_key.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_key(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_key(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_key();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_key.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_key.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_key();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_key();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(key());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::keys() {
@@ -503,22 +1221,56 @@ void service_with_special_namesSvIf::async_tm_key(std::unique_ptr<apache::thrift
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_keys() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return keys();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_keys.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return keys();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_keys() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_keys(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_keys.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_keys(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_keys(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_keys();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_keys.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_keys.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_keys();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_keys();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(keys());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::annotation() {
@@ -526,22 +1278,56 @@ void service_with_special_namesSvIf::async_tm_keys(std::unique_ptr<apache::thrif
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_annotation() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return annotation();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_annotation.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return annotation();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_annotation() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_annotation(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_annotation.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_annotation(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_annotation(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_annotation();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_annotation.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_annotation.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_annotation();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_annotation();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(annotation());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::annotations() {
@@ -549,22 +1335,56 @@ void service_with_special_namesSvIf::async_tm_annotation(std::unique_ptr<apache:
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_annotations() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return annotations();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_annotations.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return annotations();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_annotations() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_annotations(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_annotations.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_annotations(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_annotations(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_annotations();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_annotations.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_annotations.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_annotations();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_annotations();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(annotations());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::member() {
@@ -572,22 +1392,56 @@ void service_with_special_namesSvIf::async_tm_annotations(std::unique_ptr<apache
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_member() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return member();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_member.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return member();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_member() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_member(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_member.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_member(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_member(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_member();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_member.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_member.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_member();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_member();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(member());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::members() {
@@ -595,22 +1449,56 @@ void service_with_special_namesSvIf::async_tm_member(std::unique_ptr<apache::thr
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_members() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return members();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_members.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return members();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_members() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_members(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_members.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_members(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_members(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_members();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_members.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_members.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_members();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_members();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(members());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::field() {
@@ -618,22 +1506,56 @@ void service_with_special_namesSvIf::async_tm_members(std::unique_ptr<apache::th
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_field() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return field();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_field.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return field();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_field() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_field(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_field.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_field(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_field(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_field();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_field.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_field.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_field();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_field();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(field());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvIf::fields() {
@@ -641,22 +1563,56 @@ void service_with_special_namesSvIf::async_tm_field(std::unique_ptr<apache::thri
 }
 
 folly::SemiFuture<::std::int32_t> service_with_special_namesSvIf::semifuture_fields() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return fields();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_fields.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return fields();
 }
 
 folly::Future<::std::int32_t> service_with_special_namesSvIf::future_fields() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_fields(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_fields.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_fields(), getInternalKeepAlive());
 }
 
 void service_with_special_namesSvIf::async_tm_fields(std::unique_ptr<apache::thrift::HandlerCallback<::std::int32_t>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_fields();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_fields.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_fields.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_fields();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_fields();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(fields());
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 ::std::int32_t service_with_special_namesSvNull::get() {
@@ -785,78 +1741,43 @@ void service_with_special_namesAsyncProcessor::processSerializedCompressedReques
   apache::thrift::detail::ap::process(this, std::move(req), std::move(serializedRequest), protType, context, eb, tm);
 }
 
-std::shared_ptr<folly::RequestContext> service_with_special_namesAsyncProcessor::getBaseContextForRequest() {
-  return iface_->getBaseContextForRequest();
+void service_with_special_namesAsyncProcessor::processSerializedCompressedRequestWithMetadata(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, const apache::thrift::AsyncProcessorFactory::MethodMetadata& methodMetadata, apache::thrift::protocol::PROTOCOL_TYPES protType, apache::thrift::Cpp2RequestContext* context, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  apache::thrift::detail::ap::process(this, std::move(req), std::move(serializedRequest), methodMetadata, protType, context, eb, tm);
 }
 
-const service_with_special_namesAsyncProcessor::ProcessMap& service_with_special_namesAsyncProcessor::getBinaryProtocolProcessMap() {
-  return binaryProcessMap_;
+const service_with_special_namesAsyncProcessor::ProcessMap& service_with_special_namesAsyncProcessor::getOwnProcessMap() {
+  return kOwnProcessMap_;
 }
 
-const service_with_special_namesAsyncProcessor::ProcessMap service_with_special_namesAsyncProcessor::binaryProcessMap_ {
-  {"get", &service_with_special_namesAsyncProcessor::setUpAndProcess_get<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"getter", &service_with_special_namesAsyncProcessor::setUpAndProcess_getter<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"lists", &service_with_special_namesAsyncProcessor::setUpAndProcess_lists<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"maps", &service_with_special_namesAsyncProcessor::setUpAndProcess_maps<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"name", &service_with_special_namesAsyncProcessor::setUpAndProcess_name<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"name_to_value", &service_with_special_namesAsyncProcessor::setUpAndProcess_name_to_value<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"names", &service_with_special_namesAsyncProcessor::setUpAndProcess_names<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"prefix_tree", &service_with_special_namesAsyncProcessor::setUpAndProcess_prefix_tree<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"sets", &service_with_special_namesAsyncProcessor::setUpAndProcess_sets<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"setter", &service_with_special_namesAsyncProcessor::setUpAndProcess_setter<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"str", &service_with_special_namesAsyncProcessor::setUpAndProcess_str<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"strings", &service_with_special_namesAsyncProcessor::setUpAndProcess_strings<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"type", &service_with_special_namesAsyncProcessor::setUpAndProcess_type<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"value", &service_with_special_namesAsyncProcessor::setUpAndProcess_value<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"value_to_name", &service_with_special_namesAsyncProcessor::setUpAndProcess_value_to_name<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"values", &service_with_special_namesAsyncProcessor::setUpAndProcess_values<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"id", &service_with_special_namesAsyncProcessor::setUpAndProcess_id<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"ids", &service_with_special_namesAsyncProcessor::setUpAndProcess_ids<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"descriptor", &service_with_special_namesAsyncProcessor::setUpAndProcess_descriptor<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"descriptors", &service_with_special_namesAsyncProcessor::setUpAndProcess_descriptors<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"key", &service_with_special_namesAsyncProcessor::setUpAndProcess_key<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"keys", &service_with_special_namesAsyncProcessor::setUpAndProcess_keys<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"annotation", &service_with_special_namesAsyncProcessor::setUpAndProcess_annotation<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"annotations", &service_with_special_namesAsyncProcessor::setUpAndProcess_annotations<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"member", &service_with_special_namesAsyncProcessor::setUpAndProcess_member<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"members", &service_with_special_namesAsyncProcessor::setUpAndProcess_members<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"field", &service_with_special_namesAsyncProcessor::setUpAndProcess_field<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"fields", &service_with_special_namesAsyncProcessor::setUpAndProcess_fields<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-};
-
-const service_with_special_namesAsyncProcessor::ProcessMap& service_with_special_namesAsyncProcessor::getCompactProtocolProcessMap() {
-  return compactProcessMap_;
-}
-
-const service_with_special_namesAsyncProcessor::ProcessMap service_with_special_namesAsyncProcessor::compactProcessMap_ {
-  {"get", &service_with_special_namesAsyncProcessor::setUpAndProcess_get<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"getter", &service_with_special_namesAsyncProcessor::setUpAndProcess_getter<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"lists", &service_with_special_namesAsyncProcessor::setUpAndProcess_lists<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"maps", &service_with_special_namesAsyncProcessor::setUpAndProcess_maps<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"name", &service_with_special_namesAsyncProcessor::setUpAndProcess_name<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"name_to_value", &service_with_special_namesAsyncProcessor::setUpAndProcess_name_to_value<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"names", &service_with_special_namesAsyncProcessor::setUpAndProcess_names<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"prefix_tree", &service_with_special_namesAsyncProcessor::setUpAndProcess_prefix_tree<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"sets", &service_with_special_namesAsyncProcessor::setUpAndProcess_sets<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"setter", &service_with_special_namesAsyncProcessor::setUpAndProcess_setter<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"str", &service_with_special_namesAsyncProcessor::setUpAndProcess_str<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"strings", &service_with_special_namesAsyncProcessor::setUpAndProcess_strings<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"type", &service_with_special_namesAsyncProcessor::setUpAndProcess_type<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"value", &service_with_special_namesAsyncProcessor::setUpAndProcess_value<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"value_to_name", &service_with_special_namesAsyncProcessor::setUpAndProcess_value_to_name<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"values", &service_with_special_namesAsyncProcessor::setUpAndProcess_values<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"id", &service_with_special_namesAsyncProcessor::setUpAndProcess_id<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"ids", &service_with_special_namesAsyncProcessor::setUpAndProcess_ids<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"descriptor", &service_with_special_namesAsyncProcessor::setUpAndProcess_descriptor<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"descriptors", &service_with_special_namesAsyncProcessor::setUpAndProcess_descriptors<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"key", &service_with_special_namesAsyncProcessor::setUpAndProcess_key<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"keys", &service_with_special_namesAsyncProcessor::setUpAndProcess_keys<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"annotation", &service_with_special_namesAsyncProcessor::setUpAndProcess_annotation<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"annotations", &service_with_special_namesAsyncProcessor::setUpAndProcess_annotations<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"member", &service_with_special_namesAsyncProcessor::setUpAndProcess_member<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"members", &service_with_special_namesAsyncProcessor::setUpAndProcess_members<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"field", &service_with_special_namesAsyncProcessor::setUpAndProcess_field<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"fields", &service_with_special_namesAsyncProcessor::setUpAndProcess_fields<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
+const service_with_special_namesAsyncProcessor::ProcessMap service_with_special_namesAsyncProcessor::kOwnProcessMap_ {
+  {"get", {&service_with_special_namesAsyncProcessor::setUpAndProcess_get<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_get<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"getter", {&service_with_special_namesAsyncProcessor::setUpAndProcess_getter<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_getter<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"lists", {&service_with_special_namesAsyncProcessor::setUpAndProcess_lists<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_lists<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"maps", {&service_with_special_namesAsyncProcessor::setUpAndProcess_maps<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_maps<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"name", {&service_with_special_namesAsyncProcessor::setUpAndProcess_name<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_name<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"name_to_value", {&service_with_special_namesAsyncProcessor::setUpAndProcess_name_to_value<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_name_to_value<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"names", {&service_with_special_namesAsyncProcessor::setUpAndProcess_names<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_names<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"prefix_tree", {&service_with_special_namesAsyncProcessor::setUpAndProcess_prefix_tree<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_prefix_tree<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"sets", {&service_with_special_namesAsyncProcessor::setUpAndProcess_sets<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_sets<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"setter", {&service_with_special_namesAsyncProcessor::setUpAndProcess_setter<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_setter<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"str", {&service_with_special_namesAsyncProcessor::setUpAndProcess_str<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_str<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"strings", {&service_with_special_namesAsyncProcessor::setUpAndProcess_strings<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_strings<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"type", {&service_with_special_namesAsyncProcessor::setUpAndProcess_type<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_type<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"value", {&service_with_special_namesAsyncProcessor::setUpAndProcess_value<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_value<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"value_to_name", {&service_with_special_namesAsyncProcessor::setUpAndProcess_value_to_name<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_value_to_name<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"values", {&service_with_special_namesAsyncProcessor::setUpAndProcess_values<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_values<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"id", {&service_with_special_namesAsyncProcessor::setUpAndProcess_id<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_id<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"ids", {&service_with_special_namesAsyncProcessor::setUpAndProcess_ids<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_ids<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"descriptor", {&service_with_special_namesAsyncProcessor::setUpAndProcess_descriptor<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_descriptor<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"descriptors", {&service_with_special_namesAsyncProcessor::setUpAndProcess_descriptors<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_descriptors<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"key", {&service_with_special_namesAsyncProcessor::setUpAndProcess_key<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_key<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"keys", {&service_with_special_namesAsyncProcessor::setUpAndProcess_keys<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_keys<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"annotation", {&service_with_special_namesAsyncProcessor::setUpAndProcess_annotation<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_annotation<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"annotations", {&service_with_special_namesAsyncProcessor::setUpAndProcess_annotations<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_annotations<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"member", {&service_with_special_namesAsyncProcessor::setUpAndProcess_member<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_member<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"members", {&service_with_special_namesAsyncProcessor::setUpAndProcess_members<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_members<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"field", {&service_with_special_namesAsyncProcessor::setUpAndProcess_field<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_field<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"fields", {&service_with_special_namesAsyncProcessor::setUpAndProcess_fields<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &service_with_special_namesAsyncProcessor::setUpAndProcess_fields<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
 };
 
 }} // test_cpp2::cpp_reflection

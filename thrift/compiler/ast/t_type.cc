@@ -18,6 +18,7 @@
 
 #include <array>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 #include <openssl/sha.h>
@@ -74,9 +75,8 @@ uint64_t t_type::get_type_id() const {
   return (hash & ~t_type::kTypeMask) | int(tv);
 }
 
-std::string t_type::make_full_name(const char* prefix) const {
+std::string t_type::get_scoped_name() const {
   std::ostringstream os;
-  os << prefix << " ";
   if (program_) {
     os << program_->name() << ".";
   }
@@ -84,9 +84,23 @@ std::string t_type::make_full_name(const char* prefix) const {
   return os.str();
 }
 
+std::string t_type::make_full_name(const char* prefix) const {
+  return std::string(prefix) + " " + get_scoped_name();
+}
+
 const t_type* t_type::get_true_type() const {
   return t_typedef::find_type_if(
       this, [](const t_type* type) { return !type->is_typedef(); });
+}
+
+const t_type& t_type_ref::deref() const {
+  if (type_ == nullptr) {
+    throw std::runtime_error("t_type_ref has no type.");
+  }
+  if (auto ph = dynamic_cast<const t_placeholder_typedef*>(type_)) {
+    return ph->type().deref();
+  }
+  return *type_;
 }
 
 } // namespace compiler

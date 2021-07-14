@@ -16,6 +16,8 @@
 
 #pragma once
 
+#include <array>
+#include <chrono>
 #include <fmt/core.h>
 #include <folly/IntrusiveList.h>
 #include <folly/SocketAddress.h>
@@ -24,8 +26,6 @@
 #include <thrift/lib/cpp/protocol/TProtocolTypes.h>
 #include <thrift/lib/cpp2/transport/core/RequestStateMachine.h>
 #include <thrift/lib/cpp2/transport/rocket/Types.h>
-#include <array>
-#include <chrono>
 
 namespace apache {
 namespace thrift {
@@ -37,9 +37,12 @@ class ResponseChannelRequest;
 class RecentRequestCounter {
  public:
   static inline constexpr uint64_t kBuckets = 512ul;
-  using Values = std::array<int32_t, kBuckets>;
+  using ArrivalCount = int32_t;
+  using ActiveCount = int32_t;
+  using Values = std::array<std::pair<ArrivalCount, ActiveCount>, kBuckets>;
 
   void increment();
+  void decrement();
   Values get() const;
 
  private:
@@ -48,6 +51,7 @@ class RecentRequestCounter {
   mutable uint64_t currentBucket_{};
   mutable uint64_t lastTick_{};
   mutable Values counts_{};
+  mutable uint64_t currActiveCount_{};
 };
 
 /**
@@ -95,7 +99,6 @@ class RequestsRegistry {
           rctx_(std::move(rctx)),
           protoId_(protoId),
           payload_(std::move(debugPayload)),
-          timestamp_(std::chrono::steady_clock::now()),
           registry_(&reqRegistry),
           rootRequestContextId_(rctx_->getRootId()),
           stateMachine_(stateMachine) {
@@ -113,31 +116,28 @@ class RequestsRegistry {
       }
     }
 
-    const ResponseChannelRequest* getRequest() const {
-      return req_;
-    }
+    const ResponseChannelRequest* getRequest() const { return req_; }
 
     const Cpp2RequestContext* getCpp2RequestContext() const {
       return reqContext_;
     }
 
     std::chrono::steady_clock::time_point getTimestamp() const {
-      return timestamp_;
+      return stateMachine_.started();
     }
 
     std::chrono::steady_clock::time_point getFinished() const {
       return finished_;
     }
 
-    intptr_t getRootRequestContextId() const {
-      return rootRequestContextId_;
-    }
+    intptr_t getRootRequestContextId() const { return rootRequestContextId_; }
 
     std::shared_ptr<folly::RequestContext> getRequestContext() const {
       return rctx_;
     }
 
     const std::string& getMethodName() const;
+    const folly::SocketAddress* getLocalAddress() const;
     const folly::SocketAddress* getPeerAddress() const;
 
     /**
@@ -147,25 +147,17 @@ class RequestsRegistry {
      * this should be called from the IO worker which also owns the same
      * RequestsRegistry.
      */
-    rocket::Payload clonePayload() const {
-      return payload_.clone();
-    }
+    rocket::Payload clonePayload() const { return payload_.clone(); }
 
-    protocol::PROTOCOL_TYPES getProtoId() const {
-      return protoId_;
-    }
+    protocol::PROTOCOL_TYPES getProtoId() const { return protoId_; }
 
     bool getStartedProcessing() const {
       return stateMachine_.getStartedProcessing();
     }
 
    private:
-    uint64_t getPayloadSize() const {
-      return payload_.dataSize();
-    }
-    void releasePayload() {
-      payload_ = rocket::Payload();
-    }
+    uint64_t getPayloadSize() const { return payload_.dataSize(); }
+    void releasePayload() { payload_ = rocket::Payload(); }
 
     void prepareAsFinished();
 
@@ -174,12 +166,12 @@ class RequestsRegistry {
 
     std::string methodNameIfFinished_;
     folly::SocketAddress peerAddressIfFinished_;
+    folly::SocketAddress localAddressIfFinished_;
     ResponseChannelRequest* req_;
     const Cpp2RequestContext* reqContext_;
     std::shared_ptr<folly::RequestContext> rctx_;
     const protocol::PROTOCOL_TYPES protoId_;
     rocket::Payload payload_;
-    std::chrono::steady_clock::time_point timestamp_;
     std::chrono::steady_clock::time_point finished_{
         std::chrono::steady_clock::duration::zero()};
     RequestsRegistry* registry_;
@@ -244,13 +236,9 @@ class RequestsRegistry {
       uint16_t finishedRequestsLimit);
   ~RequestsRegistry();
 
-  const ActiveRequestDebugStubList& getActive() {
-    return reqActiveList_;
-  }
+  const ActiveRequestDebugStubList& getActive() { return reqActiveList_; }
 
-  const ActiveRequestDebugStubList& getFinished() {
-    return reqFinishedList_;
-  }
+  const ActiveRequestDebugStubList& getFinished() { return reqFinishedList_; }
 
   void registerStub(DebugStub& req);
 
@@ -270,9 +258,7 @@ class RequestsRegistry {
       stub.releasePayload();
     }
   }
-  DebugStub& nextStubToEvict() {
-    return reqPayloadList_.front();
-  }
+  DebugStub& nextStubToEvict() { return reqPayloadList_.front(); }
   void onStubPayloadUnlinked(const DebugStub& stub) {
     uint64_t payloadSize = stub.getPayloadSize();
     DCHECK(payloadMemoryUsage_ >= payloadSize);

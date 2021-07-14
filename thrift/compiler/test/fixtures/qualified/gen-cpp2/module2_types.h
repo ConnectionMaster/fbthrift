@@ -57,6 +57,13 @@ class BigStruct;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace module2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Struct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -74,49 +81,36 @@ class Struct final  {
 
  public:
 
-  Struct() {}
+  Struct() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Struct(apache::thrift::FragileConstructor, ::module0::Struct first__arg, ::module1::Struct second__arg);
 
-  Struct(Struct&&) = default;
+  Struct(Struct&&) noexcept;
 
-  Struct(const Struct&) = default;
+  Struct(const Struct& src);
 
 
-  Struct& operator=(Struct&&) = default;
-
-  Struct& operator=(const Struct&) = default;
+  Struct& operator=(Struct&&) noexcept;
+  Struct& operator=(const Struct& src);
   void __clear();
  private:
   ::module0::Struct first;
  private:
   ::module1::Struct second;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool first;
     bool second;
   } __isset = {};
-  bool operator==(const Struct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Struct& __x, const Struct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Struct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Struct& __x, const Struct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Struct& __x, const Struct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Struct& __x, const Struct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Struct&) const;
+  bool operator<(const Struct&) const;
 
   template <typename..., typename T = ::module0::Struct>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> first_ref() const& {
@@ -161,6 +155,7 @@ class Struct final  {
   ::module0::Struct get_first() &&;
 
   template <typename T_Struct_first_struct_setter = ::module0::Struct>
+  [[deprecated("Use `FOO.first_ref() = BAR;` instead of `FOO.set_first(BAR);`")]]
   ::module0::Struct& set_first(T_Struct_first_struct_setter&& first_) {
     first = std::forward<T_Struct_first_struct_setter>(first_);
     __isset.first = true;
@@ -170,6 +165,7 @@ class Struct final  {
   ::module1::Struct get_second() &&;
 
   template <typename T_Struct_second_struct_setter = ::module1::Struct>
+  [[deprecated("Use `FOO.second_ref() = BAR;` instead of `FOO.set_second(BAR);`")]]
   ::module1::Struct& set_second(T_Struct_second_struct_setter&& second_) {
     second = std::forward<T_Struct_second_struct_setter>(second_);
     __isset.second = true;
@@ -189,7 +185,7 @@ class Struct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Struct >;
+  friend class ::apache::thrift::Cpp2Ops<Struct>;
   friend void swap(Struct& a, Struct& b);
 };
 
@@ -202,6 +198,13 @@ uint32_t Struct::read(Protocol_* iprot) {
 
 } // module2
 namespace module2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class BigStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -220,49 +223,36 @@ class BigStruct final  {
  public:
 
   BigStruct() :
-      id(0) {}
+      id(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   BigStruct(apache::thrift::FragileConstructor, ::module2::Struct s__arg, ::std::int32_t id__arg);
 
-  BigStruct(BigStruct&&) = default;
+  BigStruct(BigStruct&&) noexcept;
 
-  BigStruct(const BigStruct&) = default;
+  BigStruct(const BigStruct& src);
 
 
-  BigStruct& operator=(BigStruct&&) = default;
-
-  BigStruct& operator=(const BigStruct&) = default;
+  BigStruct& operator=(BigStruct&&) noexcept;
+  BigStruct& operator=(const BigStruct& src);
   void __clear();
  private:
   ::module2::Struct s;
  private:
   ::std::int32_t id;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool s;
     bool id;
   } __isset = {};
-  bool operator==(const BigStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const BigStruct& __x, const BigStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const BigStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const BigStruct& __x, const BigStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const BigStruct& __x, const BigStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const BigStruct& __x, const BigStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const BigStruct&) const;
+  bool operator<(const BigStruct&) const;
 
   template <typename..., typename T = ::module2::Struct>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> s_ref() const& {
@@ -307,6 +297,7 @@ class BigStruct final  {
   ::module2::Struct get_s() &&;
 
   template <typename T_BigStruct_s_struct_setter = ::module2::Struct>
+  [[deprecated("Use `FOO.s_ref() = BAR;` instead of `FOO.set_s(BAR);`")]]
   ::module2::Struct& set_s(T_BigStruct_s_struct_setter&& s_) {
     s = std::forward<T_BigStruct_s_struct_setter>(s_);
     __isset.s = true;
@@ -317,6 +308,7 @@ class BigStruct final  {
     return id;
   }
 
+  [[deprecated("Use `FOO.id_ref() = BAR;` instead of `FOO.set_id(BAR);`")]]
   ::std::int32_t& set_id(::std::int32_t id_) {
     id = id_;
     __isset.id = true;
@@ -336,7 +328,7 @@ class BigStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< BigStruct >;
+  friend class ::apache::thrift::Cpp2Ops<BigStruct>;
   friend void swap(BigStruct& a, BigStruct& b);
 };
 

@@ -33,9 +33,9 @@
 #include <thrift/lib/cpp2/protocol/CompactProtocol.h>
 #include <thrift/lib/cpp2/protocol/Serializer.h>
 #include <thrift/lib/cpp2/server/Cpp2Worker.h>
+#include <thrift/lib/cpp2/server/ThriftProcessor.h>
 #include <thrift/lib/cpp2/transport/core/EnvelopeUtil.h>
 #include <thrift/lib/cpp2/transport/core/ThriftClientCallback.h>
-#include <thrift/lib/cpp2/transport/core/ThriftProcessor.h>
 
 namespace apache {
 namespace thrift {
@@ -60,7 +60,10 @@ SingleRpcChannel::SingleRpcChannel(
     HTTPTransaction* txn,
     ThriftProcessor* processor,
     std::shared_ptr<Cpp2Worker> worker)
-    : processor_(processor), worker_(std::move(worker)), httpTransaction_(txn) {
+    : processor_(processor),
+      worker_(std::move(worker)),
+      httpTransaction_(txn),
+      activeRequestsGuard_{worker_->getActiveRequestsGuard()} {
   evb_ = EventBaseManager::get()->getExistingEventBase();
 }
 
@@ -84,8 +87,7 @@ SingleRpcChannel::~SingleRpcChannel() {
 }
 
 void SingleRpcChannel::sendThriftResponse(
-    ResponseRpcMetadata&& metadata,
-    std::unique_ptr<IOBuf> payload) noexcept {
+    ResponseRpcMetadata&& metadata, std::unique_ptr<IOBuf> payload) noexcept {
   DCHECK(evb_->isInEventBaseThread());
   VLOG(4) << "sendThriftResponse:" << std::endl
           << IOBufPrinter::printHexFolly(payload.get(), true);
@@ -143,7 +145,7 @@ void SingleRpcChannel::sendThriftRequest(
         std::chrono::milliseconds(*clientTimeoutMs));
   }
 
-  auto otherMetadata = std::map<std::string, std::string>();
+  apache::thrift::transport::THeader::StringToStringMap otherMetadata;
   if (auto other = metadata.otherMetadata_ref()) {
     otherMetadata = std::move(*other);
   }
@@ -219,8 +221,7 @@ void SingleRpcChannel::onH2StreamEnd() noexcept {
 }
 
 void SingleRpcChannel::onH2StreamClosed(
-    proxygen::ProxygenError error,
-    std::string errorDescription) noexcept {
+    proxygen::ProxygenError error, std::string errorDescription) noexcept {
   VLOG(4) << "onH2StreamClosed";
   if (callback_) {
     std::unique_ptr<TTransportException> ex;
@@ -260,6 +261,10 @@ void SingleRpcChannel::onMessageFlushed() noexcept {
 }
 
 void SingleRpcChannel::onThriftRequest() noexcept {
+  if (worker_->isStopping()) {
+    sendThriftErrorResponse("Server shutting down");
+    return;
+  }
   if (!contents_) {
     sendThriftErrorResponse("Proxygen stream has no body");
     return;
@@ -301,7 +306,6 @@ void SingleRpcChannel::onThriftRequest() noexcept {
     sendThriftResponse(std::move(responseMetadata), std::move(payload));
     receivedThriftRPC_ = true;
   }
-  metadata.seqId_ref() = 0;
   const folly::AsyncTransport* transport = httpTransaction_
       ? httpTransaction_->getTransport().getUnderlyingTransport()
       : nullptr;
@@ -360,7 +364,7 @@ void SingleRpcChannel::onThriftResponse() noexcept {
   }
   auto evb = callback_->getEventBase();
   ResponseRpcMetadata metadata;
-  map<string, string> headers;
+  transport::THeader::StringToStringMap headers;
   decodeHeaders(*headers_, headers, /*requestMetadata=*/nullptr);
   if (!headers.empty()) {
     metadata.otherMetadata_ref() = std::move(headers);
@@ -377,7 +381,7 @@ void SingleRpcChannel::onThriftResponse() noexcept {
 
 void SingleRpcChannel::extractHeaderInfo(
     RequestRpcMetadata* metadata) noexcept {
-  map<string, string> headers;
+  transport::THeader::StringToStringMap headers;
   decodeHeaders(*headers_, headers, metadata);
   if (!headers.empty()) {
     metadata->otherMetadata_ref() = std::move(headers);
@@ -385,11 +389,8 @@ void SingleRpcChannel::extractHeaderInfo(
 }
 
 void SingleRpcChannel::sendThriftErrorResponse(
-    const string& message,
-    ProtocolId protoId,
-    const string& name) noexcept {
+    const string& message, ProtocolId protoId, const string& name) noexcept {
   ResponseRpcMetadata responseMetadata;
-  responseMetadata.protocol_ref() = protoId;
   // Not setting the "ex" header since these errors do not fit into any
   // of the existing error categories.
   TApplicationException tae(message);

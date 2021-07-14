@@ -15,10 +15,12 @@
  */
 
 #include <thrift/lib/cpp2/server/Cpp2Worker.h>
+
 #include <vector>
 
 #include <glog/logging.h>
 
+#include <folly/Overload.h>
 #include <folly/String.h>
 #include <folly/io/async/AsyncSSLSocket.h>
 #include <folly/io/async/AsyncSocket.h>
@@ -132,8 +134,7 @@ void Cpp2Worker::onNewConnection(
 }
 
 void Cpp2Worker::handleHeader(
-    folly::AsyncTransport::UniquePtr sock,
-    const folly::SocketAddress* addr) {
+    folly::AsyncTransport::UniquePtr sock, const folly::SocketAddress* addr) {
   auto fd = sock->getUnderlyingTransport<folly::AsyncSocket>()
                 ->getNetworkSocket()
                 .toFd();
@@ -144,12 +145,6 @@ void Cpp2Worker::handleHeader(
       std::move(thriftTransport), addr, shared_from_this(), nullptr);
   Acceptor::addConnection(connection.get());
   connection->addConnection(connection);
-  // set compression algorithm to be used on this connection
-  auto compression = fizzPeeker_.getNegotiatedParameters().compression;
-  if (compression != CompressionAlgorithm::NONE) {
-    connection->setNegotiatedCompressionAlgorithm(compression);
-  }
-
   connection->start();
 
   VLOG(4) << "Cpp2Worker: created connection for socket " << fd;
@@ -293,8 +288,7 @@ wangle::AcceptorHandshakeHelper::UniquePtr Cpp2Worker::createSSLHelper(
 }
 
 bool Cpp2Worker::shouldPerformSSL(
-    const std::vector<uint8_t>& bytes,
-    const folly::SocketAddress& clientAddr) {
+    const std::vector<uint8_t>& bytes, const folly::SocketAddress& clientAddr) {
   auto sslPolicy = getSSLPolicy();
   if (sslPolicy == SSLPolicy::REQUIRED) {
     if (isPlaintextAllowedOnLoopback()) {
@@ -337,17 +331,7 @@ wangle::AcceptorHandshakeHelper::UniquePtr Cpp2Worker::getHelper(
     return wangle::AcceptorHandshakeHelper::UniquePtr(
         new wangle::UnencryptedAcceptorHandshakeHelper());
   }
-
-  auto sslAcceptor = createSSLHelper(bytes, clientAddr, acceptTime, ti);
-
-  // If we have a nonzero dedicated ssl handshake pool, offload the SSL
-  // handshakes with EvbHandshakeHelper.
-  if (server_->sslHandshakePool_->numThreads() > 0) {
-    return wangle::EvbHandshakeHelper::UniquePtr(new wangle::EvbHandshakeHelper(
-        std::move(sslAcceptor), server_->sslHandshakePool_->getEventBase()));
-  } else {
-    return sslAcceptor;
-  }
+  return createSSLHelper(bytes, clientAddr, acceptTime, ti);
 }
 
 void Cpp2Worker::requestStop() {
@@ -363,7 +347,7 @@ void Cpp2Worker::requestStop() {
   });
 }
 
-bool Cpp2Worker::waitForStop(std::chrono::system_clock::time_point deadline) {
+bool Cpp2Worker::waitForStop(std::chrono::steady_clock::time_point deadline) {
   if (!stopBaton_.try_wait_until(deadline)) {
     LOG(ERROR) << "Failed to join outstanding requests.";
     return false;
@@ -387,5 +371,34 @@ Cpp2Worker::ActiveRequestsGuard Cpp2Worker::getActiveRequestsGuard() {
   ++activeRequests_;
   return Cpp2Worker::ActiveRequestsGuard(this);
 }
+
+Cpp2Worker::PerServiceMetadata::FindMethodResult
+Cpp2Worker::PerServiceMetadata::findMethod(std::string_view methodName) const {
+  static const auto& wildcardMethodMetadata =
+      *new AsyncProcessorFactory::WildcardMethodMetadata{};
+
+  return folly::variant_match(
+      methods_,
+      [](AsyncProcessorFactory::MetadataNotImplemented) -> FindMethodResult {
+        return MetadataNotImplemented{};
+      },
+      [&](const AsyncProcessorFactory::MethodMetadataMap& map)
+          -> FindMethodResult {
+        if (auto* m = folly::get_ptr(map, methodName)) {
+          DCHECK(m->get());
+          return MetadataFound{**m};
+        }
+        return MetadataNotFound{};
+      },
+      [&](const AsyncProcessorFactory::WildcardMethodMetadataMap& wildcard)
+          -> FindMethodResult {
+        if (auto* m = folly::get_ptr(wildcard.knownMethods, methodName)) {
+          DCHECK(m->get());
+          return MetadataFound{**m};
+        }
+        return MetadataFound{wildcardMethodMetadata};
+      });
+}
+
 } // namespace thrift
 } // namespace apache

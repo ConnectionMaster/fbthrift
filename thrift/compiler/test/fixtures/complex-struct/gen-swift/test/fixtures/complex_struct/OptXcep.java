@@ -22,7 +22,7 @@ import org.apache.thrift.meta_data.FieldValueMetaData;
 
 @SwiftGenerated
 @com.facebook.swift.codec.ThriftStruct("optXcep")
-public final class OptXcep extends java.lang.Exception {
+public final class OptXcep extends java.lang.Exception implements com.facebook.thrift.payload.ThriftSerializable {
     private static final long serialVersionUID = 1L;
 
 
@@ -96,6 +96,10 @@ public final class OptXcep extends java.lang.Exception {
     @com.facebook.swift.codec.ThriftField(value=2, name="errorCode", requiredness=Requiredness.OPTIONAL)
     public Integer getErrorCode() { return errorCode; }
     
+    
+    public static com.facebook.thrift.payload.Reader<OptXcep> asReader() {
+      return OptXcep::read0;
+    }
     
     public static OptXcep read0(TProtocol oprot) throws TException {
       TField __field;

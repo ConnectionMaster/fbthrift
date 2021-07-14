@@ -281,6 +281,13 @@ typedef ::std::map<::std::string, ::std::string> MyMapIdentifier;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Internship final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -301,19 +308,19 @@ class Internship final  {
   Internship() :
       weeks(0),
       employer( ::cpp2::Company::FACEBOOK),
-      compensation(0) {}
+      compensation(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Internship(apache::thrift::FragileConstructor, ::std::int32_t weeks__arg, ::std::string title__arg, ::cpp2::Company employer__arg, double compensation__arg);
 
-  Internship(Internship&&) = default;
+  Internship(Internship&&) noexcept;
 
-  Internship(const Internship&) = default;
+  Internship(const Internship& src);
 
 
-  Internship& operator=(Internship&&) = default;
-
-  Internship& operator=(const Internship&) = default;
+  Internship& operator=(Internship&&) noexcept;
+  Internship& operator=(const Internship& src);
   void __clear();
  public:
   ::std::int32_t weeks;
@@ -324,31 +331,18 @@ class Internship final  {
  private:
   double compensation;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool title;
     bool employer;
     bool compensation;
   } __isset = {};
-  bool operator==(const Internship& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Internship& __x, const Internship& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Internship& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Internship& __x, const Internship& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Internship& __x, const Internship& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Internship& __x, const Internship& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Internship&) const;
+  bool operator<(const Internship&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::required_field_ref<const T&> weeks_ref() const& {
@@ -434,6 +428,7 @@ class Internship final  {
     return weeks;
   }
 
+  [[deprecated("Use `FOO.weeks_ref() = BAR;` instead of `FOO.set_weeks(BAR);`")]]
   ::std::int32_t& set_weeks(::std::int32_t weeks_) {
     weeks = weeks_;
     return weeks;
@@ -448,6 +443,7 @@ class Internship final  {
   }
 
   template <typename T_Internship_title_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.title_ref() = BAR;` instead of `FOO.set_title(BAR);`")]]
   ::std::string& set_title(T_Internship_title_struct_setter&& title_) {
     title = std::forward<T_Internship_title_struct_setter>(title_);
     __isset.title = true;
@@ -463,6 +459,7 @@ class Internship final  {
   }
   ::cpp2::Company* get_employer() && = delete;
 
+  [[deprecated("Use `FOO.employer_ref() = BAR;` instead of `FOO.set_employer(BAR);`")]]
   ::cpp2::Company& set_employer(::cpp2::Company employer_) {
     employer = employer_;
     __isset.employer = true;
@@ -478,6 +475,7 @@ class Internship final  {
   }
   double* get_compensation() && = delete;
 
+  [[deprecated("Use `FOO.compensation_ref() = BAR;` instead of `FOO.set_compensation(BAR);`")]]
   double& set_compensation(double compensation_) {
     compensation = compensation_;
     __isset.compensation = true;
@@ -497,7 +495,7 @@ class Internship final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Internship >;
+  friend class ::apache::thrift::Cpp2Ops<Internship>;
   friend void swap(Internship& a, Internship& b);
 };
 
@@ -510,6 +508,13 @@ uint32_t Internship::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class Range final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -529,7 +534,8 @@ class Range final  {
 
   Range() :
       min(0),
-      max(0) {}
+      max(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Range(apache::thrift::FragileConstructor, ::std::int32_t min__arg, ::std::int32_t max__arg);
@@ -548,25 +554,12 @@ class Range final  {
  public:
   ::std::int32_t max;
 
+ private:
+
  public:
-  bool operator==(const Range& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Range& __x, const Range& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Range& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Range& __x, const Range& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Range& __x, const Range& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Range& __x, const Range& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const Range&) const;
+  bool operator<(const Range&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::required_field_ref<const T&> min_ref() const& {
@@ -612,6 +605,7 @@ class Range final  {
     return min;
   }
 
+  [[deprecated("Use `FOO.min_ref() = BAR;` instead of `FOO.set_min(BAR);`")]]
   ::std::int32_t& set_min(::std::int32_t min_) {
     min = min_;
     return min;
@@ -621,6 +615,7 @@ class Range final  {
     return max;
   }
 
+  [[deprecated("Use `FOO.max_ref() = BAR;` instead of `FOO.set_max(BAR);`")]]
   ::std::int32_t& set_max(::std::int32_t max_) {
     max = max_;
     return max;
@@ -639,7 +634,7 @@ class Range final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Range >;
+  friend class ::apache::thrift::Cpp2Ops<Range>;
   friend void swap(Range& a, Range& b);
 };
 
@@ -652,6 +647,13 @@ uint32_t Range::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class struct1 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -671,49 +673,36 @@ class struct1 final  {
 
   struct1() :
       a(1234567),
-      b(apache::thrift::StringTraits< std::string>::fromStringLiteral("<uninitialized>")) {}
+      b(apache::thrift::StringTraits<std::string>::fromStringLiteral("<uninitialized>")) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   struct1(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::std::string b__arg);
 
-  struct1(struct1&&) = default;
+  struct1(struct1&&) noexcept;
 
-  struct1(const struct1&) = default;
+  struct1(const struct1& src);
 
 
-  struct1& operator=(struct1&&) = default;
-
-  struct1& operator=(const struct1&) = default;
+  struct1& operator=(struct1&&) noexcept;
+  struct1& operator=(const struct1& src);
   void __clear();
  private:
   ::std::int32_t a;
  private:
   ::std::string b;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool a;
     bool b;
   } __isset = {};
-  bool operator==(const struct1& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const struct1& __x, const struct1& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const struct1& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const struct1& __x, const struct1& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const struct1& __x, const struct1& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const struct1& __x, const struct1& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const struct1&) const;
+  bool operator<(const struct1&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> a_ref() const& {
@@ -759,6 +748,7 @@ class struct1 final  {
     return a;
   }
 
+  [[deprecated("Use `FOO.a_ref() = BAR;` instead of `FOO.set_a(BAR);`")]]
   ::std::int32_t& set_a(::std::int32_t a_) {
     a = a_;
     __isset.a = true;
@@ -774,6 +764,7 @@ class struct1 final  {
   }
 
   template <typename T_struct1_b_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.b_ref() = BAR;` instead of `FOO.set_b(BAR);`")]]
   ::std::string& set_b(T_struct1_b_struct_setter&& b_) {
     b = std::forward<T_struct1_b_struct_setter>(b_);
     __isset.b = true;
@@ -793,7 +784,7 @@ class struct1 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< struct1 >;
+  friend class ::apache::thrift::Cpp2Ops<struct1>;
   friend void swap(struct1& a, struct1& b);
 };
 
@@ -806,6 +797,13 @@ uint32_t struct1::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class struct2 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -824,19 +822,19 @@ class struct2 final  {
  public:
 
   struct2() :
-      a(0) {}
+      a(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   struct2(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::std::string b__arg, ::cpp2::struct1 c__arg, ::std::vector<::std::int32_t> d__arg);
 
-  struct2(struct2&&) = default;
+  struct2(struct2&&) noexcept;
 
-  struct2(const struct2&) = default;
+  struct2(const struct2& src);
 
 
-  struct2& operator=(struct2&&) = default;
-
-  struct2& operator=(const struct2&) = default;
+  struct2& operator=(struct2&&) noexcept;
+  struct2& operator=(const struct2& src);
   void __clear();
  private:
   ::std::int32_t a;
@@ -847,7 +845,7 @@ class struct2 final  {
  private:
   ::std::vector<::std::int32_t> d;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool a;
@@ -855,24 +853,11 @@ class struct2 final  {
     bool c;
     bool d;
   } __isset = {};
-  bool operator==(const struct2& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const struct2& __x, const struct2& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const struct2& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const struct2& __x, const struct2& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const struct2& __x, const struct2& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const struct2& __x, const struct2& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const struct2&) const;
+  bool operator<(const struct2&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> a_ref() const& {
@@ -958,6 +943,7 @@ class struct2 final  {
     return a;
   }
 
+  [[deprecated("Use `FOO.a_ref() = BAR;` instead of `FOO.set_a(BAR);`")]]
   ::std::int32_t& set_a(::std::int32_t a_) {
     a = a_;
     __isset.a = true;
@@ -973,6 +959,7 @@ class struct2 final  {
   }
 
   template <typename T_struct2_b_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.b_ref() = BAR;` instead of `FOO.set_b(BAR);`")]]
   ::std::string& set_b(T_struct2_b_struct_setter&& b_) {
     b = std::forward<T_struct2_b_struct_setter>(b_);
     __isset.b = true;
@@ -982,6 +969,7 @@ class struct2 final  {
   ::cpp2::struct1 get_c() &&;
 
   template <typename T_struct2_c_struct_setter = ::cpp2::struct1>
+  [[deprecated("Use `FOO.c_ref() = BAR;` instead of `FOO.set_c(BAR);`")]]
   ::cpp2::struct1& set_c(T_struct2_c_struct_setter&& c_) {
     c = std::forward<T_struct2_c_struct_setter>(c_);
     __isset.c = true;
@@ -991,6 +979,7 @@ class struct2 final  {
   ::std::vector<::std::int32_t> get_d() &&;
 
   template <typename T_struct2_d_struct_setter = ::std::vector<::std::int32_t>>
+  [[deprecated("Use `FOO.d_ref() = BAR;` instead of `FOO.set_d(BAR);`")]]
   ::std::vector<::std::int32_t>& set_d(T_struct2_d_struct_setter&& d_) {
     d = std::forward<T_struct2_d_struct_setter>(d_);
     __isset.d = true;
@@ -1010,7 +999,7 @@ class struct2 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< struct2 >;
+  friend class ::apache::thrift::Cpp2Ops<struct2>;
   friend void swap(struct2& a, struct2& b);
 };
 
@@ -1023,6 +1012,13 @@ uint32_t struct2::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class struct3 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1041,19 +1037,19 @@ class struct3 final  {
  public:
 
   struct3() :
-      b(0) {}
+      b(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   struct3(apache::thrift::FragileConstructor, ::std::string a__arg, ::std::int32_t b__arg, ::cpp2::struct2 c__arg);
 
-  struct3(struct3&&) = default;
+  struct3(struct3&&) noexcept;
 
-  struct3(const struct3&) = default;
+  struct3(const struct3& src);
 
 
-  struct3& operator=(struct3&&) = default;
-
-  struct3& operator=(const struct3&) = default;
+  struct3& operator=(struct3&&) noexcept;
+  struct3& operator=(const struct3& src);
   void __clear();
  private:
   ::std::string a;
@@ -1062,31 +1058,18 @@ class struct3 final  {
  private:
   ::cpp2::struct2 c;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool a;
     bool b;
     bool c;
   } __isset = {};
-  bool operator==(const struct3& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const struct3& __x, const struct3& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const struct3& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const struct3& __x, const struct3& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const struct3& __x, const struct3& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const struct3& __x, const struct3& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const struct3&) const;
+  bool operator<(const struct3&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> a_ref() const& {
@@ -1157,6 +1140,7 @@ class struct3 final  {
   }
 
   template <typename T_struct3_a_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.a_ref() = BAR;` instead of `FOO.set_a(BAR);`")]]
   ::std::string& set_a(T_struct3_a_struct_setter&& a_) {
     a = std::forward<T_struct3_a_struct_setter>(a_);
     __isset.a = true;
@@ -1167,6 +1151,7 @@ class struct3 final  {
     return b;
   }
 
+  [[deprecated("Use `FOO.b_ref() = BAR;` instead of `FOO.set_b(BAR);`")]]
   ::std::int32_t& set_b(::std::int32_t b_) {
     b = b_;
     __isset.b = true;
@@ -1176,6 +1161,7 @@ class struct3 final  {
   ::cpp2::struct2 get_c() &&;
 
   template <typename T_struct3_c_struct_setter = ::cpp2::struct2>
+  [[deprecated("Use `FOO.c_ref() = BAR;` instead of `FOO.set_c(BAR);`")]]
   ::cpp2::struct2& set_c(T_struct3_c_struct_setter&& c_) {
     c = std::forward<T_struct3_c_struct_setter>(c_);
     __isset.c = true;
@@ -1195,7 +1181,7 @@ class struct3 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< struct3 >;
+  friend class ::apache::thrift::Cpp2Ops<struct3>;
   friend void swap(struct3& a, struct3& b);
 };
 
@@ -1208,6 +1194,13 @@ uint32_t struct3::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class struct4 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1228,19 +1221,19 @@ class struct4 final  {
   struct4() :
       a(0),
       b(0),
-      c(0) {}
+      c(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   struct4(apache::thrift::FragileConstructor, ::std::int32_t a__arg, double b__arg, ::std::int8_t c__arg);
 
-  struct4(struct4&&) = default;
+  struct4(struct4&&) noexcept;
 
-  struct4(const struct4&) = default;
+  struct4(const struct4& src);
 
 
-  struct4& operator=(struct4&&) = default;
-
-  struct4& operator=(const struct4&) = default;
+  struct4& operator=(struct4&&) noexcept;
+  struct4& operator=(const struct4& src);
   void __clear();
  private:
   ::std::int32_t a;
@@ -1249,31 +1242,18 @@ class struct4 final  {
  private:
   ::std::int8_t c;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool a;
     bool b;
     bool c;
   } __isset = {};
-  bool operator==(const struct4& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const struct4& __x, const struct4& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const struct4& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const struct4& __x, const struct4& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const struct4& __x, const struct4& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const struct4& __x, const struct4& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const struct4&) const;
+  bool operator<(const struct4&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> a_ref() const& {
@@ -1339,6 +1319,7 @@ class struct4 final  {
     return a;
   }
 
+  [[deprecated("Use `FOO.a_ref() = BAR;` instead of `FOO.set_a(BAR);`")]]
   ::std::int32_t& set_a(::std::int32_t a_) {
     a = a_;
     __isset.a = true;
@@ -1354,6 +1335,7 @@ class struct4 final  {
   }
   double* get_b() && = delete;
 
+  [[deprecated("Use `FOO.b_ref() = BAR;` instead of `FOO.set_b(BAR);`")]]
   double& set_b(double b_) {
     b = b_;
     __isset.b = true;
@@ -1369,6 +1351,7 @@ class struct4 final  {
   }
   ::std::int8_t* get_c() && = delete;
 
+  [[deprecated("Use `FOO.c_ref() = BAR;` instead of `FOO.set_c(BAR);`")]]
   ::std::int8_t& set_c(::std::int8_t c_) {
     c = c_;
     __isset.c = true;
@@ -1388,7 +1371,7 @@ class struct4 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< struct4 >;
+  friend class ::apache::thrift::Cpp2Ops<struct4>;
   friend void swap(struct4& a, struct4& b);
 };
 
@@ -1401,6 +1384,13 @@ uint32_t struct4::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class union1 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1426,7 +1416,7 @@ class union1 final  {
   union1()
       : type_(Type::__EMPTY__) {}
 
-  union1(union1&& rhs)
+  union1(union1&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -1473,7 +1463,7 @@ class union1 final  {
     }
   }
 
-  union1& operator=(union1&& rhs) {
+  union1& operator=(union1&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -1533,24 +1523,9 @@ class union1 final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const union1& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const union1& __x, const union1& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const union1& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const union1& __x, const union1& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const union1& __x, const union1& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const union1& __x, const union1& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const union1&) const;
+  bool operator<(const union1&) const;
 
   ::std::int32_t& set_i(::std::int32_t t = ::std::int32_t()) {
     __clear();
@@ -1566,22 +1541,26 @@ class union1 final  {
     return value_.d;
   }
 
-  ::std::int32_t const & get_i() const {
-    assert(type_ == Type::i);
+  ::std::int32_t const& get_i() const {
+    if (type_ != Type::i) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.i;
   }
 
-  double const & get_d() const {
-    assert(type_ == Type::d);
+  double const& get_d() const {
+    if (type_ != Type::d) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.d;
   }
 
-  ::std::int32_t & mutable_i() {
+  ::std::int32_t& mutable_i() {
     assert(type_ == Type::i);
     return value_.i;
   }
 
-  double & mutable_d() {
+  double& mutable_d() {
     assert(type_ == Type::d);
     return value_.d;
   }
@@ -1657,7 +1636,7 @@ class union1 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< union1 >;
+  friend class ::apache::thrift::Cpp2Ops<union1>;
   friend void swap(union1& a, union1& b);
 };
 
@@ -1670,6 +1649,13 @@ uint32_t union1::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class union2 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1697,7 +1683,7 @@ class union2 final  {
   union2()
       : type_(Type::__EMPTY__) {}
 
-  union2(union2&& rhs)
+  union2(union2&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -1764,7 +1750,7 @@ class union2 final  {
     }
   }
 
-  union2& operator=(union2&& rhs) {
+  union2& operator=(union2&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -1846,24 +1832,9 @@ class union2 final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const union2& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const union2& __x, const union2& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const union2& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const union2& __x, const union2& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const union2& __x, const union2& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const union2& __x, const union2& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const union2&) const;
+  bool operator<(const union2&) const;
 
   ::std::int32_t& set_i(::std::int32_t t = ::std::int32_t()) {
     __clear();
@@ -1921,42 +1892,50 @@ class union2 final  {
     return value_.u;
   }
 
-  ::std::int32_t const & get_i() const {
-    assert(type_ == Type::i);
+  ::std::int32_t const& get_i() const {
+    if (type_ != Type::i) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.i;
   }
 
-  double const & get_d() const {
-    assert(type_ == Type::d);
+  double const& get_d() const {
+    if (type_ != Type::d) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.d;
   }
 
-  ::cpp2::struct1 const & get_s() const {
-    assert(type_ == Type::s);
+  ::cpp2::struct1 const& get_s() const {
+    if (type_ != Type::s) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.s;
   }
 
-  ::cpp2::union1 const & get_u() const {
-    assert(type_ == Type::u);
+  ::cpp2::union1 const& get_u() const {
+    if (type_ != Type::u) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.u;
   }
 
-  ::std::int32_t & mutable_i() {
+  ::std::int32_t& mutable_i() {
     assert(type_ == Type::i);
     return value_.i;
   }
 
-  double & mutable_d() {
+  double& mutable_d() {
     assert(type_ == Type::d);
     return value_.d;
   }
 
-  ::cpp2::struct1 & mutable_s() {
+  ::cpp2::struct1& mutable_s() {
     assert(type_ == Type::s);
     return value_.s;
   }
 
-  ::cpp2::union1 & mutable_u() {
+  ::cpp2::union1& mutable_u() {
     assert(type_ == Type::u);
     return value_.u;
   }
@@ -2080,7 +2059,7 @@ class union2 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< union2 >;
+  friend class ::apache::thrift::Cpp2Ops<union2>;
   friend void swap(union2& a, union2& b);
 };
 

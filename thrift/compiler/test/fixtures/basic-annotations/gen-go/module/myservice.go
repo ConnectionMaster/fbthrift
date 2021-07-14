@@ -527,6 +527,11 @@ type myServiceProcessorPing struct {
   handler MyService
 }
 
+func (p *MyServicePingResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *myServiceProcessorPing) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := MyServicePingArgs{}
   if err := args.Read(iprot); err != nil {
@@ -572,6 +577,11 @@ func (p *myServiceProcessorPing) Run(argStruct thrift.Struct) (thrift.WritableSt
 
 type myServiceProcessorGetRandomData struct {
   handler MyService
+}
+
+func (p *MyServiceGetRandomDataResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *myServiceProcessorGetRandomData) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -621,6 +631,11 @@ func (p *myServiceProcessorGetRandomData) Run(argStruct thrift.Struct) (thrift.W
 
 type myServiceProcessorHasDataById struct {
   handler MyService
+}
+
+func (p *MyServiceHasDataByIdResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *myServiceProcessorHasDataById) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -673,6 +688,11 @@ type myServiceProcessorGetDataById struct {
   handler MyService
 }
 
+func (p *MyServiceGetDataByIdResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *myServiceProcessorGetDataById) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := MyServiceGetDataByIdArgs{}
   if err := args.Read(iprot); err != nil {
@@ -721,6 +741,11 @@ func (p *myServiceProcessorGetDataById) Run(argStruct thrift.Struct) (thrift.Wri
 
 type myServiceProcessorPutDataById struct {
   handler MyService
+}
+
+func (p *MyServicePutDataByIdResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *myServiceProcessorPutDataById) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -816,6 +841,11 @@ func (p *myServiceProcessorLobDataById) Run(argStruct thrift.Struct) (thrift.Wri
 
 type myServiceProcessorDoNothing struct {
   handler MyService
+}
+
+func (p *MyServiceDoNothingResult) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *myServiceProcessorDoNothing) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -1066,7 +1096,7 @@ func (p *MyServiceGetRandomDataArgs) String() string {
 //  - Success
 type MyServiceGetRandomDataResult struct {
   thrift.IResponse
-  Success *string `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *string `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewMyServiceGetRandomDataResult() *MyServiceGetRandomDataResult {
@@ -1304,7 +1334,7 @@ func (p *MyServiceHasDataByIdArgs) String() string {
 //  - Success
 type MyServiceHasDataByIdResult struct {
   thrift.IResponse
-  Success *bool `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *bool `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewMyServiceHasDataByIdResult() *MyServiceHasDataByIdResult {
@@ -1542,7 +1572,7 @@ func (p *MyServiceGetDataByIdArgs) String() string {
 //  - Success
 type MyServiceGetDataByIdResult struct {
   thrift.IResponse
-  Success *string `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success *string `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewMyServiceGetDataByIdResult() *MyServiceGetDataByIdResult {

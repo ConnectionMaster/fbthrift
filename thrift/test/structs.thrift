@@ -42,10 +42,6 @@ struct BasicRefsShared {
   1: HasInt def_field (cpp.ref_type = "shared");
 }
 
-struct BasicRefsAnnotCppNoexceptMoveCtor {
-  1: HasInt def_field (cpp.ref);
-} (cpp.noexcept_move_ctor)
-
 typedef Basic (
   cpp.type = "WrappedTypeField<Basic>",
   cpp.indirection,
@@ -82,3 +78,7 @@ struct NoexceptMoveStruct {
 struct CppDataMethod {
   1: i32 foo;
 } (cpp.internal.deprecated._data.method)
+
+struct PublicIsset {
+  1: i32 foo;
+} (cpp.deprecated_public_isset)

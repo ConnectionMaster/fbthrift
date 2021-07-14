@@ -41,3 +41,12 @@ TEST(EnumUtilsTest, ShortEnumNameSafe) {
   EXPECT_EQ(enumNameSafe((MyEnum)42), "42");
   EXPECT_EQ(enumNameSafe((MyEnum)-1), "-1");
 }
+
+TEST(EnumUtilsTest, ShortEnumNameOrThrow) {
+  EXPECT_STREQ(enumNameOrThrow((MyEnum)0), "UNKNOWN");
+  EXPECT_STREQ(enumNameOrThrow((MyEnum)1), "VALUE");
+  EXPECT_STREQ(enumNameOrThrow((MyEnum)2), "FOO");
+  EXPECT_STREQ(enumNameOrThrow((MyEnum)3), "BAR");
+  EXPECT_THROW(enumNameOrThrow(MyEnum(42)), std::out_of_range);
+  EXPECT_THROW(enumNameOrThrow(MyEnum(-1)), std::out_of_range);
+}

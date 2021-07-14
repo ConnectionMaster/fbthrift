@@ -150,13 +150,13 @@ void HTTPClientChannel::destroy() {
 
 void HTTPClientChannel::sendRequestNoResponse(
     const RpcOptions& rpcOptions,
-    ManagedStringView&& methodName,
+    MethodMetadata&& methodMetadata,
     SerializedRequest&& serializedRequest,
     std::shared_ptr<THeader> header,
     RequestClientCallback::Ptr cb) {
   auto buf = LegacySerializedRequest(
                  header->getProtocolId(),
-                 methodName.view(),
+                 methodMetadata.name_view(),
                  std::move(serializedRequest))
                  .buffer;
 
@@ -166,13 +166,13 @@ void HTTPClientChannel::sendRequestNoResponse(
 
 void HTTPClientChannel::sendRequestResponse(
     const RpcOptions& rpcOptions,
-    ManagedStringView&& methodName,
+    MethodMetadata&& methodMetadata,
     SerializedRequest&& serializedRequest,
     std::shared_ptr<THeader> header,
     RequestClientCallback::Ptr cb) {
   auto buf = LegacySerializedRequest(
                  header->getProtocolId(),
-                 methodName.view(),
+                 methodMetadata.name_view(),
                  std::move(serializedRequest))
                  .buffer;
 
@@ -271,20 +271,14 @@ void HTTPClientChannel::setHeaders(
 }
 
 proxygen::HTTPMessage HTTPClientChannel::buildHTTPMessage(THeader* header) {
+  preprocessHeader(header);
+
   proxygen::HTTPMessage msg;
   msg.setMethod(proxygen::HTTPMethod::POST);
   msg.setURL(httpUrl_);
   msg.setHTTPVersion(1, 1);
   msg.setIsChunked(false);
   auto& headers = msg.getHeaders();
-
-  {
-    auto pwh = getPersistentWriteHeaders();
-    setHeaders(headers, pwh);
-    // We do not clear the persistent write headers, since http does not
-    // distinguish persistent/per request headers
-    // pwh.clear();
-  }
 
   {
     auto wh = header->releaseWriteHeaders();
@@ -346,8 +340,7 @@ void HTTPClientChannel::setFlowControl(
 // HTTPTransactionCallback methods
 
 HTTPClientChannel::HTTPTransactionCallback::HTTPTransactionCallback(
-    bool oneway,
-    RequestClientCallback::Ptr cb)
+    bool oneway, RequestClientCallback::Ptr cb)
     : oneway_(oneway), cb_(std::move(cb)), txn_(nullptr) {}
 
 HTTPClientChannel::HTTPTransactionCallback::~HTTPTransactionCallback() {

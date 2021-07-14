@@ -278,6 +278,11 @@ type dbMixedStackArgumentsProcessorGetDataByKey0 struct {
   handler DbMixedStackArguments
 }
 
+func (p *DbMixedStackArgumentsGetDataByKey0Result) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
+}
+
 func (p *dbMixedStackArgumentsProcessorGetDataByKey0) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
   args := DbMixedStackArgumentsGetDataByKey0Args{}
   if err := args.Read(iprot); err != nil {
@@ -326,6 +331,11 @@ func (p *dbMixedStackArgumentsProcessorGetDataByKey0) Run(argStruct thrift.Struc
 
 type dbMixedStackArgumentsProcessorGetDataByKey1 struct {
   handler DbMixedStackArguments
+}
+
+func (p *DbMixedStackArgumentsGetDataByKey1Result) Exception() thrift.WritableException {
+  if p == nil { return nil }
+  return nil
 }
 
 func (p *dbMixedStackArgumentsProcessorGetDataByKey1) Read(iprot thrift.Protocol) (thrift.Struct, thrift.Exception) {
@@ -493,7 +503,7 @@ func (p *DbMixedStackArgumentsGetDataByKey0Args) String() string {
 //  - Success
 type DbMixedStackArgumentsGetDataByKey0Result struct {
   thrift.IResponse
-  Success []byte `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success []byte `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewDbMixedStackArgumentsGetDataByKey0Result() *DbMixedStackArgumentsGetDataByKey0Result {
@@ -724,7 +734,7 @@ func (p *DbMixedStackArgumentsGetDataByKey1Args) String() string {
 //  - Success
 type DbMixedStackArgumentsGetDataByKey1Result struct {
   thrift.IResponse
-  Success []byte `thrift:"success,0" db:"success" json:"success,omitempty"`
+  Success []byte `thrift:"success,0,optional" db:"success" json:"success,omitempty"`
 }
 
 func NewDbMixedStackArgumentsGetDataByKey1Result() *DbMixedStackArgumentsGetDataByKey1Result {

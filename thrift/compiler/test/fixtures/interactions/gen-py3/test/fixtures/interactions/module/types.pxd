@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -38,8 +38,15 @@ from thrift.py3.common cimport (
     MetadataBox as __MetadataBox,
 )
 from folly.optional cimport cOptional as __cOptional
+from folly cimport cFollyTry
+from cpython.ref cimport PyObject
+from thrift.py3.stream cimport (
+    ClientBufferedStream, cClientBufferedStream, cClientBufferedStreamWrapper,
+    ResponseAndClientBufferedStream, cResponseAndClientBufferedStream,
+    ServerStream, cServerStream, ResponseAndServerStream
+)
 
-cimport test.fixtures.interactions.module.types_fields as __fbthrift_types_fields
+cimport test.fixtures.interactions.module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -50,4 +57,20 @@ cdef extern from "src/gen-py3/module/types.h":
 
 
 
+
+
+cdef class ClientBufferedStream__bool(ClientBufferedStream):
+    cdef unique_ptr[cClientBufferedStreamWrapper[cbool]] _gen
+
+    @staticmethod
+    cdef create(cClientBufferedStream[cbool]& c_obj, __RpcOptions rpc_options)
+
+    @staticmethod
+    cdef void callback(
+        cFollyTry[__cOptional[cbool]]&& res,
+        PyObject* userdata,
+    )
+
+cdef class ServerStream__bool(ServerStream):
+    pass
 

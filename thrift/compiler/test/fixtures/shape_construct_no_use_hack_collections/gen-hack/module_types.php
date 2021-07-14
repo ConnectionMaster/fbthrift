@@ -16,7 +16,19 @@ enum TestEnum: int {
 }
 
 class TestEnum_TEnumStaticMetadata implements \IThriftEnumStaticMetadata {
-  public static function getAllStructuredAnnotations(): \TEnumAnnotations {
+  public static function getEnumMetadata()[]: \tmeta_ThriftEnum {
+    return tmeta_ThriftEnum::fromShape(
+      shape(
+        "name" => "module.TestEnum",
+        "elements" => dict[
+          0 => "UNKNOWN",
+          1 => "NEW_VALUE",
+        ],
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TEnumAnnotations {
     return shape(
       'enum' => dict[],
       'constants' => dict[
@@ -191,15 +203,15 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'TestUnion';
   }
 
-  public function getType(): TestUnionEnum {
+  public function getType()[]: TestUnionEnum {
     return $this->_type;
   }
 
-  public function reset(): void {
+  public function reset()[write_props]: void {
     switch ($this->_type) {
       case TestUnionEnum::int_value:
         $this->int_value = null;
@@ -225,22 +237,22 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
     $this->_type = TestUnionEnum::_EMPTY_;
 }
 
-  public function set_int_value(int $int_value): this {
+  public function set_int_value(int $int_value)[write_props]: this {
     return $this->setx_int_value($int_value);
    }
 
-  public function setx_int_value(int $int_value): this {
+  public function setx_int_value(int $int_value)[write_props]: this {
     $this->reset();
     $this->_type = TestUnionEnum::int_value;
     $this->int_value = $int_value;
     return $this;
   }
 
-  public function get_int_value(): int {
+  public function get_int_value()[]: int {
     return $this->getx_int_value();
   }
 
-  public function getx_int_value(): int {
+  public function getx_int_value()[]: int {
     invariant(
       $this->_type === TestUnionEnum::int_value,
       'get_int_value called on an instance of TestUnion whose current type is %s',
@@ -249,22 +261,22 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
     return $this->int_value as nonnull;
   }
 
-  public function set_str_value(string $str_value): this {
+  public function set_str_value(string $str_value)[write_props]: this {
     return $this->setx_str_value($str_value);
    }
 
-  public function setx_str_value(string $str_value): this {
+  public function setx_str_value(string $str_value)[write_props]: this {
     $this->reset();
     $this->_type = TestUnionEnum::str_value;
     $this->str_value = $str_value;
     return $this;
   }
 
-  public function get_str_value(): string {
+  public function get_str_value()[]: string {
     return $this->getx_str_value();
   }
 
-  public function getx_str_value(): string {
+  public function getx_str_value()[]: string {
     invariant(
       $this->_type === TestUnionEnum::str_value,
       'get_str_value called on an instance of TestUnion whose current type is %s',
@@ -273,22 +285,22 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
     return $this->str_value as nonnull;
   }
 
-  public function set_double_value(float $double_value): this {
+  public function set_double_value(float $double_value)[write_props]: this {
     return $this->setx_double_value($double_value);
    }
 
-  public function setx_double_value(float $double_value): this {
+  public function setx_double_value(float $double_value)[write_props]: this {
     $this->reset();
     $this->_type = TestUnionEnum::double_value;
     $this->double_value = $double_value;
     return $this;
   }
 
-  public function get_double_value(): float {
+  public function get_double_value()[]: float {
     return $this->getx_double_value();
   }
 
-  public function getx_double_value(): float {
+  public function getx_double_value()[]: float {
     invariant(
       $this->_type === TestUnionEnum::double_value,
       'get_double_value called on an instance of TestUnion whose current type is %s',
@@ -297,22 +309,22 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
     return $this->double_value as nonnull;
   }
 
-  public function set_list_of_strings(varray<string> $list_of_strings): this {
+  public function set_list_of_strings(varray<string> $list_of_strings)[write_props]: this {
     return $this->setx_list_of_strings($list_of_strings);
    }
 
-  public function setx_list_of_strings(varray<string> $list_of_strings): this {
+  public function setx_list_of_strings(varray<string> $list_of_strings)[write_props]: this {
     $this->reset();
     $this->_type = TestUnionEnum::list_of_strings;
     $this->list_of_strings = $list_of_strings;
     return $this;
   }
 
-  public function get_list_of_strings(): varray<string> {
+  public function get_list_of_strings()[]: varray<string> {
     return $this->getx_list_of_strings();
   }
 
-  public function getx_list_of_strings(): varray<string> {
+  public function getx_list_of_strings()[]: varray<string> {
     invariant(
       $this->_type === TestUnionEnum::list_of_strings,
       'get_list_of_strings called on an instance of TestUnion whose current type is %s',
@@ -321,22 +333,22 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
     return $this->list_of_strings as nonnull;
   }
 
-  public function set_map_of_string_to_ints(darray<string, int> $map_of_string_to_ints): this {
+  public function set_map_of_string_to_ints(darray<string, int> $map_of_string_to_ints)[write_props]: this {
     return $this->setx_map_of_string_to_ints($map_of_string_to_ints);
    }
 
-  public function setx_map_of_string_to_ints(darray<string, int> $map_of_string_to_ints): this {
+  public function setx_map_of_string_to_ints(darray<string, int> $map_of_string_to_ints)[write_props]: this {
     $this->reset();
     $this->_type = TestUnionEnum::map_of_string_to_ints;
     $this->map_of_string_to_ints = $map_of_string_to_ints;
     return $this;
   }
 
-  public function get_map_of_string_to_ints(): darray<string, int> {
+  public function get_map_of_string_to_ints()[]: darray<string, int> {
     return $this->getx_map_of_string_to_ints();
   }
 
-  public function getx_map_of_string_to_ints(): darray<string, int> {
+  public function getx_map_of_string_to_ints()[]: darray<string, int> {
     invariant(
       $this->_type === TestUnionEnum::map_of_string_to_ints,
       'get_map_of_string_to_ints called on an instance of TestUnion whose current type is %s',
@@ -345,22 +357,22 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
     return $this->map_of_string_to_ints as nonnull;
   }
 
-  public function set_struct_foo(Foo $struct_foo): this {
+  public function set_struct_foo(Foo $struct_foo)[write_props]: this {
     return $this->setx_struct_foo($struct_foo);
    }
 
-  public function setx_struct_foo(Foo $struct_foo): this {
+  public function setx_struct_foo(Foo $struct_foo)[write_props]: this {
     $this->reset();
     $this->_type = TestUnionEnum::struct_foo;
     $this->struct_foo = $struct_foo;
     return $this;
   }
 
-  public function get_struct_foo(): Foo {
+  public function get_struct_foo()[]: Foo {
     return $this->getx_struct_foo();
   }
 
-  public function getx_struct_foo(): Foo {
+  public function getx_struct_foo()[]: Foo {
     invariant(
       $this->_type === TestUnionEnum::struct_foo,
       'get_struct_foo called on an instance of TestUnion whose current type is %s',
@@ -369,7 +381,118 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
     return $this->struct_foo as nonnull;
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.TestUnion",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I32_TYPE,
+                )
+              ),
+              "name" => "int_value",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "str_value",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_DOUBLE_TYPE,
+                )
+              ),
+              "name" => "double_value",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 4,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_list" => tmeta_ThriftListType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "list_of_strings",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 5,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_map" => tmeta_ThriftMapType::fromShape(
+                    shape(
+                      "keyType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                        )
+                      ),
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I32_TYPE,
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "map_of_string_to_ints",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 6,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                    shape(
+                      "name" => "module.Foo",
+                      "underlyingType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_struct" => tmeta_ThriftStructType::fromShape(
+                            shape(
+                              "name" => "module.Foo",
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "struct_foo",
+            )
+          ),
+        ],
+        "is_union" => true,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -379,11 +502,11 @@ class TestUnion implements \IThriftStruct, \IThriftUnion<TestUnionEnum>, \IThrif
 
   public static function __fromShape(self::TShape $shape)[]: this {
     return new static(
-      Shapes::idx($shape, 'int_value') === null ? null : ($shape['int_value']),
-      Shapes::idx($shape, 'str_value') === null ? null : ($shape['str_value']),
-      Shapes::idx($shape, 'double_value') === null ? null : ($shape['double_value']),
-      Shapes::idx($shape, 'list_of_strings') === null ? null : ($shape['list_of_strings']),
-      Shapes::idx($shape, 'map_of_string_to_ints') === null ? null : ($shape['map_of_string_to_ints']),
+      Shapes::idx($shape, 'int_value'),
+      Shapes::idx($shape, 'str_value'),
+      Shapes::idx($shape, 'double_value'),
+      Shapes::idx($shape, 'list_of_strings'),
+      Shapes::idx($shape, 'map_of_string_to_ints'),
       Shapes::idx($shape, 'struct_foo') === null ? null : (Foo::__fromShape($shape['struct_foo'])),
     );
   }
@@ -525,11 +648,116 @@ class Foo implements \IThriftStruct, \IThriftShapishStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Foo';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Foo",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_list" => tmeta_ThriftListType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "a",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_map" => tmeta_ThriftMapType::fromShape(
+                    shape(
+                      "keyType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                        )
+                      ),
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_list" => tmeta_ThriftListType::fromShape(
+                            shape(
+                              "valueType" => tmeta_ThriftType::fromShape(
+                                shape(
+                                  "t_set" => tmeta_ThriftSetType::fromShape(
+                                    shape(
+                                      "valueType" => tmeta_ThriftType::fromShape(
+                                        shape(
+                                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I32_TYPE,
+                                        )
+                                      ),
+                                    )
+                                  ),
+                                )
+                              ),
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "b",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I64_TYPE,
+                )
+              ),
+              "name" => "c",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 4,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_BOOL_TYPE,
+                )
+              ),
+              "name" => "d",
+              "is_optional" => true,
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 5,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "str_value",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -540,7 +768,7 @@ class Foo implements \IThriftStruct, \IThriftShapishStruct {
   public static function __fromShape(self::TShape $shape)[]: this {
     return new static(
       $shape['a'],
-      Shapes::idx($shape, 'b') === null ? null : ($shape['b']),
+      Shapes::idx($shape, 'b'),
       $shape['c'],
       $shape['d'],
       $shape['str_value'],
@@ -698,11 +926,159 @@ class TestStruct implements \IThriftStruct, \IThriftShapishStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'TestStruct';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.TestStruct",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Foo",
+                    )
+                  ),
+                )
+              ),
+              "name" => "foo_struct",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.TestUnion",
+                    )
+                  ),
+                )
+              ),
+              "name" => "union_value",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                    shape(
+                      "name" => "module.TestStruct",
+                      "underlyingType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_struct" => tmeta_ThriftStructType::fromShape(
+                            shape(
+                              "name" => "module.TestStruct",
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "struct_of_self",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 4,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_list" => tmeta_ThriftListType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_struct" => tmeta_ThriftStructType::fromShape(
+                            shape(
+                              "name" => "module.Foo",
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "list_of_struct_foo",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 5,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_map" => tmeta_ThriftMapType::fromShape(
+                    shape(
+                      "keyType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                        )
+                      ),
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_struct" => tmeta_ThriftStructType::fromShape(
+                            shape(
+                              "name" => "module.Foo",
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "map_of_string_to_struct_foo",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 6,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_list" => tmeta_ThriftListType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                            shape(
+                              "name" => "module.TestStruct",
+                              "underlyingType" => tmeta_ThriftType::fromShape(
+                                shape(
+                                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                                    shape(
+                                      "name" => "module.TestStruct",
+                                    )
+                                  ),
+                                )
+                              ),
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "list_of_struct_self",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -854,11 +1230,77 @@ class Baz extends \TException implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Baz';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getExceptionMetadata()[]: \tmeta_ThriftException {
+    return tmeta_ThriftException::fromShape(
+      shape(
+        "name" => "module.Baz",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "message",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Foo",
+                    )
+                  ),
+                )
+              ),
+              "name" => "some_field",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_set" => tmeta_ThriftSetType::fromShape(
+                    shape(
+                      "valueType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "some_container",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 4,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_I32_TYPE,
+                )
+              ),
+              "name" => "code",
+            )
+          ),
+        ],
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -911,11 +1353,33 @@ class OptBaz extends \TException implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'OptBaz';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getExceptionMetadata()[]: \tmeta_ThriftException {
+    return tmeta_ThriftException::fromShape(
+      shape(
+        "name" => "module.OptBaz",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "message",
+              "is_optional" => true,
+            )
+          ),
+        ],
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[

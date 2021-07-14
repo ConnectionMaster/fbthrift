@@ -232,7 +232,7 @@ trait RaiserClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -241,7 +241,7 @@ trait RaiserClientBase {
         $result = Raiser_doBland_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("doBland failed: sequence id is out of order");
         }
       }
@@ -325,7 +325,7 @@ trait RaiserClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -334,7 +334,7 @@ trait RaiserClientBase {
         $result = Raiser_doRaise_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("doRaise failed: sequence id is out of order");
         }
       }
@@ -433,7 +433,7 @@ trait RaiserClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -442,7 +442,7 @@ trait RaiserClientBase {
         $result = Raiser_get200_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("get200 failed: sequence id is out of order");
         }
       }
@@ -532,7 +532,7 @@ trait RaiserClientBase {
           inout $mtype,
           inout $rseqid,
         );
-        if ($mtype == \TMessageType::EXCEPTION) {
+        if ($mtype === \TMessageType::EXCEPTION) {
           $x = new \TApplicationException();
           $x->read($this->input_);
           $this->input_->readMessageEnd();
@@ -541,7 +541,7 @@ trait RaiserClientBase {
         $result = Raiser_get500_result::withDefaultValues();
         $result->read($this->input_);
         $this->input_->readMessageEnd();
-        if ($expectedsequenceid !== null && ($rseqid != $expectedsequenceid)) {
+        if ($expectedsequenceid !== null && ($rseqid !== $expectedsequenceid)) {
           throw new \TProtocolException("get500 failed: sequence id is out of order");
         }
       }
@@ -998,11 +998,20 @@ class Raiser_doBland_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Raiser_doBland_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.doBland_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1037,11 +1046,20 @@ class Raiser_doBland_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Raiser_doBland_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Raiser_doBland_result",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1076,11 +1094,20 @@ class Raiser_doRaise_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Raiser_doRaise_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.doRaise_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1142,11 +1169,76 @@ class Raiser_doRaise_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Raiser_doRaise_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Raiser_doRaise_result",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                    shape(
+                      "name" => "module.Banal",
+                      "underlyingType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_struct" => tmeta_ThriftStructType::fromShape(
+                            shape(
+                              "name" => "module.Banal",
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "b",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Fiery",
+                    )
+                  ),
+                )
+              ),
+              "name" => "f",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Serious",
+                    )
+                  ),
+                )
+              ),
+              "name" => "s",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1181,11 +1273,20 @@ class Raiser_get200_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Raiser_get200_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.get200_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1228,11 +1329,33 @@ class Raiser_get200_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Raiser_get200_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Raiser_get200_result",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 0,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "success",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1267,11 +1390,20 @@ class Raiser_get500_args implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Raiser_get500_args';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.get500_args",
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1341,11 +1473,87 @@ class Raiser_get500_result implements \IThriftStruct {
     );
   }
 
-  public function getName(): string {
+  public function getName()[]: string {
     return 'Raiser_get500_result';
   }
 
-  public static function getAllStructuredAnnotations(): \TStructAnnotations {
+  public static function getStructMetadata()[]: \tmeta_ThriftStruct {
+    return tmeta_ThriftStruct::fromShape(
+      shape(
+        "name" => "module.Raiser_get500_result",
+        "fields" => vec[
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 0,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_primitive" => tmeta_ThriftPrimitiveType::THRIFT_STRING_TYPE,
+                )
+              ),
+              "name" => "success",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 1,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Fiery",
+                    )
+                  ),
+                )
+              ),
+              "name" => "f",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 2,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                    shape(
+                      "name" => "module.Banal",
+                      "underlyingType" => tmeta_ThriftType::fromShape(
+                        shape(
+                          "t_struct" => tmeta_ThriftStructType::fromShape(
+                            shape(
+                              "name" => "module.Banal",
+                            )
+                          ),
+                        )
+                      ),
+                    )
+                  ),
+                )
+              ),
+              "name" => "b",
+            )
+          ),
+          tmeta_ThriftField::fromShape(
+            shape(
+              "id" => 3,
+              "type" => tmeta_ThriftType::fromShape(
+                shape(
+                  "t_struct" => tmeta_ThriftStructType::fromShape(
+                    shape(
+                      "name" => "module.Serious",
+                    )
+                  ),
+                )
+              ),
+              "name" => "s",
+            )
+          ),
+        ],
+        "is_union" => false,
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TStructAnnotations {
     return shape(
       'struct' => dict[],
       'fields' => dict[
@@ -1356,10 +1564,10 @@ class Raiser_get500_result implements \IThriftStruct {
 }
 
 class RaiserStaticMetadata implements \IThriftServiceStaticMetadata {
-  public static function getServiceMetadata(): \tmeta_ThriftService {
+  public static function getServiceMetadata()[]: \tmeta_ThriftService {
     return tmeta_ThriftService::fromShape(
       shape(
-        "name" => "Raiser",
+        "name" => "module.Raiser",
         "functions" => vec[
           tmeta_ThriftFunction::fromShape(
             shape(
@@ -1385,6 +1593,20 @@ class RaiserStaticMetadata implements \IThriftServiceStaticMetadata {
                     "id" => 1,
                     "type" => tmeta_ThriftType::fromShape(
                       shape(
+                        "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                          shape(
+                            "name" => "module.Banal",
+                            "underlyingType" => tmeta_ThriftType::fromShape(
+                              shape(
+                                "t_struct" => tmeta_ThriftStructType::fromShape(
+                                  shape(
+                                    "name" => "module.Banal",
+                                  )
+                                ),
+                              )
+                            ),
+                          )
+                        ),
                       )
                     ),
                     "name" => "b",
@@ -1395,6 +1617,11 @@ class RaiserStaticMetadata implements \IThriftServiceStaticMetadata {
                     "id" => 2,
                     "type" => tmeta_ThriftType::fromShape(
                       shape(
+                        "t_struct" => tmeta_ThriftStructType::fromShape(
+                          shape(
+                            "name" => "module.Fiery",
+                          )
+                        ),
                       )
                     ),
                     "name" => "f",
@@ -1405,6 +1632,11 @@ class RaiserStaticMetadata implements \IThriftServiceStaticMetadata {
                     "id" => 3,
                     "type" => tmeta_ThriftType::fromShape(
                       shape(
+                        "t_struct" => tmeta_ThriftStructType::fromShape(
+                          shape(
+                            "name" => "module.Serious",
+                          )
+                        ),
                       )
                     ),
                     "name" => "s",
@@ -1437,6 +1669,11 @@ class RaiserStaticMetadata implements \IThriftServiceStaticMetadata {
                     "id" => 1,
                     "type" => tmeta_ThriftType::fromShape(
                       shape(
+                        "t_struct" => tmeta_ThriftStructType::fromShape(
+                          shape(
+                            "name" => "module.Fiery",
+                          )
+                        ),
                       )
                     ),
                     "name" => "f",
@@ -1447,6 +1684,20 @@ class RaiserStaticMetadata implements \IThriftServiceStaticMetadata {
                     "id" => 2,
                     "type" => tmeta_ThriftType::fromShape(
                       shape(
+                        "t_typedef" => tmeta_ThriftTypedefType::fromShape(
+                          shape(
+                            "name" => "module.Banal",
+                            "underlyingType" => tmeta_ThriftType::fromShape(
+                              shape(
+                                "t_struct" => tmeta_ThriftStructType::fromShape(
+                                  shape(
+                                    "name" => "module.Banal",
+                                  )
+                                ),
+                              )
+                            ),
+                          )
+                        ),
                       )
                     ),
                     "name" => "b",
@@ -1457,6 +1708,11 @@ class RaiserStaticMetadata implements \IThriftServiceStaticMetadata {
                     "id" => 3,
                     "type" => tmeta_ThriftType::fromShape(
                       shape(
+                        "t_struct" => tmeta_ThriftStructType::fromShape(
+                          shape(
+                            "name" => "module.Serious",
+                          )
+                        ),
                       )
                     ),
                     "name" => "s",
@@ -1469,7 +1725,41 @@ class RaiserStaticMetadata implements \IThriftServiceStaticMetadata {
       )
     );
   }
-  public static function getAllStructuredAnnotations(): \TServiceAnnotations {
+
+  public static function getServiceMetadataResponse()[]: \tmeta_ThriftServiceMetadataResponse {
+    return \tmeta_ThriftServiceMetadataResponse::fromShape(
+      shape(
+        'context' => \tmeta_ThriftServiceContext::fromShape(
+          shape(
+            'service_info' => self::getServiceMetadata(),
+            'module' => \tmeta_ThriftModuleContext::fromShape(
+              shape(
+                'name' => 'module',
+              )
+            ),
+          )
+        ),
+        'metadata' => \tmeta_ThriftMetadata::fromShape(
+          shape(
+            'enums' => dict[
+            ],
+            'structs' => dict[
+            ],
+            'exceptions' => dict[
+              'module.Banal' => Banal::getExceptionMetadata(),
+              'module.Fiery' => Fiery::getExceptionMetadata(),
+              'module.Serious' => Serious::getExceptionMetadata(),
+              'module.Banal' => Banal::getExceptionMetadata(),
+            ],
+            'services' => dict[
+            ],
+          )
+        ),
+      )
+    );
+  }
+
+  public static function getAllStructuredAnnotations()[]: \TServiceAnnotations {
     return shape(
       'service' => dict[],
       'functions' => dict[

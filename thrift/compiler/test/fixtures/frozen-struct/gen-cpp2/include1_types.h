@@ -44,6 +44,13 @@ class IncludedA;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace some { namespace ns {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class IncludedA final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -62,49 +69,36 @@ class IncludedA final  {
  public:
 
   IncludedA() :
-      i32Field(0) {}
+      i32Field(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   IncludedA(apache::thrift::FragileConstructor, ::std::int32_t i32Field__arg, ::std::string strField__arg);
 
-  IncludedA(IncludedA&&) = default;
+  IncludedA(IncludedA&&) noexcept;
 
-  IncludedA(const IncludedA&) = default;
+  IncludedA(const IncludedA& src);
 
 
-  IncludedA& operator=(IncludedA&&) = default;
-
-  IncludedA& operator=(const IncludedA&) = default;
+  IncludedA& operator=(IncludedA&&) noexcept;
+  IncludedA& operator=(const IncludedA& src);
   void __clear();
  private:
   ::std::int32_t i32Field;
  private:
   ::std::string strField;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool i32Field;
     bool strField;
   } __isset = {};
-  bool operator==(const IncludedA& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const IncludedA& __x, const IncludedA& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const IncludedA& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const IncludedA& __x, const IncludedA& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const IncludedA& __x, const IncludedA& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const IncludedA& __x, const IncludedA& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const IncludedA&) const;
+  bool operator<(const IncludedA&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> i32Field_ref() const& {
@@ -150,6 +144,7 @@ class IncludedA final  {
     return i32Field;
   }
 
+  [[deprecated("Use `FOO.i32Field_ref() = BAR;` instead of `FOO.set_i32Field(BAR);`")]]
   ::std::int32_t& set_i32Field(::std::int32_t i32Field_) {
     i32Field = i32Field_;
     __isset.i32Field = true;
@@ -165,6 +160,7 @@ class IncludedA final  {
   }
 
   template <typename T_IncludedA_strField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.strField_ref() = BAR;` instead of `FOO.set_strField(BAR);`")]]
   ::std::string& set_strField(T_IncludedA_strField_struct_setter&& strField_) {
     strField = std::forward<T_IncludedA_strField_struct_setter>(strField_);
     __isset.strField = true;
@@ -184,7 +180,7 @@ class IncludedA final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< IncludedA >;
+  friend class ::apache::thrift::Cpp2Ops<IncludedA>;
   friend void swap(IncludedA& a, IncludedA& b);
 };
 

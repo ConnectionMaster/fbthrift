@@ -59,6 +59,9 @@ class ScopedServerInterfaceThread {
       uint16_t port = 0,
       ServerConfigCb configCb = {});
 
+  explicit ScopedServerInterfaceThread(
+      std::shared_ptr<AsyncProcessorFactory> apf, ServerConfigCb configCb);
+
   explicit ScopedServerInterfaceThread(std::shared_ptr<BaseThriftServer> ts);
 
   BaseThriftServer& getThriftServer() const;
@@ -96,7 +99,6 @@ class ScopedServerInterfaceThread {
 
   static std::shared_ptr<RequestChannel> makeTestClientChannel(
       std::shared_ptr<AsyncProcessorFactory> apf,
-      folly::Executor* callbackExecutor,
       ScopedServerInterfaceThread::FaultInjectionFunc injectFault);
 
  private:
@@ -106,7 +108,8 @@ class ScopedServerInterfaceThread {
   RequestChannel::Ptr newChannel(
       folly::Executor* callbackExecutor = nullptr,
       MakeChannelFunc channelFunc = makeRocketOrHeaderChannel,
-      std::weak_ptr<folly::IOExecutor> executor = folly::getIOExecutor()) const;
+      std::weak_ptr<folly::IOExecutor> executor =
+          folly::getUnsafeMutableGlobalIOExecutor()) const;
 
   static RequestChannel::Ptr makeRocketOrHeaderChannel(
       folly::AsyncSocket::UniquePtr socket) {
@@ -130,7 +133,6 @@ class ScopedServerInterfaceThread {
 template <class AsyncClientT>
 std::unique_ptr<AsyncClientT> makeTestClient(
     std::shared_ptr<AsyncProcessorFactory> apf,
-    folly::Executor* callbackExecutor = nullptr,
     ScopedServerInterfaceThread::FaultInjectionFunc injectFault = nullptr);
 } // namespace thrift
 } // namespace apache

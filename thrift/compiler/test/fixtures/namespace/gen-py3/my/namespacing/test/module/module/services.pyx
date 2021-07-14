@@ -6,6 +6,7 @@
 #
 
 cimport cython
+from typing import AsyncIterator
 from cpython.version cimport PY_VERSION_HEX
 from libc.stdint cimport (
     int8_t as cint8_t,
@@ -21,6 +22,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap
 from libcpp.utility cimport move as cmove
+from libcpp.pair cimport pair
 from cython.operator cimport dereference as deref
 from cpython.ref cimport PyObject
 from thrift.py3.exceptions cimport (
@@ -47,8 +49,8 @@ if PY_VERSION_HEX >= 0x030702F0:  # 3.7.2 Final
 
 cimport folly.futures
 from folly.executor cimport get_executor
-cimport folly.iobuf as __iobuf
-import folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
+import folly.iobuf as _fbthrift_iobuf
 from folly.iobuf cimport move as move_iobuf
 from folly.memory cimport to_shared_ptr as __to_shared_ptr
 

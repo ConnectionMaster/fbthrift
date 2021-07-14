@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -39,7 +39,7 @@ from thrift.py3.common cimport (
 )
 from folly.optional cimport cOptional as __cOptional
 
-cimport module.types_fields as __fbthrift_types_fields
+cimport module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -75,9 +75,6 @@ cdef extern from "src/gen-cpp2/module_metadata.h" namespace "apache::thrift::det
         @staticmethod
         void gen(__fbthrift_cThriftMetadata &metadata)
 cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2":
-    cdef cppclass cSmallStruct__isset "::cpp2::SmallStruct::__isset":
-        bint small_A
-        bint small_B
 
     cdef cppclass cSmallStruct "::cpp2::SmallStruct":
         cSmallStruct() except +
@@ -92,31 +89,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         __field_ref[cint32_t] small_B_ref()
         cbool small_A
         cint32_t small_B
-        cSmallStruct__isset __isset
 
-    cdef cppclass ccontainerStruct__isset "::cpp2::containerStruct::__isset":
-        bint fieldA
-        bint fieldB
-        bint fieldC
-        bint fieldD
-        bint fieldE
-        bint fieldF
-        bint fieldG
-        bint fieldH
-        bint fieldI
-        bint fieldJ
-        bint fieldK
-        bint fieldL
-        bint fieldM
-        bint fieldN
-        bint fieldO
-        bint fieldP
-        bint fieldQ
-        bint fieldR
-        bint fieldS
-        bint fieldT
-        bint fieldU
-        bint fieldX
 
     cdef cppclass ccontainerStruct "::cpp2::containerStruct":
         ccontainerStruct() except +
@@ -144,6 +117,11 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         __field_ref[vector[Bar]] fieldO_ref()
         __field_ref[vector[Baz]] fieldP_ref()
         __field_ref[cMyEnumA] fieldQ_ref()
+        unique_ptr[cmap[string,cbool]] fieldR_ref()
+        unique_ptr[cSmallStruct] fieldS_ref()
+        shared_ptr[cSmallStruct] fieldT_ref()
+        shared_ptr[const cSmallStruct] fieldU_ref()
+        unique_ptr[cSmallStruct] fieldX_ref()
         cbool fieldA
         cmap[string,cbool] fieldB
         cset[cint32_t] fieldC
@@ -166,14 +144,13 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         shared_ptr[cSmallStruct] fieldT
         shared_ptr[const cSmallStruct] fieldU
         unique_ptr[cSmallStruct] fieldX
-        ccontainerStruct__isset __isset
 
 
 
 
 cdef class SmallStruct(thrift.py3.types.Struct):
     cdef shared_ptr[cSmallStruct] _cpp_obj
-    cdef __fbthrift_types_fields.__SmallStruct_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__SmallStruct_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cSmallStruct])
@@ -182,7 +159,7 @@ cdef class SmallStruct(thrift.py3.types.Struct):
 
 cdef class containerStruct(thrift.py3.types.Struct):
     cdef shared_ptr[ccontainerStruct] _cpp_obj
-    cdef __fbthrift_types_fields.__containerStruct_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__containerStruct_FieldsSetter _fields_setter
     cdef Map__string_bool __fbthrift_cached_fieldB
     cdef Set__i32 __fbthrift_cached_fieldC
     cdef List__List__List__i32 __fbthrift_cached_fieldF

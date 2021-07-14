@@ -11,8 +11,8 @@ import com.facebook.nifty.client.RequestChannel;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.service.*;
 import com.facebook.swift.service.metadata.*;
-import com.facebook.swift.transport.client.*;
-import com.facebook.swift.transport.util.FutureUtil;
+import com.facebook.thrift.client.*;
+import com.facebook.thrift.util.FutureUtil;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.lang.reflect.Method;
@@ -25,9 +25,30 @@ public class MyServiceAsyncClientImpl extends AbstractThriftClient implements My
 
     // Method Handlers
     private ThriftMethodHandler fooMethodHandler;
+    // Interaction Handlers
+    private ThriftMethodHandler frobnicateMethodHandler;
+    private ThriftMethodHandler pingMethodHandler;
+    // Interaction Handlers
+    private ThriftMethodHandler frobnicateMethodHandler;
+    private ThriftMethodHandler pingMethodHandler;
+    // Interaction Handlers
+    private ThriftMethodHandler frobnicateMethodHandler;
 
     // Method Exceptions
     private static final Class[] fooExceptions = new Class[] {
+        org.apache.thrift.TException.class};
+    // Interaction Exceptions
+    private static final Class[] frobnicateExceptions = new Class[] {
+        org.apache.thrift.TException.class};
+    private static final Class[] pingExceptions = new Class[] {
+        org.apache.thrift.TException.class};
+    // Interaction Exceptions
+    private static final Class[] frobnicateExceptions = new Class[] {
+        org.apache.thrift.TException.class};
+    private static final Class[] pingExceptions = new Class[] {
+        org.apache.thrift.TException.class};
+    // Interaction Exceptions
+    private static final Class[] frobnicateExceptions = new Class[] {
         org.apache.thrift.TException.class};
 
     public MyServiceAsyncClientImpl(
@@ -46,6 +67,14 @@ public class MyServiceAsyncClientImpl extends AbstractThriftClient implements My
 
       // Set method handlers
       fooMethodHandler = methodHandlerMap.get("foo");
+      // Set interaction handlers
+      frobnicateMethodHandler = methodHandlerMap.get("frobnicate");
+      pingMethodHandler = methodHandlerMap.get("ping");
+      // Set interaction handlers
+      frobnicateMethodHandler = methodHandlerMap.get("frobnicate");
+      pingMethodHandler = methodHandlerMap.get("ping");
+      // Set interaction handlers
+      frobnicateMethodHandler = methodHandlerMap.get("frobnicate");
     }
 
     public MyServiceAsyncClientImpl(
@@ -66,6 +95,14 @@ public class MyServiceAsyncClientImpl extends AbstractThriftClient implements My
 
       // Set method handlers
       fooMethodHandler = methodHandlerMap.get("foo");
+      // Set interaction handlers
+      frobnicateMethodHandler = methodHandlerMap.get("frobnicate");
+      pingMethodHandler = methodHandlerMap.get("ping");
+      // Set interaction handlers
+      frobnicateMethodHandler = methodHandlerMap.get("frobnicate");
+      pingMethodHandler = methodHandlerMap.get("ping");
+      // Set interaction handlers
+      frobnicateMethodHandler = methodHandlerMap.get("frobnicate");
     }
 
     @java.lang.Override
@@ -93,5 +130,216 @@ public class MyServiceAsyncClientImpl extends AbstractThriftClient implements My
         } catch (Throwable t) {
           throw new RuntimeTException(t.getMessage(), t);
         }
+    }
+
+    public class MyInteractionImpl implements MyInteraction {
+      private final long interactionId;
+
+      MyInteractionImpl(long interactionId) {
+        this.interactionId = interactionId;
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Integer> frobnicate(
+          RpcOptions rpcOptions) {
+          return FutureUtil.transform(frobnicateWrapper(rpcOptions));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Integer> frobnicate() throws org.apache.thrift.TException {
+        return FutureUtil.transform(frobnicateWrapper(RpcOptions.EMPTY));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<ResponseWrapper<Integer>> frobnicateWrapper(
+        RpcOptions _rpcOptions) throws org.apache.thrift.TException {
+        try {
+          RpcOptions rpcOptions = updateRpcOptions(_rpcOptions);
+          return executeWrapperWithOptions(frobnicateMethodHandler, frobnicateExceptions, rpcOptions);
+        } catch (Throwable t) {
+          if (t instanceof org.apache.thrift.TException) {
+            throw (org.apache.thrift.TException) t;
+          }
+          throw new org.apache.thrift.TException(t);
+        }
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Void> ping(
+          RpcOptions rpcOptions) {
+          return FutureUtil.transform(pingWrapper(rpcOptions));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Void> ping() throws org.apache.thrift.TException {
+        return FutureUtil.transform(pingWrapper(RpcOptions.EMPTY));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<ResponseWrapper<Void>> pingWrapper(
+        RpcOptions _rpcOptions) throws org.apache.thrift.TException {
+        try {
+          RpcOptions rpcOptions = updateRpcOptions(_rpcOptions);
+          return executeWrapperWithOptions(pingMethodHandler, pingExceptions, rpcOptions);
+        } catch (Throwable t) {
+          if (t instanceof org.apache.thrift.TException) {
+            throw (org.apache.thrift.TException) t;
+          }
+          throw new org.apache.thrift.TException(t);
+        }
+      }
+
+      @java.lang.Override
+      public void close() {
+        activeInteractions.remove(interactionId);
+      }
+
+      private RpcOptions updateRpcOptions(RpcOptions _rpcOptions) {
+        RpcOptions.Builder builder = new RpcOptions.Builder(_rpcOptions);
+        if (activeInteractions.contains(interactionId)) {
+          builder.setInteractionId(interactionId);
+        } else {
+          builder.setCreateInteractionId(interactionId).setInteractionId(0L);
+          activeInteractions.add(interactionId);
+        }
+        return builder.build();
+      }
+    }
+
+    public MyInteraction createMyInteraction() {
+        return new MyInteractionImpl(interactionCounter.incrementAndGet());
+    }
+
+
+    public class MyInteractionFastImpl implements MyInteractionFast {
+      private final long interactionId;
+
+      MyInteractionFastImpl(long interactionId) {
+        this.interactionId = interactionId;
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Integer> frobnicate(
+          RpcOptions rpcOptions) {
+          return FutureUtil.transform(frobnicateWrapper(rpcOptions));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Integer> frobnicate() throws org.apache.thrift.TException {
+        return FutureUtil.transform(frobnicateWrapper(RpcOptions.EMPTY));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<ResponseWrapper<Integer>> frobnicateWrapper(
+        RpcOptions _rpcOptions) throws org.apache.thrift.TException {
+        try {
+          RpcOptions rpcOptions = updateRpcOptions(_rpcOptions);
+          return executeWrapperWithOptions(frobnicateMethodHandler, frobnicateExceptions, rpcOptions);
+        } catch (Throwable t) {
+          if (t instanceof org.apache.thrift.TException) {
+            throw (org.apache.thrift.TException) t;
+          }
+          throw new org.apache.thrift.TException(t);
+        }
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Void> ping(
+          RpcOptions rpcOptions) {
+          return FutureUtil.transform(pingWrapper(rpcOptions));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Void> ping() throws org.apache.thrift.TException {
+        return FutureUtil.transform(pingWrapper(RpcOptions.EMPTY));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<ResponseWrapper<Void>> pingWrapper(
+        RpcOptions _rpcOptions) throws org.apache.thrift.TException {
+        try {
+          RpcOptions rpcOptions = updateRpcOptions(_rpcOptions);
+          return executeWrapperWithOptions(pingMethodHandler, pingExceptions, rpcOptions);
+        } catch (Throwable t) {
+          if (t instanceof org.apache.thrift.TException) {
+            throw (org.apache.thrift.TException) t;
+          }
+          throw new org.apache.thrift.TException(t);
+        }
+      }
+
+      @java.lang.Override
+      public void close() {
+        activeInteractions.remove(interactionId);
+      }
+
+      private RpcOptions updateRpcOptions(RpcOptions _rpcOptions) {
+        RpcOptions.Builder builder = new RpcOptions.Builder(_rpcOptions);
+        if (activeInteractions.contains(interactionId)) {
+          builder.setInteractionId(interactionId);
+        } else {
+          builder.setCreateInteractionId(interactionId).setInteractionId(0L);
+          activeInteractions.add(interactionId);
+        }
+        return builder.build();
+      }
+    }
+
+    public MyInteractionFast createMyInteractionFast() {
+        return new MyInteractionFastImpl(interactionCounter.incrementAndGet());
+    }
+
+
+    public class SerialInteractionImpl implements SerialInteraction {
+      private final long interactionId;
+
+      SerialInteractionImpl(long interactionId) {
+        this.interactionId = interactionId;
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Void> frobnicate(
+          RpcOptions rpcOptions) {
+          return FutureUtil.transform(frobnicateWrapper(rpcOptions));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<Void> frobnicate() throws org.apache.thrift.TException {
+        return FutureUtil.transform(frobnicateWrapper(RpcOptions.EMPTY));
+      }
+
+      @java.lang.Override
+      public ListenableFuture<ResponseWrapper<Void>> frobnicateWrapper(
+        RpcOptions _rpcOptions) throws org.apache.thrift.TException {
+        try {
+          RpcOptions rpcOptions = updateRpcOptions(_rpcOptions);
+          return executeWrapperWithOptions(frobnicateMethodHandler, frobnicateExceptions, rpcOptions);
+        } catch (Throwable t) {
+          if (t instanceof org.apache.thrift.TException) {
+            throw (org.apache.thrift.TException) t;
+          }
+          throw new org.apache.thrift.TException(t);
+        }
+      }
+
+      @java.lang.Override
+      public void close() {
+        activeInteractions.remove(interactionId);
+      }
+
+      private RpcOptions updateRpcOptions(RpcOptions _rpcOptions) {
+        RpcOptions.Builder builder = new RpcOptions.Builder(_rpcOptions);
+        if (activeInteractions.contains(interactionId)) {
+          builder.setInteractionId(interactionId);
+        } else {
+          builder.setCreateInteractionId(interactionId).setInteractionId(0L);
+          activeInteractions.add(interactionId);
+        }
+        return builder.build();
+      }
+    }
+
+    public SerialInteraction createSerialInteraction() {
+        return new SerialInteractionImpl(interactionCounter.incrementAndGet());
     }
 }

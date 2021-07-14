@@ -7,6 +7,7 @@
 
 package test.fixtures.includes;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class MyServiceAsyncReactiveWrapper 
@@ -19,18 +20,18 @@ public class MyServiceAsyncReactiveWrapper
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<Void> query(final test.fixtures.includes.MyStruct s, final test.fixtures.includes.includes.Included i) {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.query(s, i));
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.query(s, i));
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<Void> hasArgDocs(final test.fixtures.includes.MyStruct s, final test.fixtures.includes.includes.Included i) {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.hasArgDocs(s, i));
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.hasArgDocs(s, i));
     }
 
 }

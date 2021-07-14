@@ -36,6 +36,10 @@ void TccStructTraits<::extra::svc::containerStruct2>::translateFieldName(
 namespace extra { namespace svc {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+containerStruct2::containerStruct2(const containerStruct2&) = default;
+containerStruct2& containerStruct2::operator=(const containerStruct2&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 containerStruct2::containerStruct2() :
       fieldA(0),
       req_fieldA(0),
@@ -52,13 +56,50 @@ containerStruct2::containerStruct2() :
   2,
   3,
   4}),
-      fieldE(apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring")),
-      req_fieldE(apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring")),
-      opt_fieldE(apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring")) {}
+      fieldE(apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring")),
+      req_fieldE(apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring")),
+      opt_fieldE(apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring")) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 containerStruct2::~containerStruct2() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+containerStruct2::containerStruct2(containerStruct2&& other) noexcept  :
+    fieldA(std::move(other.fieldA)),
+    req_fieldA(std::move(other.req_fieldA)),
+    opt_fieldA(std::move(other.opt_fieldA)),
+    fieldB(std::move(other.fieldB)),
+    req_fieldB(std::move(other.req_fieldB)),
+    opt_fieldB(std::move(other.opt_fieldB)),
+    fieldC(std::move(other.fieldC)),
+    req_fieldC(std::move(other.req_fieldC)),
+    opt_fieldC(std::move(other.opt_fieldC)),
+    fieldD(std::move(other.fieldD)),
+    fieldE(std::move(other.fieldE)),
+    req_fieldE(std::move(other.req_fieldE)),
+    opt_fieldE(std::move(other.opt_fieldE)),
+    __isset(other.__isset) {}
+containerStruct2& containerStruct2::operator=(FOLLY_MAYBE_UNUSED containerStruct2&& other) noexcept {
+    this->fieldA = std::move(other.fieldA);
+    this->req_fieldA = std::move(other.req_fieldA);
+    this->opt_fieldA = std::move(other.opt_fieldA);
+    this->fieldB = std::move(other.fieldB);
+    this->req_fieldB = std::move(other.req_fieldB);
+    this->opt_fieldB = std::move(other.opt_fieldB);
+    this->fieldC = std::move(other.fieldC);
+    this->req_fieldC = std::move(other.req_fieldC);
+    this->opt_fieldC = std::move(other.opt_fieldC);
+    this->fieldD = std::move(other.fieldD);
+    this->fieldE = std::move(other.fieldE);
+    this->req_fieldE = std::move(other.req_fieldE);
+    this->opt_fieldE = std::move(other.opt_fieldE);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 containerStruct2::containerStruct2(apache::thrift::FragileConstructor, bool fieldA__arg, bool req_fieldA__arg, bool opt_fieldA__arg, ::std::map<::std::string, bool> fieldB__arg, ::std::map<::std::string, bool> req_fieldB__arg, ::std::map<::std::string, bool> opt_fieldB__arg, ::std::set<::std::int32_t> fieldC__arg, ::std::set<::std::int32_t> req_fieldC__arg, ::std::set<::std::int32_t> opt_fieldC__arg, ::std::string fieldD__arg, ::std::string fieldE__arg, ::std::string req_fieldE__arg, ::std::string opt_fieldE__arg) :
@@ -86,21 +127,22 @@ containerStruct2::containerStruct2(apache::thrift::FragileConstructor, bool fiel
   __isset.opt_fieldE = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void containerStruct2::__clear() {
   // clear all fields
-  fieldA = 0;
-  req_fieldA = 0;
-  opt_fieldA = 0;
-  fieldB.clear();
-  req_fieldB.clear();
-  opt_fieldB.clear();
-  fieldC.clear();
-  req_fieldC.clear();
-  opt_fieldC.clear();
-  fieldD = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  fieldE = apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring");
-  req_fieldE = apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring");
-  opt_fieldE = apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring");
+  this->fieldA = 0;
+  this->req_fieldA = 0;
+  this->opt_fieldA = 0;
+  this->fieldB.clear();
+  this->req_fieldB.clear();
+  this->opt_fieldB.clear();
+  this->fieldC.clear();
+  this->req_fieldC.clear();
+  this->opt_fieldC.clear();
+  this->fieldD = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->fieldE = apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring");
+  this->req_fieldE = apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring");
+  this->opt_fieldE = apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

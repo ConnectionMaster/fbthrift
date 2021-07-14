@@ -34,11 +34,11 @@
 
 #include <stdlib.h>
 #include <sys/types.h>
-#include <thrift/compiler/generate/t_concat_generator.h>
-#include <thrift/compiler/generate/t_generator.h>
 #include <algorithm>
 #include <clocale>
 #include <sstream>
+#include <thrift/compiler/generate/t_concat_generator.h>
+#include <thrift/compiler/generate/t_generator.h>
 
 using namespace std;
 
@@ -182,37 +182,26 @@ class t_go_generator : public t_concat_generator {
   void generate_service_client(const t_service* tservice, bool);
   void generate_service_client_channel(const t_service* tservice);
   void generate_service_client_common_methods(string&, bool);
-  void generate_service_client_method(
-      string&,
-      const vector<t_function*>::const_iterator&,
-      bool);
-  void generate_service_client_channel_method(
-      string&,
-      const vector<t_function*>::const_iterator&);
-  void generate_service_client_channel_call(
-      const vector<t_function*>::const_iterator& f_iter);
-  void generate_service_client_send_msg_call(
-      const vector<t_function*>::const_iterator&);
-  void generate_service_client_recv_method(
-      string&,
-      const vector<t_function*>::const_iterator&);
+  void generate_service_client_method(string&, const t_function*, bool);
+  void generate_service_client_channel_method(string&, const t_function*);
+  void generate_service_client_channel_call(const t_function* f_iter);
+  void generate_service_client_send_msg_call(const t_function*);
+  void generate_service_client_recv_method(string&, const t_function*);
   void generate_service_client_recv_method_exception_handling(
       const std::vector<t_field*>& exceptions);
   void generate_service_client_threadsafe(const t_service* tservice);
   void generate_service_remote(const t_service* tservice);
   void generate_service_server(const t_service* tservice);
   void generate_process_function_type(
-      const t_service* tservice,
-      const t_function* tfunction);
+      const t_service* tservice, const t_function* tfunction);
   void generate_run_function(
-      const t_service* tservice,
-      const t_function* tfunction);
+      const t_service* tservice, const t_function* tfunction);
   void generate_read_function(
-      const t_service* tservice,
-      const t_function* tfunction);
+      const t_service* tservice, const t_function* tfunction);
   void generate_write_function(
-      const t_service* tservice,
-      const t_function* tfunction);
+      const t_service* tservice, const t_function* tfunction);
+  void generate_struct_error_result_fn(
+      const t_service* tservice, const t_function* tfunction);
 
   /**
    * Serialization constructs
@@ -267,9 +256,7 @@ class t_go_generator : public t_concat_generator {
       bool inkey = false);
 
   void generate_serialize_struct(
-      std::ofstream& out,
-      const t_struct* tstruct,
-      std::string prefix = "");
+      std::ofstream& out, const t_struct* tstruct, std::string prefix = "");
 
   void generate_serialize_container(
       std::ofstream& out,
@@ -284,14 +271,10 @@ class t_go_generator : public t_concat_generator {
       std::string viter);
 
   void generate_serialize_set_element(
-      std::ofstream& out,
-      const t_set* tmap,
-      std::string iter);
+      std::ofstream& out, const t_set* tmap, std::string iter);
 
   void generate_serialize_list_element(
-      std::ofstream& out,
-      const t_list* tlist,
-      std::string iter);
+      std::ofstream& out, const t_list* tlist, std::string iter);
 
   void generate_go_docstring(std::ofstream& out, const t_struct* tstruct);
 
@@ -318,13 +301,10 @@ class t_go_generator : public t_concat_generator {
   std::string render_fastbinary_includes();
   std::string declare_argument(const t_field* tfield);
   std::string render_field_initial_value(
-      const t_field* tfield,
-      const string& name,
-      bool optional_field);
+      const t_field* tfield, const string& name, bool optional_field);
   std::string type_name(const t_type* ttype);
   std::string function_signature(
-      const t_function* tfunction,
-      std::string prefix = "");
+      const t_function* tfunction, std::string prefix = "");
   std::string function_signature_if(
       const t_function* tfunction,
       std::string prefix = "",
@@ -333,9 +313,7 @@ class t_go_generator : public t_concat_generator {
   std::string type_to_enum(const t_type* ttype);
   std::string type_to_go_type(const t_type* ttype);
   std::string type_to_go_type_with_opt(
-      const t_type* ttype,
-      bool optional_field,
-      bool from_typedef = false);
+      const t_type* ttype, bool optional_field, bool from_typedef = false);
   std::string type_to_go_key_type(const t_type* ttype);
   std::string type_to_spec_args(const t_type* ttype);
 
@@ -385,16 +363,30 @@ class t_go_generator : public t_concat_generator {
 
   std::string camelcase(const std::string& value) const;
   std::string publicize(
-      const std::string& value,
-      bool is_args_or_result = false) const;
+      const std::string& value, bool is_args_or_result = false) const;
   std::string privatize(const std::string& value) const;
   static std::string variable_name_to_go_name(const std::string& value);
   static bool is_pointer_field(
-      const t_field* tfield,
-      bool in_container = false);
+      const t_field* tfield, bool in_container = false);
   static bool omit_initialization(const t_field* tfield);
   static bool type_need_reference(const t_type* type);
+  static std::vector<const t_function*> get_supported_functions(
+      const t_service*);
 };
+
+// we don't have support for thrift streaming in go yet, so skip methods that
+// produce it.
+std::vector<const t_function*> t_go_generator::get_supported_functions(
+    const t_service* tservice) {
+  std::vector<const t_function*> funcs;
+  for (auto const* func : tservice->get_functions()) {
+    if (!func->returns_stream() && !func->returns_sink() &&
+        !func->get_returntype()->is_service()) {
+      funcs.push_back(func);
+    }
+  }
+  return funcs;
+}
 
 // returns true if field initialization can be omitted since it has
 // corresponding go type zero value or default value is not set
@@ -449,8 +441,7 @@ bool t_go_generator::type_need_reference(const t_type* type) {
 
 // returns false if field could not use comparison to default value as !IsSet*
 bool t_go_generator::is_pointer_field(
-    const t_field* tfield,
-    bool in_container_value) {
+    const t_field* tfield, bool in_container_value) {
   (void)in_container_value;
   if (tfield->has_annotation("cpp.ref")) {
     return true;
@@ -543,8 +534,7 @@ std::string t_go_generator::camelcase(const std::string& value) const {
 }
 
 std::string t_go_generator::publicize(
-    const std::string& value,
-    bool is_args_or_result) const {
+    const std::string& value, bool is_args_or_result) const {
   if (value.size() <= 0) {
     return value;
   }
@@ -830,12 +820,9 @@ void t_go_generator::init_generator() {
   f_consts_name_ = package_dir_ + "/" + "constants.go";
   f_consts_.open(f_consts_name_.c_str());
 
-  vector<t_service*> services = program_->services();
-  vector<t_service*>::iterator sv_iter;
-
-  for (sv_iter = services.begin(); sv_iter != services.end(); ++sv_iter) {
+  for (const auto* tservice : program_->services()) {
     string service_dir =
-        package_dir_ + "/" + underscore((*sv_iter)->get_name()) + "-remote";
+        package_dir_ + "/" + underscore(tservice->get_name()) + "-remote";
     boost::filesystem::create_directory(service_dir);
   }
 
@@ -969,7 +956,7 @@ void t_go_generator::close_generator() {
  */
 void t_go_generator::generate_typedef(const t_typedef* ttypedef) {
   generate_go_docstring(f_types_, ttypedef);
-  string new_type_name(publicize(ttypedef->get_symbolic()));
+  string new_type_name(publicize(ttypedef->name()));
   const t_type* tbasetype(ttypedef->get_type());
   const t_type* true_type(ttypedef->get_true_type());
   string base_type(type_to_go_type_with_opt(tbasetype, false, true));
@@ -997,9 +984,11 @@ void t_go_generator::generate_typedef(const t_typedef* ttypedef) {
              << endl;
   }
   // Generate New* function
-  if ((true_type->is_struct() || true_type->is_xception()) &&
-      !true_type->is_union()) {
-    const t_program* program = tbasetype->get_program();
+  if (true_type->is_struct() || true_type->is_xception()) {
+    const t_program* program = tbasetype->program();
+    // only declare a return with a pointer if the concrete type isn't
+    // already a pointer
+    const bool needsptr = !(base_type.at(0) == '*');
     string ctor;
     if (program != nullptr && program != program_) {
       string module(package_identifiers[get_real_go_module(program)]);
@@ -1008,8 +997,9 @@ void t_go_generator::generate_typedef(const t_typedef* ttypedef) {
       ctor = "New" + publicize(tbasetype->get_name());
     }
     f_types_ << "func "
-             << "New" << publicize(new_type_name) << "() *" << new_type_name
-             << " { return " << ctor << "() }" << endl
+             << "New" << publicize(new_type_name) << "() "
+             << (needsptr ? "*" : "") << new_type_name << " { return " << ctor
+             << "() }" << endl
              << endl;
   }
 }
@@ -1319,8 +1309,7 @@ void t_go_generator::generate_xception(const t_struct* txception) {
  * Generates a go struct
  */
 void t_go_generator::generate_go_struct(
-    const t_struct* tstruct,
-    bool is_exception) {
+    const t_struct* tstruct, bool is_exception) {
   generate_go_struct_definition(f_types_, tstruct, is_exception);
 }
 
@@ -1335,9 +1324,7 @@ void t_go_generator::get_publicized_name_and_def_value(
 }
 
 void t_go_generator::generate_go_struct_initializer(
-    ofstream& out,
-    const t_struct* tstruct,
-    bool is_args_or_result) {
+    ofstream& out, const t_struct* tstruct, bool is_args_or_result) {
   out << publicize(type_name(tstruct), is_args_or_result) << "{";
   indent_up();
   const vector<t_field*>& members = tstruct->get_members();
@@ -1346,13 +1333,14 @@ void t_go_generator::generate_go_struct_initializer(
   for (vector<t_field*>::const_iterator m_iter = members.begin();
        m_iter != members.end();
        ++m_iter) {
-    const t_type* ttype = (*m_iter)->get_type()->get_true_type();
+    const t_type* ttype = (*m_iter)->get_type();
+    const t_type* ttruetype = ttype->get_true_type();
     bool pointer_field = is_pointer_field(*m_iter);
-    bool struct_field = ttype->is_struct() &&
-        !(dynamic_cast<const t_struct*>(ttype)->is_union());
+    bool struct_field = ttruetype->is_struct() &&
+        !(dynamic_cast<const t_struct*>(ttruetype)->is_union());
     string publicized_name;
     string module;
-    if (auto&& program = ttype->get_program()) {
+    if (auto&& program = ttype->program()) {
       if (program != program_) {
         module = package_identifiers[get_real_go_module(program)] + ".";
       }
@@ -1487,6 +1475,8 @@ void t_go_generator::generate_go_struct_definition(
 
       if ((*m_iter)->get_req() == t_field::e_req::required) {
         out << ",required";
+      } else if (((*m_iter)->get_req() == t_field::e_req::optional)) {
+        out << ",optional";
       }
 
       out << "\" " << gotag << "`" << endl;
@@ -2142,14 +2132,13 @@ void t_go_generator::generate_service(const t_service* tservice) {
  * @param tservice The service to generate a header definition for
  */
 void t_go_generator::generate_service_helpers(const t_service* tservice) {
-  vector<t_function*> functions = tservice->get_functions();
-  vector<t_function*>::iterator f_iter;
+  vector<const t_function*> functions = get_supported_functions(tservice);
   f_service_ << "// HELPER FUNCTIONS AND STRUCTURES" << endl << endl;
 
-  for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-    const t_struct* ts = (*f_iter)->get_paramlist();
+  for (auto func : functions) {
+    const t_struct* ts = func->get_paramlist();
     generate_go_struct_definition(f_service_, ts, false, false, true);
-    generate_go_function_helpers(*f_iter);
+    generate_go_function_helpers(func);
   }
 }
 
@@ -2159,7 +2148,7 @@ void t_go_generator::generate_service_helpers(const t_service* tservice) {
  * @param tfunction The function
  */
 void t_go_generator::generate_go_function_helpers(const t_function* tfunction) {
-  if (!tfunction->is_oneway()) {
+  if (tfunction->qualifier() != t_function_qualifier::one_way) {
     t_struct result(program_, tfunction->get_name() + "_result");
     auto success =
         std::make_unique<t_field>(tfunction->get_returntype(), "success", 0);
@@ -2210,18 +2199,16 @@ void t_go_generator::generate_service_interface(const t_service* tservice) {
              << extends_if;
   indent_up();
   generate_go_docstring(f_service_, tservice);
-  vector<t_function*> functions = tservice->get_functions();
+  vector<const t_function*> functions = get_supported_functions(tservice);
 
   if (!functions.empty()) {
     f_service_ << endl;
-    vector<t_function*>::iterator f_iter;
 
-    for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-      generate_go_docstring(f_service_, (*f_iter));
+    for (auto const* func : functions) {
+      generate_go_docstring(f_service_, func);
 
       f_service_ << indent()
-                 << function_signature_if(*f_iter, "", gen_use_context_)
-                 << endl;
+                 << function_signature_if(func, "", gen_use_context_) << endl;
     }
   }
 
@@ -2230,19 +2217,17 @@ void t_go_generator::generate_service_interface(const t_service* tservice) {
 }
 
 void t_go_generator::generate_service_client_method(
-    string& clientTypeName,
-    const vector<t_function*>::const_iterator& f_iter,
-    bool isThreadsafe) {
-  string funname = publicize((*f_iter)->get_name());
+    string& clientTypeName, const t_function* func, bool isThreadsafe) {
+  string funname = publicize(func->get_name());
   // Open function
-  generate_go_docstring(f_service_, (*f_iter));
+  generate_go_docstring(f_service_, func);
   f_service_ << indent() << "func (p *" << clientTypeName << ") "
-             << function_signature_if(*f_iter, "", false) << " {" << endl;
+             << function_signature_if(func, "", false) << " {" << endl;
   indent_up();
   /*
   f_service_ <<
     indent() << "p.SeqId += 1" << endl;
-  if (!(*f_iter)->is_oneway()) {
+  if ((*f_iter)->qualifier() != t_function_qualifier::one_way) {
     f_service_ <<
       indent() << "d := defer.Deferred()" << endl <<
       indent() << "p.Reqs[p.SeqId] = d" << endl;
@@ -2254,11 +2239,11 @@ void t_go_generator::generate_service_client_method(
     f_service_ << indent() << "defer p.Mu.Unlock()" << endl;
   }
 
-  generate_service_client_send_msg_call(f_iter);
+  generate_service_client_send_msg_call(func);
 
   f_service_ << indent() << "if err != nil { return }" << endl;
 
-  if (!(*f_iter)->is_oneway()) {
+  if (func->qualifier() != t_function_qualifier::one_way) {
     f_service_ << indent() << "return p.recv" << funname << "()" << endl;
   } else {
     f_service_ << indent() << "return" << endl;
@@ -2267,35 +2252,34 @@ void t_go_generator::generate_service_client_method(
   indent_down();
   f_service_ << indent() << "}" << endl << endl;
 
-  if (!(*f_iter)->is_oneway()) {
-    generate_service_client_recv_method(clientTypeName, f_iter);
+  if (func->qualifier() != t_function_qualifier::one_way) {
+    generate_service_client_recv_method(clientTypeName, func);
   }
 }
 
 void t_go_generator::generate_service_client_channel_method(
-    string& clientTypeName,
-    const vector<t_function*>::const_iterator& f_iter) {
-  string funname = publicize((*f_iter)->get_name());
+    string& clientTypeName, const t_function* func) {
+  string funname = publicize(func->get_name());
   // Open function
-  generate_go_docstring(f_service_, (*f_iter));
+  generate_go_docstring(f_service_, func);
   f_service_ << indent() << "func (p *" << clientTypeName << ") "
-             << function_signature_if(*f_iter, "", true) << " {" << endl;
+             << function_signature_if(func, "", true) << " {" << endl;
   indent_up();
 
-  generate_service_client_channel_call(f_iter);
+  generate_service_client_channel_call(func);
 }
 
 void t_go_generator::generate_service_client_channel_call(
-    const vector<t_function*>::const_iterator& f_iter) {
-  auto methodName = (*f_iter)->get_name();
-  auto result_type_name = publicize((*f_iter)->get_name() + "_result", true);
+    const t_function* func) {
+  auto methodName = func->get_name();
+  auto result_type_name = publicize(func->get_name() + "_result", true);
   auto argsType = publicize(methodName + "_args", true);
-  auto isOneway = (*f_iter)->is_oneway();
-  auto returnsVoid = (*f_iter)->get_returntype()->is_void();
-  const auto& exceptions = (*f_iter)->get_xceptions()->get_members();
+  auto isOneway = func->qualifier() == t_function_qualifier::one_way;
+  auto returnsVoid = func->get_returntype()->is_void();
+  const auto& exceptions = func->get_xceptions()->get_members();
   // bool raisesExceptions = exceptions.size() > 0;
 
-  auto arg_struct = (*f_iter)->get_paramlist();
+  auto arg_struct = func->get_paramlist();
   const auto& fields = arg_struct->get_members();
 
   // Initialize request struct
@@ -2341,12 +2325,14 @@ void t_go_generator::generate_service_client_channel_call(
 }
 
 void t_go_generator::generate_service_client_send_msg_call(
-    const vector<t_function*>::const_iterator& f_iter) {
-  auto methodName = (*f_iter)->get_name();
+    const t_function* func) {
+  auto methodName = func->get_name();
   auto argsType = publicize(methodName + "_args", true);
-  auto messageType = (*f_iter)->is_oneway() ? "thrift.ONEWAY" : "thrift.CALL";
+  auto messageType = func->qualifier() == t_function_qualifier::one_way
+      ? "thrift.ONEWAY"
+      : "thrift.CALL";
 
-  auto arg_struct = (*f_iter)->get_paramlist();
+  auto arg_struct = func->get_paramlist();
   const auto& fields = arg_struct->get_members();
 
   // If there are no fields in the struct, don't bother initializing anything
@@ -2369,23 +2355,20 @@ void t_go_generator::generate_service_client_send_msg_call(
 }
 
 void t_go_generator::generate_service_client_recv_method(
-    string& clientTypeName,
-    const vector<t_function*>::const_iterator& f_iter) {
-  std::string result_type_name =
-      publicize((*f_iter)->get_name() + "_result", true);
-  auto methodName = (*f_iter)->get_name();
-  auto returnsVoid = (*f_iter)->get_returntype()->is_void();
-  const auto& exceptions = (*f_iter)->get_xceptions()->get_members();
+    string& clientTypeName, const t_function* func) {
+  std::string result_type_name = publicize(func->get_name() + "_result", true);
+  auto methodName = func->get_name();
+  auto returnsVoid = func->get_returntype()->is_void();
+  const auto& exceptions = func->get_xceptions()->get_members();
   bool raisesExceptions = exceptions.size() > 0;
 
   // Open function
   f_service_ << endl
              << indent() << "func (p *" << clientTypeName << ") recv"
-             << publicize((*f_iter)->get_name()) << "() (";
+             << publicize(func->get_name()) << "() (";
 
   if (!returnsVoid) {
-    f_service_ << "value " << type_to_go_type((*f_iter)->get_returntype())
-               << ", ";
+    f_service_ << "value " << type_to_go_type(func->get_returntype()) << ", ";
   }
 
   f_service_ << "err error) {" << endl;
@@ -2439,8 +2422,7 @@ void t_go_generator::generate_service_client_recv_method_exception_handling(
 }
 
 void t_go_generator::generate_service_client_common_methods(
-    string& clientTypeName,
-    bool isThreadsafe) {
+    string& clientTypeName, bool isThreadsafe) {
   for (auto& method : common_client_methods_) {
     f_service_ << indent() << "func(client *" << clientTypeName << ") "
                << method.name << "() " << method.return_type << " {" << endl;
@@ -2471,7 +2453,7 @@ void t_go_generator::generate_service_client_interface(
   // Embed the base ClientInterface into this one
   f_service_ << indent() << "thrift.ClientInterface" << endl;
 
-  for (auto* function : tservice->get_functions()) {
+  for (auto* function : get_supported_functions(tservice)) {
     generate_go_docstring(f_service_, function);
     f_service_ << indent() << function_signature_if(function, "", false)
                << endl;
@@ -2489,8 +2471,7 @@ void t_go_generator::generate_service_client_interface(
  *     threadsafe.
  */
 void t_go_generator::generate_service_client(
-    const t_service* tservice,
-    bool isThreadsafe) {
+    const t_service* tservice, bool isThreadsafe) {
   string extends = "";
   string extends_field = "";
   string extends_client = "";
@@ -2585,11 +2566,8 @@ void t_go_generator::generate_service_client(
   f_service_ << indent() << "}" << endl << endl;
 
   // Generate client method implementations
-  vector<t_function*> functions = tservice->get_functions();
-  vector<t_function*>::const_iterator f_iter;
-
-  for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-    generate_service_client_method(clientTypeName, f_iter, isThreadsafe);
+  for (auto* func : get_supported_functions(tservice)) {
+    generate_service_client_method(clientTypeName, func, isThreadsafe);
   }
 
   // indent_down();
@@ -2685,11 +2663,8 @@ void t_go_generator::generate_service_client_channel(
   f_service_ << indent() << "}" << endl << endl;
 
   // Generate client method implementations
-  vector<t_function*> functions = tservice->get_functions();
-  vector<t_function*>::const_iterator f_iter;
-
-  for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-    generate_service_client_channel_method(clientTypeName, f_iter);
+  for (const auto* func : get_supported_functions(tservice)) {
+    generate_service_client_channel_method(clientTypeName, func);
   }
 
   // indent_down();
@@ -2702,17 +2677,16 @@ void t_go_generator::generate_service_client_channel(
  * @param tservice The service to generate a remote for.
  */
 void t_go_generator::generate_service_remote(const t_service* tservice) {
-  vector<t_function*> functions = tservice->get_functions();
+  vector<const t_function*> functions = get_supported_functions(tservice);
   const t_service* parent = tservice->get_extends();
 
   // collect inherited functions
   while (parent != nullptr) {
-    vector<t_function*> p_functions = parent->get_functions();
+    vector<const t_function*> p_functions = get_supported_functions(parent);
     functions.insert(functions.end(), p_functions.begin(), p_functions.end());
     parent = parent->get_extends();
   }
 
-  vector<t_function*>::iterator f_iter;
   string f_remote_name = package_dir_ + "/" + underscore(service_name_) +
       "-remote/" + underscore(service_name_) + "-remote.go";
   ofstream f_remote;
@@ -2753,11 +2727,11 @@ void t_go_generator::generate_service_remote(const t_service* tservice) {
   f_remote << indent() << "  fmt.Fprintln(os.Stderr, \"\\nFunctions:\")"
            << endl;
 
-  for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
+  for (const auto* func : functions) {
     f_remote << "  fmt.Fprintln(os.Stderr, \"  "
-             << (*f_iter)->get_returntype()->get_name() << " "
-             << (*f_iter)->get_name() << "(";
-    const t_struct* arg_struct = (*f_iter)->get_paramlist();
+             << func->get_returntype()->get_name() << " " << func->get_name()
+             << "(";
+    const t_struct* arg_struct = func->get_paramlist();
     const std::vector<t_field*>& args = arg_struct->get_members();
     std::vector<t_field*>::size_type num_args = args.size();
     bool first = true;
@@ -2923,11 +2897,11 @@ void t_go_generator::generate_service_remote(const t_service* tservice) {
   f_remote << indent() << endl;
   f_remote << indent() << "switch cmd {" << endl;
 
-  for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-    const t_struct* arg_struct = (*f_iter)->get_paramlist();
+  for (auto* func : functions) {
+    const t_struct* arg_struct = func->get_paramlist();
     const std::vector<t_field*>& args = arg_struct->get_members();
     std::vector<t_field*>::size_type num_args = args.size();
-    string funcName((*f_iter)->get_name());
+    string funcName(func->get_name());
     string pubName(publicize(funcName));
     string argumentsName(publicize(funcName + "_args", true));
     f_remote << indent() << "case \"" << escape_string(funcName)
@@ -3203,8 +3177,7 @@ void t_go_generator::generate_service_remote(const t_service* tservice) {
  */
 void t_go_generator::generate_service_server(const t_service* tservice) {
   // Generate the dispatch methods
-  vector<t_function*> functions = tservice->get_functions();
-  vector<t_function*>::iterator f_iter;
+  vector<const t_function*> functions = get_supported_functions(tservice);
   string extends = "";
   string extends_processor = "";
   string extends_processor_new = "";
@@ -3287,15 +3260,14 @@ void t_go_generator::generate_service_server(const t_service* tservice) {
                << "), functionServiceMap:make(map[string]string)}" << endl;
 
     indent_up();
-    for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-      string escapedFuncName(escape_string((*f_iter)->get_name()));
+    for (const auto* func : functions) {
+      string escapedFuncName(escape_string(func->get_name()));
       f_service_ << indent() << self << ".processorMap[\"" << escapedFuncName
                  << "\"] = &" << pServiceName << "Processor"
-                 << publicize((*f_iter)->get_name()) << "{handler:handler}"
-                 << endl;
+                 << publicize(func->get_name()) << "{handler:handler}" << endl;
     }
-    for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-      string escapedFuncName(escape_string((*f_iter)->get_name()));
+    for (const auto* func : functions) {
+      string escapedFuncName(escape_string(func->get_name()));
       f_service_ << indent() << self << ".functionServiceMap[\""
                  << escapedFuncName << "\"] = \"" << serviceName << "\""
                  << endl;
@@ -3317,16 +3289,16 @@ void t_go_generator::generate_service_server(const t_service* tservice) {
     f_service_ << indent() << "  " << self << " := &" << serviceName
                << "Processor{" << extends_processor_new << "(handler)}" << endl;
 
-    for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-      string escapedFuncName(escape_string((*f_iter)->get_name()));
+    for (const auto* func : functions) {
+      string escapedFuncName(escape_string(func->get_name()));
       f_service_ << indent() << "  " << self << ".AddToProcessorMap(\""
                  << escapedFuncName << "\", &" << pServiceName << "Processor"
-                 << publicize((*f_iter)->get_name()) << "{handler:handler})"
+                 << publicize((func)->get_name()) << "{handler:handler})"
                  << endl;
     }
 
-    for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-      string escapedFuncName(escape_string((*f_iter)->get_name()));
+    for (const auto* func : functions) {
+      string escapedFuncName(escape_string(func->get_name()));
       f_service_ << indent() << "  " << self << ".AddToFunctionServiceMap(\""
                  << escapedFuncName << "\", \"" << serviceName << "\")" << endl;
     }
@@ -3336,18 +3308,18 @@ void t_go_generator::generate_service_server(const t_service* tservice) {
   }
 
   // Generate the process subfunctions
-  for (f_iter = functions.begin(); f_iter != functions.end(); ++f_iter) {
-    generate_process_function_type(tservice, *f_iter);
-    generate_read_function(tservice, *f_iter);
-    generate_write_function(tservice, *f_iter);
-    generate_run_function(tservice, *f_iter);
+  for (const auto* func : functions) {
+    generate_process_function_type(tservice, func);
+    generate_struct_error_result_fn(tservice, func);
+    generate_read_function(tservice, func);
+    generate_write_function(tservice, func);
+    generate_run_function(tservice, func);
   }
 
   f_service_ << endl;
 }
 void t_go_generator::generate_process_function_type(
-    const t_service* tservice,
-    const t_function* tfunction) {
+    const t_service* tservice, const t_function* tfunction) {
   string processorName = privatize(tservice->get_name()) + "Processor" +
       publicize(tfunction->get_name());
   f_service_ << indent() << "type " << processorName << " struct {" << endl;
@@ -3357,8 +3329,7 @@ void t_go_generator::generate_process_function_type(
 }
 
 void t_go_generator::generate_read_function(
-    const t_service* tservice,
-    const t_function* tfunction) {
+    const t_service* tservice, const t_function* tfunction) {
   // Open function
   string processorName = privatize(tservice->get_name()) + "Processor" +
       publicize(tfunction->get_name());
@@ -3381,9 +3352,41 @@ void t_go_generator::generate_read_function(
   f_service_ << indent() << "}" << endl << endl;
 }
 
+void t_go_generator::generate_struct_error_result_fn(
+    const t_service* tservice, const t_function* tfunction) {
+  // Open function
+  string processorName = privatize(tservice->get_name()) + "Processor" +
+      publicize(tfunction->get_name());
+  string argsname = publicize(tfunction->get_name() + "_args", true);
+  string resultname = publicize(tfunction->get_name() + "_result", true);
+
+  if (tfunction->is_oneway()) {
+    return;
+  }
+
+  f_service_ << indent() << "func (p *" << resultname
+             << ") Exception() thrift.WritableException {" << endl;
+  indent_up();
+  f_service_ << indent() << "if p == nil { return nil }" << endl;
+  const t_struct* exceptions = tfunction->get_xceptions();
+  const vector<t_field*>& x_fields = exceptions->get_members();
+  vector<t_field*>::const_iterator xf_iter;
+  for (xf_iter = x_fields.begin(); xf_iter != x_fields.end(); ++xf_iter) {
+    indent(f_service_) << "if p." << publicize((*xf_iter)->get_name())
+                       << " != nil {" << endl;
+    indent_up();
+    indent(f_service_) << "return p." << publicize((*xf_iter)->get_name())
+                       << endl;
+    indent_down();
+    f_service_ << indent() << "}" << endl;
+  }
+  f_service_ << indent() << "return nil" << endl;
+  indent_down();
+  f_service_ << indent() << "}" << endl << endl;
+}
+
 void t_go_generator::generate_write_function(
-    const t_service* tservice,
-    const t_function* tfunction) {
+    const t_service* tservice, const t_function* tfunction) {
   // Open function
   string processorName = privatize(tservice->get_name()) + "Processor" +
       publicize(tfunction->get_name());
@@ -3445,8 +3448,7 @@ void t_go_generator::generate_write_function(
 }
 
 void t_go_generator::generate_run_function(
-    const t_service* tservice,
-    const t_function* tfunction) {
+    const t_service* tservice, const t_function* tfunction) {
   // Open function
   string processorName = privatize(tservice->get_name()) + "Processor" +
       publicize(tfunction->get_name());
@@ -3470,12 +3472,12 @@ void t_go_generator::generate_run_function(
   const t_struct* exceptions = tfunction->get_xceptions();
   const vector<t_field*>& x_fields = exceptions->get_members();
 
-  if (!tfunction->is_oneway()) {
+  if (tfunction->qualifier() != t_function_qualifier::one_way) {
     indent(f_service_) << "var result " << resultname << endl;
   }
   indent(f_service_) << "if ";
 
-  if (!tfunction->is_oneway()) {
+  if (tfunction->qualifier() != t_function_qualifier::one_way) {
     if (!tfunction->get_returntype()->is_void()) {
       f_service_ << "retval, ";
     }
@@ -3529,7 +3531,8 @@ void t_go_generator::generate_run_function(
 
   bool need_reference = type_need_reference(tfunction->get_returntype());
 
-  if (!tfunction->is_oneway() && !tfunction->get_returntype()->is_void()) {
+  if (tfunction->qualifier() != t_function_qualifier::one_way &&
+      !tfunction->get_returntype()->is_void()) {
     f_service_ << " else {"
                << endl; // make sure we set Success retval only on success
     indent_up();
@@ -3544,7 +3547,7 @@ void t_go_generator::generate_run_function(
     f_service_ << endl;
   }
 
-  if (!tfunction->is_oneway()) {
+  if (tfunction->qualifier() != t_function_qualifier::one_way) {
     indent(f_service_) << "return &result, nil" << endl;
   } else {
     indent(f_service_) << "return nil, nil" << endl;
@@ -3706,7 +3709,7 @@ void t_go_generator::generate_deserialize_struct(
 
   out << indent() << prefix << eq << (pointer_field ? "" : "*");
 
-  const t_program* program = tstruct->get_program();
+  const t_program* program = tstruct->program();
   if (program != nullptr && program != program_) {
     out << package_identifiers[get_real_go_module(program)] << ".";
   }
@@ -3821,10 +3824,7 @@ void t_go_generator::generate_deserialize_container(
  * Generates code to deserialize a map
  */
 void t_go_generator::generate_deserialize_map_element(
-    ofstream& out,
-    const t_map* tmap,
-    bool declare,
-    string prefix) {
+    ofstream& out, const t_map* tmap, bool declare, string prefix) {
   (void)declare;
   string key = tmp("_key");
   string val = tmp("_val");
@@ -3843,10 +3843,7 @@ void t_go_generator::generate_deserialize_map_element(
  * Write a set element
  */
 void t_go_generator::generate_deserialize_set_element(
-    ofstream& out,
-    const t_set* tset,
-    bool declare,
-    string prefix) {
+    ofstream& out, const t_set* tset, bool declare, string prefix) {
   (void)declare;
   string elem = tmp("_elem");
   t_field felem(tset->get_elem_type(), elem);
@@ -3860,10 +3857,7 @@ void t_go_generator::generate_deserialize_set_element(
  * Write a list element
  */
 void t_go_generator::generate_deserialize_list_element(
-    ofstream& out,
-    const t_list* tlist,
-    bool declare,
-    string prefix) {
+    ofstream& out, const t_list* tlist, bool declare, string prefix) {
   (void)declare;
   string elem = tmp("_elem");
   t_field felem(((t_list*)tlist)->get_elem_type(), elem);
@@ -3880,10 +3874,7 @@ void t_go_generator::generate_deserialize_list_element(
  * @param prefix Name to prepend to field name
  */
 void t_go_generator::generate_serialize_field(
-    ofstream& out,
-    const t_field* tfield,
-    string prefix,
-    bool inkey) {
+    ofstream& out, const t_field* tfield, string prefix, bool inkey) {
   const t_type* type = tfield->get_type()->get_true_type();
   string name(prefix + publicize(tfield->get_name()));
 
@@ -3980,9 +3971,7 @@ void t_go_generator::generate_serialize_field(
  * @param prefix  String prefix to attach to all fields
  */
 void t_go_generator::generate_serialize_struct(
-    ofstream& out,
-    const t_struct* tstruct,
-    string prefix) {
+    ofstream& out, const t_struct* tstruct, string prefix) {
   (void)tstruct;
   out << indent() << "if err := " << prefix << ".Write(oprot); err != nil {"
       << endl;
@@ -3993,10 +3982,7 @@ void t_go_generator::generate_serialize_struct(
 }
 
 void t_go_generator::generate_serialize_container(
-    ofstream& out,
-    const t_type* ttype,
-    bool pointer_field,
-    string prefix) {
+    ofstream& out, const t_type* ttype, bool pointer_field, string prefix) {
   if (pointer_field) {
     prefix = "*" + prefix;
   }
@@ -4092,10 +4078,7 @@ void t_go_generator::generate_serialize_container(
  *
  */
 void t_go_generator::generate_serialize_map_element(
-    ofstream& out,
-    const t_map* tmap,
-    string kiter,
-    string viter) {
+    ofstream& out, const t_map* tmap, string kiter, string viter) {
   t_field kfield(tmap->get_key_type(), "");
   t_field vfield(tmap->get_val_type(), "");
   kfield.set_req(t_field::e_req::opt_in_req_out);
@@ -4108,9 +4091,7 @@ void t_go_generator::generate_serialize_map_element(
  * Serializes the members of a set.
  */
 void t_go_generator::generate_serialize_set_element(
-    ofstream& out,
-    const t_set* tset,
-    string prefix) {
+    ofstream& out, const t_set* tset, string prefix) {
   t_field efield(tset->get_elem_type(), "");
   efield.set_req(t_field::e_req::opt_in_req_out);
   generate_serialize_field(out, &efield, prefix);
@@ -4120,9 +4101,7 @@ void t_go_generator::generate_serialize_set_element(
  * Serializes the members of a list.
  */
 void t_go_generator::generate_serialize_list_element(
-    ofstream& out,
-    const t_list* tlist,
-    string prefix) {
+    ofstream& out, const t_list* tlist, string prefix) {
   t_field efield(tlist->get_elem_type(), "");
   efield.set_req(t_field::e_req::opt_in_req_out);
   generate_serialize_field(out, &efield, prefix);
@@ -4132,8 +4111,7 @@ void t_go_generator::generate_serialize_list_element(
  * Generates the docstring for a given struct.
  */
 void t_go_generator::generate_go_docstring(
-    ofstream& out,
-    const t_struct* tstruct) {
+    ofstream& out, const t_struct* tstruct) {
   generate_go_docstring(out, tstruct, tstruct, "Attributes");
 }
 
@@ -4141,8 +4119,7 @@ void t_go_generator::generate_go_docstring(
  * Generates the docstring for a given function.
  */
 void t_go_generator::generate_go_docstring(
-    ofstream& out,
-    const t_function* tfunction) {
+    ofstream& out, const t_function* tfunction) {
   generate_go_docstring(
       out, tfunction, tfunction->get_paramlist(), "Parameters");
 }
@@ -4224,9 +4201,7 @@ string t_go_generator::declare_argument(const t_field* tfield) {
  * @param tfield The field, which must have `tfield->get_value() != nullptr`
  */
 string t_go_generator::render_field_initial_value(
-    const t_field* tfield,
-    const string& name,
-    bool optional_field) {
+    const t_field* tfield, const string& name, bool optional_field) {
   const t_type* type = tfield->get_type()->get_true_type();
 
   if (optional_field) {
@@ -4250,8 +4225,7 @@ string t_go_generator::render_field_initial_value(
  * @return String of rendered function definition
  */
 string t_go_generator::function_signature(
-    const t_function* tfunction,
-    string prefix) {
+    const t_function* tfunction, string prefix) {
   // TODO(mcslee): Nitpicky, no ',' if argument_list is empty
   return publicize(prefix + tfunction->get_name()) + "(" +
       argument_list(tfunction->get_paramlist()) + ")";
@@ -4264,9 +4238,7 @@ string t_go_generator::function_signature(
  * @return String of rendered function definition
  */
 string t_go_generator::function_signature_if(
-    const t_function* tfunction,
-    string prefix,
-    bool useContext) {
+    const t_function* tfunction, string prefix, bool useContext) {
   string signature = publicize(prefix + tfunction->get_name()) + "(";
   string args = argument_list(tfunction->get_paramlist());
   if (useContext) {
@@ -4309,7 +4281,7 @@ string t_go_generator::argument_list(const t_struct* tstruct) {
 }
 
 string t_go_generator::type_name(const t_type* ttype) {
-  const t_program* program = ttype->get_program();
+  const t_program* program = ttype->program();
 
   if (program != nullptr && program != program_) {
     string module(get_real_go_module(program));
@@ -4418,13 +4390,11 @@ string t_go_generator::type_to_go_type(const t_type* type) {
  * associated with the type is T_OPTIONAL.
  */
 string t_go_generator::type_to_go_type_with_opt(
-    const t_type* type,
-    bool optional_field,
-    bool from_typedef) {
+    const t_type* type, bool optional_field, bool from_typedef) {
   string maybe_pointer(optional_field ? "*" : "");
 
-  if (type->is_typedef() && !((t_typedef*)type)->is_defined()) {
-    type = ((t_typedef*)type)->get_true_type();
+  if (auto ph = dynamic_cast<const t_placeholder_typedef*>(type)) {
+    type = ph->get_true_type();
   }
 
   if (type->is_base_type()) {

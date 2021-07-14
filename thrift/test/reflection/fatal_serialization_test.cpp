@@ -239,6 +239,21 @@ TYPED_TEST(MultiProtocolTest, test_blank_required_ref_field) {
   expect_same_serialized_size(a, this->writer);
 }
 
+TYPED_TEST(MultiProtocolTest, test_blank_optional_boxed_field) {
+  struct3 a, b;
+  a.box_nested1_ref().ensure().f1_ref() = 5;
+
+  serializer_write(a, this->writer);
+  this->prep_read();
+  this->debug_buffer();
+  serializer_read(b, this->reader);
+
+  EXPECT_EQ(*a.box_nested1_ref(), *b.box_nested1_ref());
+  EXPECT_FALSE(a.box_nested2_ref().has_value());
+  EXPECT_FALSE(b.box_nested2_ref().has_value());
+  expect_same_serialized_size(a, this->writer);
+}
+
 TYPED_TEST(MultiProtocolTest, test_empty_containers) {
   struct1 a, b;
   serializer_write(a, this->writer);
@@ -502,15 +517,11 @@ struct SimpleJsonTest : public ::testing::Test {
   }
 };
 
-TEST_F(SimpleJsonTest, throws_on_unset_required_value) {
+TEST_F(SimpleJsonTest, doesnt_throws_on_unset_required_value) {
   set_input("{}");
-  try {
-    struct2 a;
-    serializer_read(a, reader);
-    ADD_FAILURE() << "didn't throw!";
-  } catch (TProtocolException& e) {
-    EXPECT_EQ(TProtocolException::MISSING_REQUIRED_FIELD, e.getType());
-  }
+  struct2 a;
+  serializer_read(a, reader);
+  EXPECT_EQ("", *a.req_string_ref());
 }
 
 // wrap in quotes
@@ -550,7 +561,7 @@ TEST_F(SimpleJsonTest, sets_def_members) {
   EXPECT_EQ("required", a.req_string);
   EXPECT_EQ("default", *a.def_string_ref());
 }
-TEST_F(SimpleJsonTest, throws_on_missing_required_ref) {
+TEST_F(SimpleJsonTest, doesnt_throws_on_missing_required_ref) {
   // clang-format off
   set_input("{"
     KV("opt_nested", "{"
@@ -564,12 +575,8 @@ TEST_F(SimpleJsonTest, throws_on_missing_required_ref) {
 
   struct3 a;
 
-  try {
-    serializer_read(a, reader);
-    ADD_FAILURE() << "didn't throw!";
-  } catch (TProtocolException& e) {
-    EXPECT_EQ(TProtocolException::MISSING_REQUIRED_FIELD, e.getType());
-  }
+  serializer_read(a, reader);
+  EXPECT_EQ(0, *a.req_nested_ref()->f1_ref());
 }
 TEST_F(SimpleJsonTest, doesnt_throw_when_req_field_present) {
   // clang-format off

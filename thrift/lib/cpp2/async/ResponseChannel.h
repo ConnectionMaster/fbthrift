@@ -32,7 +32,6 @@
 #include <thrift/lib/cpp2/async/Sink.h>
 #endif
 #include <thrift/lib/cpp2/async/StreamCallbacks.h>
-#include <thrift/lib/cpp2/server/AdmissionController.h>
 
 namespace folly {
 class IOBuf;
@@ -69,6 +68,7 @@ extern const std::string kInteractionConstructorErrorErrorCode;
 extern const std::string kConnectionClosingErrorCode;
 extern const std::string kRequestParsingErrorCode;
 extern const std::string kServerIngressMemoryLimitExceededErrorCode;
+extern const std::string kChecksumMismatchErrorCode;
 
 namespace apache {
 namespace thrift {
@@ -82,13 +82,11 @@ class ResponseChannelRequest {
 
   virtual bool isOneway() const = 0;
 
-  virtual bool isStream() const {
-    return false;
-  }
+  virtual bool isStream() const { return false; }
 
-  virtual bool isSink() const {
-    return false;
-  }
+  virtual bool isSink() const { return false; }
+
+  virtual bool includeEnvelope() const = 0;
 
   apache::thrift::RpcKind rpcKind() const {
     if (isStream()) {
@@ -103,74 +101,76 @@ class ResponseChannelRequest {
     return apache::thrift::RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE;
   }
 
-  virtual bool isReplyChecksumNeeded() const {
-    return false;
-  }
+  virtual bool isReplyChecksumNeeded() const { return false; }
 
   virtual void sendReply(
-      std::unique_ptr<folly::IOBuf>&&,
+      ResponsePayload&&,
       MessageChannel::SendCallback* cb = nullptr,
       folly::Optional<uint32_t> crc32 = folly::none) = 0;
 
   virtual void sendStreamReply(
-      std::unique_ptr<folly::IOBuf>&&,
+      ResponsePayload&&,
       apache::thrift::detail::ServerStreamFactory&&,
       folly::Optional<uint32_t> = folly::none) {
     throw std::logic_error("unimplemented");
   }
 
-  FOLLY_NODISCARD virtual bool sendStreamReply(
-      std::unique_ptr<folly::IOBuf>,
-      StreamServerCallbackPtr,
-      folly::Optional<uint32_t> = folly::none) {
-    throw std::logic_error("unimplemented");
+  FOLLY_NODISCARD static bool sendStreamReply(
+      ResponseChannelRequest::UniquePtr request,
+      folly::EventBase* eb,
+      ResponsePayload&& payload,
+      StreamServerCallbackPtr callback,
+      folly::Optional<uint32_t> crc32 = folly::none) {
+    // Destroying request can call onStreamCancel inline, which would be a
+    // contract violation if we did it inline and returned true.
+    SCOPE_EXIT {
+      eb->runInEventBaseThread([request = std::move(request)] {});
+    };
+    return request->sendStreamReply(
+        std::move(payload), std::move(callback), crc32);
   }
 
 #if FOLLY_HAS_COROUTINES
   virtual void sendSinkReply(
-      std::unique_ptr<folly::IOBuf>&&,
+      ResponsePayload&&,
       apache::thrift::detail::SinkConsumerImpl&&,
       folly::Optional<uint32_t> = folly::none) {
     throw std::logic_error("unimplemented");
   }
+
+  FOLLY_NODISCARD static bool sendSinkReply(
+      ResponseChannelRequest::UniquePtr request,
+      folly::EventBase* eb,
+      ResponsePayload&& payload,
+      SinkServerCallbackPtr callback,
+      folly::Optional<uint32_t> crc32 = folly::none) {
+    SCOPE_EXIT {
+      eb->runInEventBaseThread([request = std::move(request)] {});
+    };
+    return request->sendSinkReply(
+        std::move(payload), std::move(callback), crc32);
+  }
 #endif
 
+  virtual void sendException(
+      ResponsePayload&& response, MessageChannel::SendCallback* cb = nullptr) {
+    // Until we start requesting payloads without the envelope we can pass any
+    // sendException calls to sendReply
+    sendReply(std::move(response), cb, folly::none);
+  }
+
   virtual void sendErrorWrapped(
-      folly::exception_wrapper ex,
-      std::string exCode) = 0;
+      folly::exception_wrapper ex, std::string exCode) = 0;
 
   virtual void sendQueueTimeoutResponse() {}
 
-  virtual ~ResponseChannelRequest() {
-    if (admissionController_ != nullptr) {
-      if (!startedProcessing_) {
-        admissionController_->dequeue();
-      } else {
-        auto latency = std::chrono::steady_clock::now() - creationTimestamps_;
-        admissionController_->returnedResponse(latency);
-      }
-    }
-  }
+  virtual ~ResponseChannelRequest() = default;
 
   bool getShouldStartProcessing() {
     if (!tryStartProcessing()) {
       return false;
     }
-
-    if (admissionController_ != nullptr) {
-      admissionController_->dequeue();
-      creationTimestamps_ = std::chrono::steady_clock::now();
-    }
     return true;
-  }
-
-  void setAdmissionController(
-      std::shared_ptr<AdmissionController> admissionController) {
-    admissionController_ = std::move(admissionController);
-  }
-
-  std::shared_ptr<AdmissionController> getAdmissionController() const {
-    return admissionController_;
   }
 
  protected:
@@ -183,9 +183,20 @@ class ResponseChannelRequest {
   }
   virtual bool tryStartProcessing() = 0;
 
-  std::shared_ptr<apache::thrift::AdmissionController> admissionController_;
+  FOLLY_NODISCARD virtual bool sendStreamReply(
+      ResponsePayload&&,
+      StreamServerCallbackPtr,
+      folly::Optional<uint32_t> = folly::none) {
+    throw std::logic_error("unimplemented");
+  }
+  FOLLY_NODISCARD virtual bool sendSinkReply(
+      ResponsePayload&&,
+      SinkServerCallbackPtr,
+      folly::Optional<uint32_t> = folly::none) {
+    throw std::logic_error("unimplemented");
+  }
+
   bool startedProcessing_{false};
-  std::chrono::steady_clock::time_point creationTimestamps_;
 };
 
 /**

@@ -34,7 +34,7 @@ ScopedServerInterfaceThread::ScopedServerInterfaceThread(
     SocketAddress const& addr,
     ServerConfigCb configCb) {
   auto tf = make_shared<PosixThreadFactory>(PosixThreadFactory::ATTACHED);
-  auto tm = ThreadManager::newSimpleThreadManager(1, false);
+  auto tm = ThreadManager::newSimpleThreadManager(1);
   tm->threadFactory(move(tf));
   tm->start();
   auto ts = make_shared<ThriftServer>();
@@ -64,9 +64,11 @@ ScopedServerInterfaceThread::ScopedServerInterfaceThread(
     uint16_t port,
     ServerConfigCb configCb)
     : ScopedServerInterfaceThread(
-          move(apf),
-          SocketAddress(host, port),
-          move(configCb)) {}
+          move(apf), SocketAddress(host, port), move(configCb)) {}
+
+ScopedServerInterfaceThread::ScopedServerInterfaceThread(
+    shared_ptr<AsyncProcessorFactory> apf, ServerConfigCb configCb)
+    : ScopedServerInterfaceThread(move(apf), "::1", 0, move(configCb)) {}
 
 ScopedServerInterfaceThread::ScopedServerInterfaceThread(
     shared_ptr<BaseThriftServer> bts) {
@@ -113,11 +115,10 @@ struct TestClientRunner {
 std::shared_ptr<RequestChannel>
 ScopedServerInterfaceThread::makeTestClientChannel(
     std::shared_ptr<AsyncProcessorFactory> apf,
-    folly::Executor* callbackExecutor,
     ScopedServerInterfaceThread::FaultInjectionFunc injectFault) {
   auto runner = std::make_shared<TestClientRunner>(std::move(apf));
   auto innerChannel = runner->runner.newChannel(
-      callbackExecutor, RocketClientChannel::newChannel);
+      folly::getGlobalCPUExecutor().get(), RocketClientChannel::newChannel);
   if (injectFault) {
     runner->channel.reset(new apache::thrift::detail::FaultInjectionChannel(
         std::move(innerChannel), std::move(injectFault)));
@@ -127,5 +128,15 @@ ScopedServerInterfaceThread::makeTestClientChannel(
   auto* channel = runner->channel.get();
   return folly::to_shared_ptr_aliasing(std::move(runner), channel);
 }
+
+namespace detail {
+void validateServiceName(AsyncProcessorFactory& apf, const char* serviceName) {
+  auto processor = apf.getProcessor();
+  if (auto* ptr = dynamic_cast<GeneratedAsyncProcessor*>(processor.get())) {
+    CHECK_STREQ(ptr->getServiceName(), serviceName)
+        << "Client and handler type mismatch";
+  }
+}
+} // namespace detail
 } // namespace thrift
 } // namespace apache

@@ -86,6 +86,7 @@ cdef extern from "thrift/lib/cpp2/server/ThriftServer.h" \
     cdef cppclass cThriftServer "apache::thrift::ThriftServer":
         ThriftServer() nogil except +
         void setPort(uint16_t port) nogil
+        uint16_t getPort() nogil
         void setAddress(cfollySocketAddress& addr) nogil
         void setAddress(string ip, uint16_t port) nogil
         void setInterface(shared_ptr[cServerInterface]) nogil
@@ -108,8 +109,6 @@ cdef extern from "thrift/lib/cpp2/server/ThriftServer.h" \
         void setNumCPUWorkerThreads(uint32_t numCPUWorkerThreads)
         uint32_t getNumCPUWorkerThreads()
         void setWorkersJoinTimeout(seconds timeout)
-        void setNumSSLHandshakeWorkerThreads(uint32_t nSSLHandshakeThreads)
-        uint32_t getNumSSLHandshakeWorkerThreads()
         void setAllowPlaintextOnLoopback(cbool allow)
         cbool isPlaintextAllowedOnLoopback()
         void setIdleTimeout(milliseconds idleTimeout)
@@ -120,6 +119,8 @@ cdef extern from "thrift/lib/cpp2/server/ThriftServer.h" \
         void useExistingSocket(int socket) except +
         cBaseThriftServerMetadata& metadata()
         void setThreadManagerFromExecutor(cFollyExecutor*)
+        void setStopWorkersOnStopListening(cbool stopWorkers)
+        cbool getStopWorkersOnStopListening()
 
 cdef extern from "folly/ssl/OpenSSLCertUtils.h":
     # I need a opque id for x509 structs

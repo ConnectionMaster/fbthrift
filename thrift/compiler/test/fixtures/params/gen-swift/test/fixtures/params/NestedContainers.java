@@ -10,7 +10,7 @@ package test.fixtures.params;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.codec.ThriftField.Requiredness;
 import com.facebook.swift.service.*;
-import com.facebook.swift.transport.client.*;
+import com.facebook.thrift.client.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.util.*;
@@ -185,9 +185,8 @@ public interface NestedContainers extends java.io.Closeable {
     }
 
     @com.facebook.swift.service.ThriftService("NestedContainers")
-    interface Reactive extends Closeable {
-        @java.lang.Override void close();
-
+    interface Reactive extends reactor.core.Disposable {
+        @ThriftMethod(value = "mapList")
         reactor.core.publisher.Mono<Void> mapList(final Map<Integer, List<Integer>> foo);
 
         default reactor.core.publisher.Mono<Void> mapList(final Map<Integer, List<Integer>> foo, RpcOptions rpcOptions) {
@@ -198,6 +197,7 @@ public interface NestedContainers extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "mapSet")
         reactor.core.publisher.Mono<Void> mapSet(final Map<Integer, Set<Integer>> foo);
 
         default reactor.core.publisher.Mono<Void> mapSet(final Map<Integer, Set<Integer>> foo, RpcOptions rpcOptions) {
@@ -208,6 +208,7 @@ public interface NestedContainers extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "listMap")
         reactor.core.publisher.Mono<Void> listMap(final List<Map<Integer, Integer>> foo);
 
         default reactor.core.publisher.Mono<Void> listMap(final List<Map<Integer, Integer>> foo, RpcOptions rpcOptions) {
@@ -218,6 +219,7 @@ public interface NestedContainers extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "listSet")
         reactor.core.publisher.Mono<Void> listSet(final List<Set<Integer>> foo);
 
         default reactor.core.publisher.Mono<Void> listSet(final List<Set<Integer>> foo, RpcOptions rpcOptions) {
@@ -228,6 +230,7 @@ public interface NestedContainers extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
+        @ThriftMethod(value = "turtles")
         reactor.core.publisher.Mono<Void> turtles(final List<List<Map<Integer, Map<Integer, Set<Integer>>>>> foo);
 
         default reactor.core.publisher.Mono<Void> turtles(final List<List<Map<Integer, Map<Integer, Set<Integer>>>>> foo, RpcOptions rpcOptions) {

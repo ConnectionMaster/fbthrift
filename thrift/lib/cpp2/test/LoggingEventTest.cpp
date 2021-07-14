@@ -22,7 +22,9 @@
 #include <folly/portability/GMock.h>
 #include <folly/portability/GTest.h>
 #include <thrift/lib/cpp2/PluggableFunction.h>
+#include <thrift/lib/cpp2/async/RocketClientChannel.h>
 #include <thrift/lib/cpp2/server/Cpp2Worker.h>
+#include <thrift/lib/cpp2/server/ServerInstrumentation.h>
 #include <thrift/lib/cpp2/server/ThriftServer.h>
 #include <thrift/lib/cpp2/test/gen-cpp2/TestService.h>
 #include <thrift/lib/cpp2/util/ScopedServerInterfaceThread.h>
@@ -34,22 +36,35 @@ using apache::thrift::ConnectionEventHandler;
 using apache::thrift::ConnectionLoggingContext;
 using apache::thrift::LoggingEventRegistry;
 using apache::thrift::ServerEventHandler;
+using apache::thrift::ServerTrackerHandler;
 using apache::thrift::ThriftServer;
+using apache::thrift::instrumentation::ServerTracker;
 
 constexpr std::string_view kServe = "serve";
 // Note not setting a ssl config is seen as a manual override
 constexpr std::string_view kNonTls = "non_tls.manual_policy";
+constexpr std::string_view kRocketSetup = "rocket.setup";
+
+using namespace apache::thrift;
 
 class TestServerEventHandler : public ServerEventHandler {
  public:
-  MOCK_METHOD2(log, void(const ThriftServer&, DynamicFieldsCallback));
+  MOCK_METHOD(
+      void, log, (const ThriftServer&, DynamicFieldsCallback), (override));
 };
 
 class TestConnectionEventHandler : public ConnectionEventHandler {
  public:
-  MOCK_METHOD2(
+  MOCK_METHOD(
+      void,
       log,
-      void(const ConnectionLoggingContext&, DynamicFieldsCallback));
+      (const ConnectionLoggingContext&, DynamicFieldsCallback),
+      (override));
+};
+
+class TestServerTrackerHandler : public ServerTrackerHandler {
+ public:
+  MOCK_METHOD(void, log, (const ServerTracker&), (override));
 };
 
 class TestEventRegistry : public LoggingEventRegistry {
@@ -57,6 +72,11 @@ class TestEventRegistry : public LoggingEventRegistry {
   TestEventRegistry() {
     serverEventMap_[kServe] = makeHandler<TestServerEventHandler>();
     connectionEventMap_[kNonTls] = makeHandler<TestConnectionEventHandler>();
+    connectionEventMap_[kRocketSetup] =
+        makeHandler<TestConnectionEventHandler>();
+    serverTrackerMap_
+        [apache::thrift::instrumentation::kThriftServerTrackerKey] =
+            makeHandler<TestServerTrackerHandler>();
   }
 
   ServerEventHandler& getServerEventHandler(
@@ -75,6 +95,11 @@ class TestEventRegistry : public LoggingEventRegistry {
     return *handler;
   }
 
+  ServerTrackerHandler& getServerTrackerHandler(
+      std::string_view key) const override {
+    return *serverTrackerMap_.at(key).get();
+  }
+
  private:
   template <typename T>
   std::unique_ptr<T> makeHandler() {
@@ -87,6 +112,8 @@ class TestEventRegistry : public LoggingEventRegistry {
       serverEventMap_;
   std::unordered_map<std::string_view, std::unique_ptr<ConnectionEventHandler>>
       connectionEventMap_;
+  std::unordered_map<std::string_view, std::unique_ptr<ServerTrackerHandler>>
+      serverTrackerMap_;
 };
 
 THRIFT_PLUGGABLE_FUNC_SET(
@@ -96,33 +123,55 @@ THRIFT_PLUGGABLE_FUNC_SET(
 }
 } // namespace
 
+namespace {
+enum class TransportType { Header, Rocket };
+} // namespace
+
+class HeaderOrRocketTest {
+ public:
+  TransportType transport = TransportType::Rocket;
+
+  bool isRocket() { return transport == TransportType::Rocket; }
+
+  template <typename ClientT>
+  auto makeClient(ScopedServerInterfaceThread& runner) {
+    if (transport == TransportType::Header) {
+      return runner.newClient<ClientT>(nullptr, [&](auto socket) mutable {
+        return HeaderClientChannel::newChannel(std::move(socket));
+      });
+    } else {
+      return runner.newClient<ClientT>(nullptr, [&](auto socket) mutable {
+        return RocketClientChannel::newChannel(std::move(socket));
+      });
+    }
+  }
+};
+
 template <typename T>
 class LoggingEventTest : public testing::Test {
  protected:
-  void SetUp() override {
-    apache::thrift::useMockLoggingEventRegistry();
-  }
+  void SetUp() override { apache::thrift::useMockLoggingEventRegistry(); }
 
   template <typename H>
   T& fetchHandler(
       H& (LoggingEventRegistry::*method)(std::string_view) const,
       std::string_view key) {
-    if (!handler_) {
-      auto& handler = (apache::thrift::getLoggingEventRegistry().*method)(key);
-      handler_ = dynamic_cast<T*>(&handler);
-      EXPECT_NE(handler_, nullptr);
+    auto& handler = handlers_[key];
+    if (!handler) {
+      handler = dynamic_cast<T*>(&(getLoggingEventRegistry().*method)(key));
+      EXPECT_NE(handler, nullptr);
     }
-    return *handler_;
+    return *handler;
   }
 
   void TearDown() override {
-    if (handler_) {
-      ASSERT_TRUE(testing::Mock::VerifyAndClearExpectations(handler_));
+    for (auto& h : handlers_) {
+      ASSERT_TRUE(testing::Mock::VerifyAndClearExpectations(h.second));
     }
   }
 
  private:
-  T* handler_{nullptr};
+  std::map<std::string_view, T*> handlers_;
 };
 
 class ServerEventLogTest : public LoggingEventTest<TestServerEventHandler> {
@@ -134,13 +183,12 @@ class ServerEventLogTest : public LoggingEventTest<TestServerEventHandler> {
   }
 };
 
-class ConnectionEventLogTest
-    : public LoggingEventTest<TestConnectionEventHandler> {
+class ServerTrackerLogTest : public LoggingEventTest<TestServerTrackerHandler> {
  protected:
-  void expectConnectionEventCall(std::string_view key, size_t times) {
+  void expectServerTrackerCall(std::string_view key, size_t times) {
     auto& handler =
-        fetchHandler(&LoggingEventRegistry::getConnectionEventHandler, key);
-    EXPECT_CALL(handler, log(testing::_, testing::_)).Times(times);
+        fetchHandler(&LoggingEventRegistry::getServerTrackerHandler, key);
+    EXPECT_CALL(handler, log(testing::_)).Times(times);
   }
 };
 
@@ -155,13 +203,38 @@ TEST_F(ServerEventLogTest, serverTest) {
   apache::thrift::ScopedServerInterfaceThread server(handler);
 }
 
-TEST_F(ConnectionEventLogTest, connectionTest) {
-  expectConnectionEventCall(kNonTls, 1);
+TEST_F(ServerTrackerLogTest, serverTest) {
+  expectServerTrackerCall(
+      apache::thrift::instrumentation::kThriftServerTrackerKey, 1);
   auto handler = std::make_shared<TestServiceHandler>();
   apache::thrift::ScopedServerInterfaceThread server(handler);
-  auto client =
-      server.newClient<apache::thrift::test::TestServiceAsyncClient>();
+}
+
+class ConnectionEventLogTest
+    : public LoggingEventTest<TestConnectionEventHandler>,
+      public HeaderOrRocketTest,
+      public ::testing::WithParamInterface<TransportType> {
+ public:
+  void SetUp() override { transport = GetParam(); }
+  void expectConnectionEventCall(std::string_view key, size_t times) {
+    auto& handler =
+        fetchHandler(&LoggingEventRegistry::getConnectionEventHandler, key);
+    EXPECT_CALL(handler, log(testing::_, testing::_)).Times(times);
+  }
+};
+
+TEST_P(ConnectionEventLogTest, connectionTest) {
+  expectConnectionEventCall(kNonTls, 1);
+  expectConnectionEventCall(kRocketSetup, isRocket() ? 1 : 0);
+  auto handler = std::make_shared<TestServiceHandler>();
+  ScopedServerInterfaceThread runner(handler);
+  auto client = makeClient<test::TestServiceAsyncClient>(runner);
 
   // block to make sure request is actually sent.
   client->semifuture_voidResponse().get();
 }
+
+INSTANTIATE_TEST_CASE_P(
+    HeaderOrRocket,
+    ConnectionEventLogTest,
+    testing::Values(TransportType::Header, TransportType::Rocket));

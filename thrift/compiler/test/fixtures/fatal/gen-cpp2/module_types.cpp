@@ -540,6 +540,24 @@ void TccStructTraits<::test_cpp2::cpp_reflection::structA>::translateFieldName(
 namespace test_cpp2 { namespace cpp_reflection {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+structA::structA(const structA&) = default;
+structA& structA::operator=(const structA&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+structA::structA(structA&& other) noexcept  :
+    a(std::move(other.a)),
+    b(std::move(other.b)),
+    __isset(other.__isset) {}
+structA& structA::operator=(FOLLY_MAYBE_UNUSED structA&& other) noexcept {
+    this->a = std::move(other.a);
+    this->b = std::move(other.b);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 structA::structA(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::std::string b__arg) :
     a(std::move(a__arg)),
     b(std::move(b__arg)) {
@@ -547,10 +565,11 @@ structA::structA(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::st
   __isset.b = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void structA::__clear() {
   // clear all fields
-  a = 0;
-  b = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
+  this->a = 0;
+  this->b = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -771,6 +790,7 @@ void TccStructTraits<::test_cpp2::cpp_reflection::structB>::translateFieldName(
 
 namespace test_cpp2 { namespace cpp_reflection {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 structB::structB(apache::thrift::FragileConstructor, double c__arg, bool d__arg) :
     c(std::move(c__arg)),
@@ -779,10 +799,11 @@ structB::structB(apache::thrift::FragileConstructor, double c__arg, bool d__arg)
   __isset.d = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void structB::__clear() {
   // clear all fields
-  c = 0;
-  d = 0;
+  this->c = 0;
+  this->d = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -861,16 +882,91 @@ void TccStructTraits<::test_cpp2::cpp_reflection::structC>::translateFieldName(
 namespace test_cpp2 { namespace cpp_reflection {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+structC::structC(const structC&) = default;
+structC& structC::operator=(const structC&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 structC::structC() :
       a(0),
       c(0),
       d(0),
       e( ::test_cpp2::cpp_reflection::enum1::field0),
-      f( ::test_cpp2::cpp_reflection::enum2::field0_2) {}
+      f( ::test_cpp2::cpp_reflection::enum2::field0_2) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 structC::~structC() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+structC::structC(structC&& other) noexcept  :
+    a(std::move(other.a)),
+    b(std::move(other.b)),
+    c(std::move(other.c)),
+    d(std::move(other.d)),
+    e(std::move(other.e)),
+    f(std::move(other.f)),
+    g(std::move(other.g)),
+    h(std::move(other.h)),
+    i(std::move(other.i)),
+    j(std::move(other.j)),
+    j1(std::move(other.j1)),
+    j2(std::move(other.j2)),
+    j3(std::move(other.j3)),
+    k(std::move(other.k)),
+    k1(std::move(other.k1)),
+    k2(std::move(other.k2)),
+    k3(std::move(other.k3)),
+    l(std::move(other.l)),
+    l1(std::move(other.l1)),
+    l2(std::move(other.l2)),
+    l3(std::move(other.l3)),
+    m1(std::move(other.m1)),
+    m2(std::move(other.m2)),
+    m3(std::move(other.m3)),
+    n1(std::move(other.n1)),
+    n2(std::move(other.n2)),
+    n3(std::move(other.n3)),
+    o1(std::move(other.o1)),
+    o2(std::move(other.o2)),
+    o3(std::move(other.o3)),
+    __isset(other.__isset) {}
+structC& structC::operator=(FOLLY_MAYBE_UNUSED structC&& other) noexcept {
+    this->a = std::move(other.a);
+    this->b = std::move(other.b);
+    this->c = std::move(other.c);
+    this->d = std::move(other.d);
+    this->e = std::move(other.e);
+    this->f = std::move(other.f);
+    this->g = std::move(other.g);
+    this->h = std::move(other.h);
+    this->i = std::move(other.i);
+    this->j = std::move(other.j);
+    this->j1 = std::move(other.j1);
+    this->j2 = std::move(other.j2);
+    this->j3 = std::move(other.j3);
+    this->k = std::move(other.k);
+    this->k1 = std::move(other.k1);
+    this->k2 = std::move(other.k2);
+    this->k3 = std::move(other.k3);
+    this->l = std::move(other.l);
+    this->l1 = std::move(other.l1);
+    this->l2 = std::move(other.l2);
+    this->l3 = std::move(other.l3);
+    this->m1 = std::move(other.m1);
+    this->m2 = std::move(other.m2);
+    this->m3 = std::move(other.m3);
+    this->n1 = std::move(other.n1);
+    this->n2 = std::move(other.n2);
+    this->n3 = std::move(other.n3);
+    this->o1 = std::move(other.o1);
+    this->o2 = std::move(other.o2);
+    this->o3 = std::move(other.o3);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 structC::structC(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::std::string b__arg, double c__arg, bool d__arg, ::test_cpp2::cpp_reflection::enum1 e__arg, ::test_cpp2::cpp_reflection::enum2 f__arg, ::test_cpp2::cpp_reflection::union1 g__arg, ::test_cpp2::cpp_reflection::unionA h__arg, ::test_cpp2::cpp_reflection::unionA i__arg, ::std::vector<::std::int32_t> j__arg, ::std::vector<::std::int32_t> j1__arg, ::std::vector<::test_cpp2::cpp_reflection::enum1> j2__arg, ::std::vector<::test_cpp2::cpp_reflection::structA> j3__arg, ::std::set<::std::int32_t> k__arg, ::std::set<::std::int32_t> k1__arg, ::std::set<::test_cpp2::cpp_reflection::enum2> k2__arg, ::std::set<::test_cpp2::cpp_reflection::structB> k3__arg, ::std::map<::std::int32_t, ::std::int32_t> l__arg, ::std::map<::std::int32_t, ::std::int32_t> l1__arg, ::std::map<::std::int32_t, ::test_cpp2::cpp_reflection::enum1> l2__arg, ::std::map<::std::int32_t, ::test_cpp2::cpp_reflection::structB> l3__arg, ::std::map<::test_cpp2::cpp_reflection::enum1, ::std::int32_t> m1__arg, ::std::map<::test_cpp2::cpp_reflection::enum1, ::test_cpp2::cpp_reflection::enum2> m2__arg, ::std::map<::test_cpp2::cpp_reflection::enum1, ::test_cpp2::cpp_reflection::structB> m3__arg, ::std::map<::std::string, ::std::int32_t> n1__arg, ::std::map<::std::string, ::test_cpp2::cpp_reflection::enum1> n2__arg, ::std::map<::std::string, ::test_cpp2::cpp_reflection::structB> n3__arg, ::std::map<::test_cpp2::cpp_reflection::structA, ::std::int32_t> o1__arg, ::std::map<::test_cpp2::cpp_reflection::structA, ::test_cpp2::cpp_reflection::enum1> o2__arg, ::std::map<::test_cpp2::cpp_reflection::structA, ::test_cpp2::cpp_reflection::structB> o3__arg) :
@@ -936,38 +1032,39 @@ structC::structC(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::st
   __isset.o3 = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void structC::__clear() {
   // clear all fields
-  a = 0;
-  b = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  c = 0;
-  d = 0;
-  e =  ::test_cpp2::cpp_reflection::enum1::field0;
-  f =  ::test_cpp2::cpp_reflection::enum2::field0_2;
-  g.__clear();
-  h.__clear();
-  i.__clear();
-  j.clear();
-  j1.clear();
-  j2.clear();
-  j3.clear();
-  k.clear();
-  k1.clear();
-  k2.clear();
-  k3.clear();
-  l.clear();
-  l1.clear();
-  l2.clear();
-  l3.clear();
-  m1.clear();
-  m2.clear();
-  m3.clear();
-  n1.clear();
-  n2.clear();
-  n3.clear();
-  o1.clear();
-  o2.clear();
-  o3.clear();
+  this->a = 0;
+  this->b = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->c = 0;
+  this->d = 0;
+  this->e =  ::test_cpp2::cpp_reflection::enum1::field0;
+  this->f =  ::test_cpp2::cpp_reflection::enum2::field0_2;
+  this->g.__clear();
+  this->h.__clear();
+  this->i.__clear();
+  this->j.clear();
+  this->j1.clear();
+  this->j2.clear();
+  this->j3.clear();
+  this->k.clear();
+  this->k1.clear();
+  this->k2.clear();
+  this->k3.clear();
+  this->l.clear();
+  this->l1.clear();
+  this->l2.clear();
+  this->l3.clear();
+  this->m1.clear();
+  this->m2.clear();
+  this->m3.clear();
+  this->n1.clear();
+  this->n2.clear();
+  this->n3.clear();
+  this->o1.clear();
+  this->o2.clear();
+  this->o3.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -1566,14 +1663,41 @@ void TccStructTraits<::test_cpp2::cpp_reflection::struct1>::translateFieldName(
 namespace test_cpp2 { namespace cpp_reflection {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct1::struct1(const struct1&) = default;
+struct1& struct1::operator=(const struct1&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct1::struct1() :
       field0(0),
       field2( ::test_cpp2::cpp_reflection::enum1::field0),
-      field3( ::test_cpp2::cpp_reflection::enum2::field0_2) {}
+      field3( ::test_cpp2::cpp_reflection::enum2::field0_2) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 struct1::~struct1() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct1::struct1(struct1&& other) noexcept  :
+    field0(std::move(other.field0)),
+    field1(std::move(other.field1)),
+    field2(std::move(other.field2)),
+    field3(std::move(other.field3)),
+    field4(std::move(other.field4)),
+    field5(std::move(other.field5)),
+    __isset(other.__isset) {}
+struct1& struct1::operator=(FOLLY_MAYBE_UNUSED struct1&& other) noexcept {
+    this->field0 = std::move(other.field0);
+    this->field1 = std::move(other.field1);
+    this->field2 = std::move(other.field2);
+    this->field3 = std::move(other.field3);
+    this->field4 = std::move(other.field4);
+    this->field5 = std::move(other.field5);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct1::struct1(apache::thrift::FragileConstructor, ::std::int32_t field0__arg, ::std::string field1__arg, ::test_cpp2::cpp_reflection::enum1 field2__arg, ::test_cpp2::cpp_reflection::enum2 field3__arg, ::test_cpp2::cpp_reflection::union1 field4__arg, ::test_cpp2::cpp_reflection::union2 field5__arg) :
@@ -1589,14 +1713,15 @@ struct1::struct1(apache::thrift::FragileConstructor, ::std::int32_t field0__arg,
   __isset.field5 = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct1::__clear() {
   // clear all fields
-  field0 = 0;
-  field1 = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  field2 =  ::test_cpp2::cpp_reflection::enum1::field0;
-  field3 =  ::test_cpp2::cpp_reflection::enum2::field0_2;
-  field4.__clear();
-  field5.__clear();
+  this->field0 = 0;
+  this->field1 = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->field2 =  ::test_cpp2::cpp_reflection::enum1::field0;
+  this->field3 =  ::test_cpp2::cpp_reflection::enum2::field0_2;
+  this->field4.__clear();
+  this->field5.__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -1743,14 +1868,43 @@ void TccStructTraits<::test_cpp2::cpp_reflection::struct2>::translateFieldName(
 namespace test_cpp2 { namespace cpp_reflection {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct2::struct2(const struct2&) = default;
+struct2& struct2::operator=(const struct2&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct2::struct2() :
       fieldA(0),
       fieldC( ::test_cpp2::cpp_reflection::enum1::field0),
-      fieldD( ::test_cpp2::cpp_reflection::enum2::field0_2) {}
+      fieldD( ::test_cpp2::cpp_reflection::enum2::field0_2) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 struct2::~struct2() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct2::struct2(struct2&& other) noexcept  :
+    fieldA(std::move(other.fieldA)),
+    fieldB(std::move(other.fieldB)),
+    fieldC(std::move(other.fieldC)),
+    fieldD(std::move(other.fieldD)),
+    fieldE(std::move(other.fieldE)),
+    fieldF(std::move(other.fieldF)),
+    fieldG(std::move(other.fieldG)),
+    __isset(other.__isset) {}
+struct2& struct2::operator=(FOLLY_MAYBE_UNUSED struct2&& other) noexcept {
+    this->fieldA = std::move(other.fieldA);
+    this->fieldB = std::move(other.fieldB);
+    this->fieldC = std::move(other.fieldC);
+    this->fieldD = std::move(other.fieldD);
+    this->fieldE = std::move(other.fieldE);
+    this->fieldF = std::move(other.fieldF);
+    this->fieldG = std::move(other.fieldG);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct2::struct2(apache::thrift::FragileConstructor, ::std::int32_t fieldA__arg, ::std::string fieldB__arg, ::test_cpp2::cpp_reflection::enum1 fieldC__arg, ::test_cpp2::cpp_reflection::enum2 fieldD__arg, ::test_cpp2::cpp_reflection::union1 fieldE__arg, ::test_cpp2::cpp_reflection::union2 fieldF__arg, ::test_cpp2::cpp_reflection::struct1 fieldG__arg) :
@@ -1770,15 +1924,16 @@ struct2::struct2(apache::thrift::FragileConstructor, ::std::int32_t fieldA__arg,
   __isset.fieldG = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct2::__clear() {
   // clear all fields
-  fieldA = 0;
-  fieldB = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  fieldC =  ::test_cpp2::cpp_reflection::enum1::field0;
-  fieldD =  ::test_cpp2::cpp_reflection::enum2::field0_2;
-  fieldE.__clear();
-  fieldF.__clear();
-  fieldG.__clear();
+  this->fieldA = 0;
+  this->fieldB = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->fieldC =  ::test_cpp2::cpp_reflection::enum1::field0;
+  this->fieldD =  ::test_cpp2::cpp_reflection::enum2::field0_2;
+  this->fieldE.__clear();
+  this->fieldF.__clear();
+  this->fieldG.__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -1952,14 +2107,65 @@ void TccStructTraits<::test_cpp2::cpp_reflection::struct3>::translateFieldName(
 namespace test_cpp2 { namespace cpp_reflection {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct3::struct3(const struct3&) = default;
+struct3& struct3::operator=(const struct3&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct3::struct3() :
       fieldA(0),
       fieldC( ::test_cpp2::cpp_reflection::enum1::field0),
-      fieldD( ::test_cpp2::cpp_reflection::enum2::field0_2) {}
+      fieldD( ::test_cpp2::cpp_reflection::enum2::field0_2) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 struct3::~struct3() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct3::struct3(struct3&& other) noexcept  :
+    fieldA(std::move(other.fieldA)),
+    fieldB(std::move(other.fieldB)),
+    fieldC(std::move(other.fieldC)),
+    fieldD(std::move(other.fieldD)),
+    fieldE(std::move(other.fieldE)),
+    fieldF(std::move(other.fieldF)),
+    fieldG(std::move(other.fieldG)),
+    fieldH(std::move(other.fieldH)),
+    fieldI(std::move(other.fieldI)),
+    fieldJ(std::move(other.fieldJ)),
+    fieldK(std::move(other.fieldK)),
+    fieldL(std::move(other.fieldL)),
+    fieldM(std::move(other.fieldM)),
+    fieldN(std::move(other.fieldN)),
+    fieldO(std::move(other.fieldO)),
+    fieldP(std::move(other.fieldP)),
+    fieldQ(std::move(other.fieldQ)),
+    fieldR(std::move(other.fieldR)),
+    __isset(other.__isset) {}
+struct3& struct3::operator=(FOLLY_MAYBE_UNUSED struct3&& other) noexcept {
+    this->fieldA = std::move(other.fieldA);
+    this->fieldB = std::move(other.fieldB);
+    this->fieldC = std::move(other.fieldC);
+    this->fieldD = std::move(other.fieldD);
+    this->fieldE = std::move(other.fieldE);
+    this->fieldF = std::move(other.fieldF);
+    this->fieldG = std::move(other.fieldG);
+    this->fieldH = std::move(other.fieldH);
+    this->fieldI = std::move(other.fieldI);
+    this->fieldJ = std::move(other.fieldJ);
+    this->fieldK = std::move(other.fieldK);
+    this->fieldL = std::move(other.fieldL);
+    this->fieldM = std::move(other.fieldM);
+    this->fieldN = std::move(other.fieldN);
+    this->fieldO = std::move(other.fieldO);
+    this->fieldP = std::move(other.fieldP);
+    this->fieldQ = std::move(other.fieldQ);
+    this->fieldR = std::move(other.fieldR);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct3::struct3(apache::thrift::FragileConstructor, ::std::int32_t fieldA__arg, ::std::string fieldB__arg, ::test_cpp2::cpp_reflection::enum1 fieldC__arg, ::test_cpp2::cpp_reflection::enum2 fieldD__arg, ::test_cpp2::cpp_reflection::union1 fieldE__arg, ::test_cpp2::cpp_reflection::union2 fieldF__arg, ::test_cpp2::cpp_reflection::struct1 fieldG__arg, ::test_cpp2::cpp_reflection::union2 fieldH__arg, ::std::vector<::std::int32_t> fieldI__arg, ::std::vector<::std::string> fieldJ__arg, ::std::vector<::std::string> fieldK__arg, ::std::vector<::test_cpp2::cpp_reflection::structA> fieldL__arg, ::std::set<::std::int32_t> fieldM__arg, ::std::set<::std::string> fieldN__arg, ::std::set<::std::string> fieldO__arg, ::std::set<::test_cpp2::cpp_reflection::structB> fieldP__arg, ::std::map<::std::string, ::test_cpp2::cpp_reflection::structA> fieldQ__arg, ::std::map<::std::string, ::test_cpp2::cpp_reflection::structB> fieldR__arg) :
@@ -2001,26 +2207,27 @@ struct3::struct3(apache::thrift::FragileConstructor, ::std::int32_t fieldA__arg,
   __isset.fieldR = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct3::__clear() {
   // clear all fields
-  fieldA = 0;
-  fieldB = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  fieldC =  ::test_cpp2::cpp_reflection::enum1::field0;
-  fieldD =  ::test_cpp2::cpp_reflection::enum2::field0_2;
-  fieldE.__clear();
-  fieldF.__clear();
-  fieldG.__clear();
-  fieldH.__clear();
-  fieldI.clear();
-  fieldJ.clear();
-  fieldK.clear();
-  fieldL.clear();
-  fieldM.clear();
-  fieldN.clear();
-  fieldO.clear();
-  fieldP.clear();
-  fieldQ.clear();
-  fieldR.clear();
+  this->fieldA = 0;
+  this->fieldB = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->fieldC =  ::test_cpp2::cpp_reflection::enum1::field0;
+  this->fieldD =  ::test_cpp2::cpp_reflection::enum2::field0_2;
+  this->fieldE.__clear();
+  this->fieldF.__clear();
+  this->fieldG.__clear();
+  this->fieldH.__clear();
+  this->fieldI.clear();
+  this->fieldJ.clear();
+  this->fieldK.clear();
+  this->fieldL.clear();
+  this->fieldM.clear();
+  this->fieldN.clear();
+  this->fieldO.clear();
+  this->fieldP.clear();
+  this->fieldQ.clear();
+  this->fieldR.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -2428,7 +2635,8 @@ THRIFT_IGNORE_ISSET_USE_WARNING_END
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset.field2 = srcObj.__isset.field2;
 THRIFT_IGNORE_ISSET_USE_WARNING_END
-  if (srcObj.field3) field3.reset(new ::test_cpp2::cpp_reflection::structA(*srcObj.field3));
+  field3 = ::apache::thrift::detail::st::copy_field<
+        ::apache::thrift::type_class::structure>(srcObj.field3);
 }
 
 struct4& struct4::operator=(const struct4& src) {
@@ -2438,7 +2646,25 @@ struct4& struct4::operator=(const struct4& src) {
 }
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
-struct4::struct4(apache::thrift::FragileConstructor, ::std::int32_t field0__arg, ::std::string field1__arg, ::test_cpp2::cpp_reflection::enum1 field2__arg, std::unique_ptr<::test_cpp2::cpp_reflection::structA> field3__arg) :
+struct4::struct4(struct4&& other) noexcept  :
+    field0(std::move(other.field0)),
+    field1(std::move(other.field1)),
+    field2(std::move(other.field2)),
+    field3(std::move(other.field3)),
+    __isset(other.__isset) {}
+struct4& struct4::operator=(FOLLY_MAYBE_UNUSED struct4&& other) noexcept {
+    this->field0 = std::move(other.field0);
+    this->field1 = std::move(other.field1);
+    this->field2 = std::move(other.field2);
+    this->field3 = std::move(other.field3);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct4::struct4(apache::thrift::FragileConstructor, ::std::int32_t field0__arg, ::std::string field1__arg, ::test_cpp2::cpp_reflection::enum1 field2__arg, ::std::unique_ptr<::test_cpp2::cpp_reflection::structA> field3__arg) :
     field0(std::move(field0__arg)),
     field1(std::move(field1__arg)),
     field2(std::move(field2__arg)),
@@ -2447,12 +2673,13 @@ struct4::struct4(apache::thrift::FragileConstructor, ::std::int32_t field0__arg,
   __isset.field2 = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct4::__clear() {
   // clear all fields
-  field0 = 0;
-  field1 = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  field2 =  ::test_cpp2::cpp_reflection::enum1::field0;
-  if (field3) field3->__clear();
+  this->field0 = 0;
+  this->field1 = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->field2 =  ::test_cpp2::cpp_reflection::enum1::field0;
+  if (this->field3) this->field3->__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -2567,13 +2794,38 @@ void TccStructTraits<::test_cpp2::cpp_reflection::struct5>::translateFieldName(
 namespace test_cpp2 { namespace cpp_reflection {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct5::struct5(const struct5&) = default;
+struct5& struct5::operator=(const struct5&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct5::struct5() :
       field0(0),
-      field2( ::test_cpp2::cpp_reflection::enum1::field0) {}
+      field2( ::test_cpp2::cpp_reflection::enum1::field0) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 struct5::~struct5() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct5::struct5(struct5&& other) noexcept  :
+    field0(std::move(other.field0)),
+    field1(std::move(other.field1)),
+    field2(std::move(other.field2)),
+    field3(std::move(other.field3)),
+    field4(std::move(other.field4)),
+    __isset(other.__isset) {}
+struct5& struct5::operator=(FOLLY_MAYBE_UNUSED struct5&& other) noexcept {
+    this->field0 = std::move(other.field0);
+    this->field1 = std::move(other.field1);
+    this->field2 = std::move(other.field2);
+    this->field3 = std::move(other.field3);
+    this->field4 = std::move(other.field4);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct5::struct5(apache::thrift::FragileConstructor, ::std::int32_t field0__arg, ::std::string field1__arg, ::test_cpp2::cpp_reflection::enum1 field2__arg, ::test_cpp2::cpp_reflection::structA field3__arg, ::test_cpp2::cpp_reflection::structB field4__arg) :
@@ -2588,13 +2840,14 @@ struct5::struct5(apache::thrift::FragileConstructor, ::std::int32_t field0__arg,
   __isset.field4 = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct5::__clear() {
   // clear all fields
-  field0 = 0;
-  field1 = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  field2 =  ::test_cpp2::cpp_reflection::enum1::field0;
-  field3.__clear();
-  field4.__clear();
+  this->field0 = 0;
+  this->field1 = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->field2 =  ::test_cpp2::cpp_reflection::enum1::field0;
+  this->field3.__clear();
+  this->field4.__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -2734,14 +2987,31 @@ void TccStructTraits<::test_cpp2::cpp_reflection::struct_binary>::translateField
 namespace test_cpp2 { namespace cpp_reflection {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct_binary::struct_binary(const struct_binary&) = default;
+struct_binary& struct_binary::operator=(const struct_binary&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct_binary::struct_binary(struct_binary&& other) noexcept  :
+    bi(std::move(other.bi)),
+    __isset(other.__isset) {}
+struct_binary& struct_binary::operator=(FOLLY_MAYBE_UNUSED struct_binary&& other) noexcept {
+    this->bi = std::move(other.bi);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct_binary::struct_binary(apache::thrift::FragileConstructor, ::std::string bi__arg) :
     bi(std::move(bi__arg)) {
   __isset.bi = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct_binary::__clear() {
   // clear all fields
-  bi = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
+  this->bi = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -2812,6 +3082,7 @@ void TccStructTraits<::test_cpp2::cpp_reflection::dep_A_struct>::translateFieldN
 
 namespace test_cpp2 { namespace cpp_reflection {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 dep_A_struct::dep_A_struct(apache::thrift::FragileConstructor, ::test_cpp2::cpp_reflection::dep_B_struct b__arg, ::test_cpp2::cpp_reflection::dep_C_struct c__arg, ::std::int32_t i_a__arg) :
     b(std::move(b__arg)),
@@ -2822,11 +3093,12 @@ dep_A_struct::dep_A_struct(apache::thrift::FragileConstructor, ::test_cpp2::cpp_
   __isset.i_a = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void dep_A_struct::__clear() {
   // clear all fields
-  b.__clear();
-  c.__clear();
-  i_a = 0;
+  this->b.__clear();
+  this->c.__clear();
+  this->i_a = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -2951,6 +3223,7 @@ void TccStructTraits<::test_cpp2::cpp_reflection::dep_B_struct>::translateFieldN
 
 namespace test_cpp2 { namespace cpp_reflection {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 dep_B_struct::dep_B_struct(apache::thrift::FragileConstructor, ::test_cpp2::cpp_reflection::dep_B_struct b__arg, ::test_cpp2::cpp_reflection::dep_C_struct c__arg, ::std::int32_t i_a__arg) :
     b(std::move(b__arg)),
@@ -2961,11 +3234,12 @@ dep_B_struct::dep_B_struct(apache::thrift::FragileConstructor, ::test_cpp2::cpp_
   __isset.i_a = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void dep_B_struct::__clear() {
   // clear all fields
-  b.__clear();
-  c.__clear();
-  i_a = 0;
+  this->b.__clear();
+  this->c.__clear();
+  this->i_a = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -3090,15 +3364,17 @@ void TccStructTraits<::test_cpp2::cpp_reflection::annotated>::translateFieldName
 
 namespace test_cpp2 { namespace cpp_reflection {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 annotated::annotated(apache::thrift::FragileConstructor, ::std::int32_t a__arg) :
     a(std::move(a__arg)) {
   __isset.a = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void annotated::__clear() {
   // clear all fields
-  a = 0;
+  this->a = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -3461,6 +3737,7 @@ void TccStructTraits<::test_cpp2::cpp_reflection::struct_with_special_names>::tr
 
 namespace test_cpp2 { namespace cpp_reflection {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct_with_special_names::struct_with_special_names(apache::thrift::FragileConstructor, ::std::int32_t get__arg, ::std::int32_t getter__arg, ::std::int32_t lists__arg, ::std::int32_t maps__arg, ::std::int32_t name__arg, ::std::int32_t name_to_value__arg, ::std::int32_t names__arg, ::std::int32_t prefix_tree__arg, ::std::int32_t sets__arg, ::std::int32_t setter__arg, ::std::int32_t str__arg, ::std::int32_t strings__arg, ::std::int32_t type__arg, ::std::int32_t value__arg, ::std::int32_t value_to_name__arg, ::std::int32_t values__arg, ::std::int32_t id__arg, ::std::int32_t ids__arg, ::std::int32_t descriptor__arg, ::std::int32_t descriptors__arg, ::std::int32_t key__arg, ::std::int32_t keys__arg, ::std::int32_t annotation__arg, ::std::int32_t annotations__arg, ::std::int32_t member__arg, ::std::int32_t members__arg, ::std::int32_t field__arg, ::std::int32_t fields__arg) :
     get(std::move(get__arg)),
@@ -3521,36 +3798,37 @@ struct_with_special_names::struct_with_special_names(apache::thrift::FragileCons
   __isset.fields = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct_with_special_names::__clear() {
   // clear all fields
-  get = 0;
-  getter = 0;
-  lists = 0;
-  maps = 0;
-  name = 0;
-  name_to_value = 0;
-  names = 0;
-  prefix_tree = 0;
-  sets = 0;
-  setter = 0;
-  str = 0;
-  strings = 0;
-  type = 0;
-  value = 0;
-  value_to_name = 0;
-  values = 0;
-  id = 0;
-  ids = 0;
-  descriptor = 0;
-  descriptors = 0;
-  key = 0;
-  keys = 0;
-  annotation = 0;
-  annotations = 0;
-  member = 0;
-  members = 0;
-  field = 0;
-  fields = 0;
+  this->get = 0;
+  this->getter = 0;
+  this->lists = 0;
+  this->maps = 0;
+  this->name = 0;
+  this->name_to_value = 0;
+  this->names = 0;
+  this->prefix_tree = 0;
+  this->sets = 0;
+  this->setter = 0;
+  this->str = 0;
+  this->strings = 0;
+  this->type = 0;
+  this->value = 0;
+  this->value_to_name = 0;
+  this->values = 0;
+  this->id = 0;
+  this->ids = 0;
+  this->descriptor = 0;
+  this->descriptors = 0;
+  this->key = 0;
+  this->keys = 0;
+  this->annotation = 0;
+  this->annotations = 0;
+  this->member = 0;
+  this->members = 0;
+  this->field = 0;
+  this->fields = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -3811,15 +4089,40 @@ void TccStructTraits<::test_cpp2::cpp_reflection::struct_with_indirections>::tra
 namespace test_cpp2 { namespace cpp_reflection {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct_with_indirections::struct_with_indirections(const struct_with_indirections&) = default;
+struct_with_indirections& struct_with_indirections::operator=(const struct_with_indirections&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct_with_indirections::struct_with_indirections() :
       real(0),
       fake(0),
       number(0),
-      result(0) {}
+      result(0) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 struct_with_indirections::~struct_with_indirections() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct_with_indirections::struct_with_indirections(struct_with_indirections&& other) noexcept  :
+    real(std::move(other.real)),
+    fake(std::move(other.fake)),
+    number(std::move(other.number)),
+    result(std::move(other.result)),
+    phrase(std::move(other.phrase)),
+    __isset(other.__isset) {}
+struct_with_indirections& struct_with_indirections::operator=(FOLLY_MAYBE_UNUSED struct_with_indirections&& other) noexcept {
+    this->real = std::move(other.real);
+    this->fake = std::move(other.fake);
+    this->number = std::move(other.number);
+    this->result = std::move(other.result);
+    this->phrase = std::move(other.phrase);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct_with_indirections::struct_with_indirections(apache::thrift::FragileConstructor, ::std::int32_t real__arg, ::test_cpp2::cpp_reflection::FakeI32 fake__arg, ::test_cpp2::cpp_reflection::HasANumber number__arg, ::test_cpp2::cpp_reflection::HasAResult result__arg, ::test_cpp2::cpp_reflection::HasAPhrase phrase__arg) :
@@ -3835,13 +4138,14 @@ struct_with_indirections::struct_with_indirections(apache::thrift::FragileConstr
   __isset.phrase = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct_with_indirections::__clear() {
   // clear all fields
-  real = 0;
-  fake = 0;
-  ::apache::thrift::apply_indirection(number) = 0;
-  ::apache::thrift::apply_indirection(result) = 0;
-  ::apache::thrift::apply_indirection(phrase) = apache::thrift::StringTraits< ::folly::remove_cvref_t<::folly::invoke_result_t<::apache::thrift::detail::apply_indirection_fn, CppHasAPhrase const&>>>::fromStringLiteral("");
+  this->real = 0;
+  this->fake = 0;
+  ::apache::thrift::apply_indirection(this->number) = 0;
+  ::apache::thrift::apply_indirection(this->result) = 0;
+  ::apache::thrift::apply_indirection(this->phrase) = apache::thrift::StringTraits<::folly::remove_cvref_t<::folly::invoke_result_t<::apache::thrift::detail::apply_indirection_fn, CppHasAPhrase const&>>>::fromStringLiteral("");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

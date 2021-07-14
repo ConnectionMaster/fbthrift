@@ -69,6 +69,28 @@ void TccStructTraits<::cpp2::MyStructFloatFieldThrowExp>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStructFloatFieldThrowExp::MyStructFloatFieldThrowExp(const MyStructFloatFieldThrowExp&) = default;
+MyStructFloatFieldThrowExp& MyStructFloatFieldThrowExp::operator=(const MyStructFloatFieldThrowExp&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStructFloatFieldThrowExp::MyStructFloatFieldThrowExp(MyStructFloatFieldThrowExp&& other) noexcept  :
+    myLongField(std::move(other.myLongField)),
+    MyByteField(std::move(other.MyByteField)),
+    myStringField(std::move(other.myStringField)),
+    myFloatField(std::move(other.myFloatField)),
+    __isset(other.__isset) {}
+MyStructFloatFieldThrowExp& MyStructFloatFieldThrowExp::operator=(FOLLY_MAYBE_UNUSED MyStructFloatFieldThrowExp&& other) noexcept {
+    this->myLongField = std::move(other.myLongField);
+    this->MyByteField = std::move(other.MyByteField);
+    this->myStringField = std::move(other.myStringField);
+    this->myFloatField = std::move(other.myFloatField);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStructFloatFieldThrowExp::MyStructFloatFieldThrowExp(apache::thrift::FragileConstructor, ::std::int64_t myLongField__arg, ::std::int8_t MyByteField__arg, ::std::string myStringField__arg, float myFloatField__arg) :
     myLongField(std::move(myLongField__arg)),
     MyByteField(std::move(MyByteField__arg)),
@@ -80,12 +102,13 @@ MyStructFloatFieldThrowExp::MyStructFloatFieldThrowExp(apache::thrift::FragileCo
   __isset.myFloatField = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyStructFloatFieldThrowExp::__clear() {
   // clear all fields
-  myLongField = 0;
-  MyByteField = 0;
-  myStringField = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  myFloatField = 0;
+  this->myLongField = 0;
+  this->MyByteField = 0;
+  this->myStringField = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->myFloatField = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -178,6 +201,24 @@ void TccStructTraits<::cpp2::SimpleStruct>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+SimpleStruct::SimpleStruct(const SimpleStruct&) = default;
+SimpleStruct& SimpleStruct::operator=(const SimpleStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+SimpleStruct::SimpleStruct(SimpleStruct&& other) noexcept  :
+    age(std::move(other.age)),
+    name(std::move(other.name)),
+    __isset(other.__isset) {}
+SimpleStruct& SimpleStruct::operator=(FOLLY_MAYBE_UNUSED SimpleStruct&& other) noexcept {
+    this->age = std::move(other.age);
+    this->name = std::move(other.name);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 SimpleStruct::SimpleStruct(apache::thrift::FragileConstructor, ::std::int64_t age__arg, ::std::string name__arg) :
     age(std::move(age__arg)),
     name(std::move(name__arg)) {
@@ -185,10 +226,11 @@ SimpleStruct::SimpleStruct(apache::thrift::FragileConstructor, ::std::int64_t ag
   __isset.name = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void SimpleStruct::__clear() {
   // clear all fields
-  age = 60LL;
-  name = apache::thrift::StringTraits< std::string>::fromStringLiteral("Batman");
+  this->age = 60LL;
+  this->name = apache::thrift::StringTraits<std::string>::fromStringLiteral("Batman");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -266,9 +308,11 @@ void TccStructTraits<::cpp2::MyDataItem>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyDataItem::MyDataItem(apache::thrift::FragileConstructor) {}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyDataItem::__clear() {
   // clear all fields
 }
@@ -331,11 +375,62 @@ void TccStructTraits<::cpp2::ComplexNestedStruct>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
-ComplexNestedStruct::ComplexNestedStruct() {}
+ComplexNestedStruct::ComplexNestedStruct(const ComplexNestedStruct&) = default;
+ComplexNestedStruct& ComplexNestedStruct::operator=(const ComplexNestedStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+ComplexNestedStruct::ComplexNestedStruct() {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 ComplexNestedStruct::~ComplexNestedStruct() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+ComplexNestedStruct::ComplexNestedStruct(ComplexNestedStruct&& other) noexcept  :
+    setOfSetOfInt(std::move(other.setOfSetOfInt)),
+    listofListOfListOfListOfEnum(std::move(other.listofListOfListOfListOfEnum)),
+    listOfListOfMyStruct(std::move(other.listOfListOfMyStruct)),
+    setOfListOfListOfLong(std::move(other.setOfListOfListOfLong)),
+    setOfSetOfsetOfLong(std::move(other.setOfSetOfsetOfLong)),
+    mapStructListOfListOfLong(std::move(other.mapStructListOfListOfLong)),
+    mKeyStructValInt(std::move(other.mKeyStructValInt)),
+    listOfMapKeyIntValInt(std::move(other.listOfMapKeyIntValInt)),
+    listOfMapKeyStrValList(std::move(other.listOfMapKeyStrValList)),
+    mapKeySetValLong(std::move(other.mapKeySetValLong)),
+    mapKeyListValLong(std::move(other.mapKeyListValLong)),
+    mapKeyMapValMap(std::move(other.mapKeyMapValMap)),
+    mapKeySetValMap(std::move(other.mapKeySetValMap)),
+    NestedMaps(std::move(other.NestedMaps)),
+    mapKeyIntValList(std::move(other.mapKeyIntValList)),
+    mapKeyIntValSet(std::move(other.mapKeyIntValSet)),
+    mapKeySetValInt(std::move(other.mapKeySetValInt)),
+    mapKeyListValSet(std::move(other.mapKeyListValSet)),
+    __isset(other.__isset) {}
+ComplexNestedStruct& ComplexNestedStruct::operator=(FOLLY_MAYBE_UNUSED ComplexNestedStruct&& other) noexcept {
+    this->setOfSetOfInt = std::move(other.setOfSetOfInt);
+    this->listofListOfListOfListOfEnum = std::move(other.listofListOfListOfListOfEnum);
+    this->listOfListOfMyStruct = std::move(other.listOfListOfMyStruct);
+    this->setOfListOfListOfLong = std::move(other.setOfListOfListOfLong);
+    this->setOfSetOfsetOfLong = std::move(other.setOfSetOfsetOfLong);
+    this->mapStructListOfListOfLong = std::move(other.mapStructListOfListOfLong);
+    this->mKeyStructValInt = std::move(other.mKeyStructValInt);
+    this->listOfMapKeyIntValInt = std::move(other.listOfMapKeyIntValInt);
+    this->listOfMapKeyStrValList = std::move(other.listOfMapKeyStrValList);
+    this->mapKeySetValLong = std::move(other.mapKeySetValLong);
+    this->mapKeyListValLong = std::move(other.mapKeyListValLong);
+    this->mapKeyMapValMap = std::move(other.mapKeyMapValMap);
+    this->mapKeySetValMap = std::move(other.mapKeySetValMap);
+    this->NestedMaps = std::move(other.NestedMaps);
+    this->mapKeyIntValList = std::move(other.mapKeyIntValList);
+    this->mapKeyIntValSet = std::move(other.mapKeyIntValSet);
+    this->mapKeySetValInt = std::move(other.mapKeySetValInt);
+    this->mapKeyListValSet = std::move(other.mapKeyListValSet);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 ComplexNestedStruct::ComplexNestedStruct(apache::thrift::FragileConstructor, ::std::set<::std::set<::std::int32_t>> setOfSetOfInt__arg, ::std::vector<::std::vector<::std::vector<::std::vector<::cpp2::MyEnum>>>> listofListOfListOfListOfEnum__arg, ::std::vector<::std::vector<::cpp2::MyStruct>> listOfListOfMyStruct__arg, ::std::set<::std::vector<::std::vector<::std::int64_t>>> setOfListOfListOfLong__arg, ::std::set<::std::set<::std::set<::std::int64_t>>> setOfSetOfsetOfLong__arg, ::std::map<::std::int32_t, ::std::vector<::std::vector<::cpp2::MyStruct>>> mapStructListOfListOfLong__arg, ::std::map<::cpp2::MyStruct, ::std::int32_t> mKeyStructValInt__arg, ::std::vector<::std::map<::std::int32_t, ::std::int32_t>> listOfMapKeyIntValInt__arg, ::std::vector<::std::map<::std::string, ::std::vector<::cpp2::MyStruct>>> listOfMapKeyStrValList__arg, ::std::map<::std::set<::std::int32_t>, ::std::int64_t> mapKeySetValLong__arg, ::std::map<::std::vector<::std::string>, ::std::int32_t> mapKeyListValLong__arg, ::std::map<::std::map<::std::int32_t, ::std::string>, ::std::map<::std::int32_t, ::std::string>> mapKeyMapValMap__arg, ::std::map<::std::set<::std::vector<::std::int32_t>>, ::std::map<::std::vector<::std::set<::std::string>>, ::std::string>> mapKeySetValMap__arg, ::std::map<::std::map<::std::map<::std::int32_t, ::std::string>, ::std::string>, ::std::map<::std::int32_t, ::std::string>> NestedMaps__arg, ::std::map<::std::int32_t, ::std::vector<::cpp2::MyStruct>> mapKeyIntValList__arg, ::std::map<::std::int32_t, ::std::set<bool>> mapKeyIntValSet__arg, ::std::map<::std::set<bool>, ::cpp2::MyEnum> mapKeySetValInt__arg, ::std::map<::std::vector<::std::int32_t>, ::std::set<::std::map<double, ::std::string>>> mapKeyListValSet__arg) :
@@ -377,26 +472,27 @@ ComplexNestedStruct::ComplexNestedStruct(apache::thrift::FragileConstructor, ::s
   __isset.mapKeyListValSet = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void ComplexNestedStruct::__clear() {
   // clear all fields
-  setOfSetOfInt.clear();
-  listofListOfListOfListOfEnum.clear();
-  listOfListOfMyStruct.clear();
-  setOfListOfListOfLong.clear();
-  setOfSetOfsetOfLong.clear();
-  mapStructListOfListOfLong.clear();
-  mKeyStructValInt.clear();
-  listOfMapKeyIntValInt.clear();
-  listOfMapKeyStrValList.clear();
-  mapKeySetValLong.clear();
-  mapKeyListValLong.clear();
-  mapKeyMapValMap.clear();
-  mapKeySetValMap.clear();
-  NestedMaps.clear();
-  mapKeyIntValList.clear();
-  mapKeyIntValSet.clear();
-  mapKeySetValInt.clear();
-  mapKeyListValSet.clear();
+  this->setOfSetOfInt.clear();
+  this->listofListOfListOfListOfEnum.clear();
+  this->listOfListOfMyStruct.clear();
+  this->setOfListOfListOfLong.clear();
+  this->setOfSetOfsetOfLong.clear();
+  this->mapStructListOfListOfLong.clear();
+  this->mKeyStructValInt.clear();
+  this->listOfMapKeyIntValInt.clear();
+  this->listOfMapKeyStrValList.clear();
+  this->mapKeySetValLong.clear();
+  this->mapKeyListValLong.clear();
+  this->mapKeyMapValMap.clear();
+  this->mapKeySetValMap.clear();
+  this->NestedMaps.clear();
+  this->mapKeyIntValList.clear();
+  this->mapKeyIntValSet.clear();
+  this->mapKeySetValInt.clear();
+  this->mapKeyListValSet.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -791,14 +887,41 @@ void TccStructTraits<::cpp2::reqXcep>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+reqXcep::reqXcep(const reqXcep&) = default;
+reqXcep& reqXcep::operator=(const reqXcep&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+reqXcep::reqXcep() :
+      errorCode(0) {
+}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+reqXcep::~reqXcep() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+reqXcep::reqXcep(reqXcep&& other) noexcept  :
+    message(std::move(other.message)),
+    errorCode(std::move(other.errorCode)) {}
+
+reqXcep& reqXcep::operator=(FOLLY_MAYBE_UNUSED reqXcep&& other) noexcept {
+    this->message = std::move(other.message);
+    this->errorCode = std::move(other.errorCode);
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 reqXcep::reqXcep(apache::thrift::FragileConstructor, ::std::string message__arg, ::std::int32_t errorCode__arg) :
     message(std::move(message__arg)),
     errorCode(std::move(errorCode__arg)) {}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void reqXcep::__clear() {
   // clear all fields
-  message = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  errorCode = 0;
+  this->message = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->errorCode = 0;
 }
 
 bool reqXcep::operator==(const reqXcep& rhs) const {

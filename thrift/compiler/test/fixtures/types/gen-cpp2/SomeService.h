@@ -42,6 +42,7 @@ class SomeServiceSvIf : public SomeServiceSvAsyncIf, public apache::thrift::Serv
  public:
   typedef SomeServiceAsyncProcessor ProcessorType;
   std::unique_ptr<apache::thrift::AsyncProcessor> getProcessor() override;
+  CreateMethodMetadataResult createMethodMetadata() override;
 
 
   virtual void bounce_map(::apache::thrift::fixtures::types::SomeMap& /*_return*/, std::unique_ptr<::apache::thrift::fixtures::types::SomeMap> /*m*/);
@@ -52,6 +53,9 @@ class SomeServiceSvIf : public SomeServiceSvAsyncIf, public apache::thrift::Serv
   folly::Future<std::unique_ptr<::std::map<::apache::thrift::fixtures::types::TBinary, ::std::int64_t>>> future_binary_keyed_map(std::unique_ptr<::std::vector<::std::int64_t>> p_r) override;
   folly::SemiFuture<std::unique_ptr<::std::map<::apache::thrift::fixtures::types::TBinary, ::std::int64_t>>> semifuture_binary_keyed_map(std::unique_ptr<::std::vector<::std::int64_t>> p_r) override;
   void async_tm_binary_keyed_map(std::unique_ptr<apache::thrift::HandlerCallback<std::unique_ptr<::std::map<::apache::thrift::fixtures::types::TBinary, ::std::int64_t>>>> callback, std::unique_ptr<::std::vector<::std::int64_t>> p_r) override;
+ private:
+  std::atomic<apache::thrift::detail::si::InvocationType> __fbthrift_invocation_bounce_map{apache::thrift::detail::si::InvocationType::AsyncTm};
+  std::atomic<apache::thrift::detail::si::InvocationType> __fbthrift_invocation_binary_keyed_map{apache::thrift::detail::si::InvocationType::AsyncTm};
 };
 
 class SomeServiceSvNull : public SomeServiceSvIf {
@@ -69,23 +73,20 @@ class SomeServiceAsyncProcessor : public ::apache::thrift::GeneratedAsyncProcess
   SomeServiceSvIf* iface_;
  public:
   void processSerializedCompressedRequest(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::protocol::PROTOCOL_TYPES protType, apache::thrift::Cpp2RequestContext* context, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) override;
- protected:
-  std::shared_ptr<folly::RequestContext> getBaseContextForRequest() override;
+  void processSerializedCompressedRequestWithMetadata(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, const apache::thrift::AsyncProcessorFactory::MethodMetadata& methodMetadata, apache::thrift::protocol::PROTOCOL_TYPES protType, apache::thrift::Cpp2RequestContext* context, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) override;
  public:
-  using ProcessFunc = GeneratedAsyncProcessor::ProcessFunc<SomeServiceAsyncProcessor>;
-  using ProcessMap = GeneratedAsyncProcessor::ProcessMap<ProcessFunc>;
-  static const SomeServiceAsyncProcessor::ProcessMap& getBinaryProtocolProcessMap();
-  static const SomeServiceAsyncProcessor::ProcessMap& getCompactProtocolProcessMap();
+  using ProcessFuncs = GeneratedAsyncProcessor::ProcessFuncs<SomeServiceAsyncProcessor>;
+  using ProcessMap = GeneratedAsyncProcessor::ProcessMap<ProcessFuncs>;
+  static const SomeServiceAsyncProcessor::ProcessMap& getOwnProcessMap();
  private:
-  static const SomeServiceAsyncProcessor::ProcessMap binaryProcessMap_;
-  static const SomeServiceAsyncProcessor::ProcessMap compactProcessMap_;
+  static const SomeServiceAsyncProcessor::ProcessMap kOwnProcessMap_;
  private:
   template <typename ProtocolIn_, typename ProtocolOut_>
   void setUpAndProcess_bounce_map(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm);
   template <typename ProtocolIn_, typename ProtocolOut_>
   void process_bounce_map(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx,folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm);
   template <class ProtocolIn_, class ProtocolOut_>
-  static folly::IOBufQueue return_bounce_map(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::apache::thrift::fixtures::types::SomeMap const& _return);
+  static apache::thrift::LegacySerializedResponse return_bounce_map(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::apache::thrift::fixtures::types::SomeMap const& _return);
   template <class ProtocolIn_, class ProtocolOut_>
   static void throw_wrapped_bounce_map(apache::thrift::ResponseChannelRequest::UniquePtr req,int32_t protoSeqId,apache::thrift::ContextStack* ctx,folly::exception_wrapper ew,apache::thrift::Cpp2RequestContext* reqCtx);
   template <typename ProtocolIn_, typename ProtocolOut_>
@@ -93,7 +94,7 @@ class SomeServiceAsyncProcessor : public ::apache::thrift::GeneratedAsyncProcess
   template <typename ProtocolIn_, typename ProtocolOut_>
   void process_binary_keyed_map(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx,folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm);
   template <class ProtocolIn_, class ProtocolOut_>
-  static folly::IOBufQueue return_binary_keyed_map(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::std::map<::apache::thrift::fixtures::types::TBinary, ::std::int64_t> const& _return);
+  static apache::thrift::LegacySerializedResponse return_binary_keyed_map(int32_t protoSeqId, apache::thrift::ContextStack* ctx, ::std::map<::apache::thrift::fixtures::types::TBinary, ::std::int64_t> const& _return);
   template <class ProtocolIn_, class ProtocolOut_>
   static void throw_wrapped_binary_keyed_map(apache::thrift::ResponseChannelRequest::UniquePtr req,int32_t protoSeqId,apache::thrift::ContextStack* ctx,folly::exception_wrapper ew,apache::thrift::Cpp2RequestContext* reqCtx);
  public:

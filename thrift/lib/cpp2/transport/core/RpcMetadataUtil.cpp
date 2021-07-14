@@ -23,13 +23,13 @@
 
 #include <folly/Conv.h>
 
+#include <thrift/lib/cpp/protocol/TBase64Utils.h>
 #include <thrift/lib/cpp/transport/THeader.h>
 #include <thrift/lib/cpp2/async/RequestCallback.h>
+#include <thrift/lib/cpp2/protocol/Serializer.h>
 #include <thrift/lib/thrift/gen-cpp2/RpcMetadata_types.h>
 
-namespace apache {
-namespace thrift {
-namespace detail {
+namespace apache::thrift::detail {
 
 RequestRpcMetadata makeRequestRpcMetadata(
     const RpcOptions& rpcOptions,
@@ -37,9 +37,7 @@ RequestRpcMetadata makeRequestRpcMetadata(
     ProtocolId protocolId,
     ManagedStringView&& methodName,
     std::chrono::milliseconds defaultChannelTimeout,
-    transport::THeader& header,
-    const transport::THeader::StringToStringMap& persistentWriteHeaders,
-    const folly::Optional<int32_t>& version) {
+    transport::THeader& header) {
   RequestRpcMetadata metadata;
   metadata.protocol_ref() = protocolId;
   metadata.kind_ref() = kind;
@@ -73,26 +71,12 @@ RequestRpcMetadata makeRequestRpcMetadata(
       writeHeaders[entry.first] = entry.second;
     }
   }
-  writeHeaders.insert(
-      persistentWriteHeaders.begin(), persistentWriteHeaders.end());
 
-  auto clientId = header.clientId();
-  auto serviceTraceMeta = header.serviceTraceMeta();
-  if (!version.has_value() || version.value() < 6) {
-    if (clientId.has_value()) {
-      writeHeaders[transport::THeader::kClientId] = std::move(*clientId);
-    }
-    if (serviceTraceMeta.has_value()) {
-      writeHeaders[transport::THeader::kServiceTraceMeta] =
-          std::move(*serviceTraceMeta);
-    }
-  } else {
-    if (clientId.has_value()) {
-      metadata.clientId_ref() = std::move(*clientId);
-    }
-    if (serviceTraceMeta.has_value()) {
-      metadata.serviceTraceMeta_ref() = std::move(*serviceTraceMeta);
-    }
+  if (auto clientId = header.clientId()) {
+    metadata.clientId_ref() = std::move(*clientId);
+  }
+  if (auto serviceTraceMeta = header.serviceTraceMeta()) {
+    metadata.serviceTraceMeta_ref() = std::move(*serviceTraceMeta);
   }
 
   auto loadIt = writeHeaders.find(transport::THeader::QUERY_LOAD_HEADER);
@@ -109,13 +93,14 @@ RequestRpcMetadata makeRequestRpcMetadata(
 }
 
 void fillTHeaderFromResponseRpcMetadata(
-    ResponseRpcMetadata& responseMetadata,
-    transport::THeader& header) {
+    ResponseRpcMetadata& responseMetadata, transport::THeader& header) {
   if (responseMetadata.otherMetadata_ref()) {
     header.setReadHeaders(std::move(*responseMetadata.otherMetadata_ref()));
   }
   if (auto load = responseMetadata.load_ref()) {
     header.setServerLoad(*load);
+    header.setReadHeader(
+        transport::THeader::QUERY_LOAD_HEADER, folly::to<std::string>(*load));
   }
   if (auto crc32c = responseMetadata.crc32c_ref()) {
     header.setCrc32c(*crc32c);
@@ -142,9 +127,8 @@ void fillTHeaderFromResponseRpcMetadata(
 }
 
 void fillResponseRpcMetadataFromTHeader(
-    transport::THeader& header,
-    ResponseRpcMetadata& responseMetadata) {
-  std::map<std::string, std::string> otherMetadata = header.releaseHeaders();
+    transport::THeader& header, ResponseRpcMetadata& responseMetadata) {
+  auto otherMetadata = header.releaseHeaders();
   {
     auto loadIt = otherMetadata.find(transport::THeader::QUERY_LOAD_HEADER);
     if (loadIt != otherMetadata.end()) {
@@ -157,6 +141,50 @@ void fillResponseRpcMetadataFromTHeader(
   }
   responseMetadata.otherMetadata_ref() = std::move(otherMetadata);
 }
-} // namespace detail
-} // namespace thrift
-} // namespace apache
+
+std::string serializeErrorClassification(ErrorClassification ec) {
+  auto serialized =
+      apache::thrift::CompactSerializer::serialize<std::string>(ec);
+  return protocol::base64Encode(folly::StringPiece(serialized));
+}
+
+ErrorClassification deserializeErrorClassification(std::string_view str) {
+  auto buf = protocol::base64Decode(str);
+  return CompactSerializer::deserialize<ErrorClassification>(buf.get());
+}
+
+// Make these in sync with thrift/lib/thrift/RpcMetadata.thrift
+folly::Optional<std::string> errorKindToString(ErrorKind kind) {
+  switch (kind) {
+    case ErrorKind::TRANSIENT:
+      return std::string("TRANSIENT");
+    case ErrorKind::STATEFUL:
+      return std::string("STATEFUL");
+    case ErrorKind::PERMANENT:
+      return std::string("PERMANENT");
+    default:
+      return folly::none;
+  }
+}
+
+folly::Optional<std::string> errorBlameToString(ErrorBlame blame) {
+  switch (blame) {
+    case ErrorBlame::SERVER:
+      return std::string("SERVER");
+    case ErrorBlame::CLIENT:
+      return std::string("CLIENT");
+    default:
+      return folly::none;
+  }
+}
+
+folly::Optional<std::string> errorSafetyToString(ErrorSafety safety) {
+  switch (safety) {
+    case ErrorSafety::SAFE:
+      return std::string("SAFE");
+    default:
+      return folly::none;
+  }
+}
+
+} // namespace apache::thrift::detail

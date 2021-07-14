@@ -10,7 +10,7 @@ package test.fixtures.basicannotations;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.codec.ThriftField.Requiredness;
 import com.facebook.swift.service.*;
-import com.facebook.swift.transport.client.*;
+import com.facebook.thrift.client.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.util.*;
@@ -51,9 +51,8 @@ public interface MyServicePrioChild extends java.io.Closeable, test.fixtures.bas
     }
 
     @com.facebook.swift.service.ThriftService("MyServicePrioChild")
-    interface Reactive extends Closeable, test.fixtures.basicannotations.MyServicePrioParent.Reactive {
-        @java.lang.Override void close();
-
+    interface Reactive extends reactor.core.Disposable, test.fixtures.basicannotations.MyServicePrioParent.Reactive {
+        @ThriftMethod(value = "pang")
         reactor.core.publisher.Mono<Void> pang();
 
         default reactor.core.publisher.Mono<Void> pang(RpcOptions rpcOptions) {

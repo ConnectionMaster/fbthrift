@@ -16,17 +16,20 @@
 
 #pragma once
 
+#include <cassert>
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
 
+#include <thrift/compiler/ast/node_list.h>
 #include <thrift/compiler/ast/t_base_type.h>
 #include <thrift/compiler/ast/t_const.h>
 #include <thrift/compiler/ast/t_enum.h>
 #include <thrift/compiler/ast/t_exception.h>
 #include <thrift/compiler/ast/t_include.h>
+#include <thrift/compiler/ast/t_interaction.h>
 #include <thrift/compiler/ast/t_list.h>
 #include <thrift/compiler/ast/t_map.h>
 #include <thrift/compiler/ast/t_node.h>
@@ -70,89 +73,90 @@ class t_program : public t_node {
    * Set program elements
    */
   void add_typedef(std::unique_ptr<t_typedef> td) {
+    assert(td != nullptr);
     typedefs_.push_back(td.get());
     nodes_.push_back(std::move(td));
   }
   void add_enum(std::unique_ptr<t_enum> te) {
+    assert(te != nullptr);
     enums_.push_back(te.get());
     nodes_.push_back(std::move(te));
   }
   void add_const(std::unique_ptr<t_const> tc) {
+    assert(tc != nullptr);
     consts_.push_back(tc.get());
     nodes_.push_back(std::move(tc));
   }
   void add_struct(std::unique_ptr<t_struct> ts) {
+    assert(ts != nullptr);
     objects_.push_back(ts.get());
     structs_.push_back(ts.get());
     nodes_.push_back(std::move(ts));
   }
-  // TODO: remove "xception" function once everything changed to "exception"
-  void add_xception(std::unique_ptr<t_exception> tx) {
-    objects_.push_back(tx.get());
-    exceptions_.push_back(tx.get());
-    nodes_.push_back(std::move(tx));
-  }
   void add_exception(std::unique_ptr<t_exception> tx) {
+    assert(tx != nullptr);
     objects_.push_back(tx.get());
     exceptions_.push_back(tx.get());
     nodes_.push_back(std::move(tx));
   }
   void add_service(std::unique_ptr<t_service> ts) {
+    assert(ts != nullptr);
     services_.push_back(ts.get());
     nodes_.push_back(std::move(ts));
   }
-  void add_interaction(std::unique_ptr<t_service> ti) {
+  void add_interaction(std::unique_ptr<t_interaction> ti) {
+    assert(ti != nullptr);
     interactions_.push_back(ti.get());
     nodes_.push_back(std::move(ti));
   }
 
-  void add_placeholder_typedef(std::unique_ptr<t_typedef> ptd) {
-    assert(!ptd->is_defined());
+  void add_placeholder_typedef(std::unique_ptr<t_placeholder_typedef> ptd) {
+    assert(ptd != nullptr);
     placeholder_typedefs_.push_back(ptd.get());
     nodes_.push_back(std::move(ptd));
   }
 
+  // Adds a concrete instantiation of a templated type.
+  void add_type_instantiation(std::unique_ptr<t_templated_type> type_inst) {
+    assert(type_inst != nullptr);
+    type_insts_.emplace_back(std::move(type_inst));
+  }
+
   void add_unnamed_typedef(std::unique_ptr<t_typedef> td) {
+    assert(td != nullptr);
     nodes_.push_back(std::move(td));
   }
 
   void add_unnamed_type(std::unique_ptr<t_type> ut) {
+    assert(ut != nullptr);
+    // Should use add_type_instantiation
+    assert(dynamic_cast<t_templated_type*>(ut.get()) == nullptr);
+    // Should use add_placeholder_typedef
+    assert(dynamic_cast<t_placeholder_typedef*>(ut.get()) == nullptr);
+    // Should use add_unnamed_typedef
+    assert(dynamic_cast<t_typedef*>(ut.get()) == nullptr);
     nodes_.push_back(std::move(ut));
   }
 
   /**
    * Get program elements
    */
-  const std::vector<t_typedef*>& typedefs() const {
-    return typedefs_;
-  }
-  const std::vector<t_enum*>& enums() const {
-    return enums_;
-  }
-  const std::vector<t_const*>& consts() const {
-    return consts_;
-  }
-  const std::vector<t_struct*>& structs() const {
-    return structs_;
-  }
-  // TODO: remove "xception" function once everything changed to "exception"
-  const std::vector<t_exception*>& xceptions() const {
-    return exceptions_;
-  }
-  const std::vector<t_exception*>& exceptions() const {
-    return exceptions_;
-  }
-  const std::vector<t_struct*>& objects() const {
-    return objects_;
-  }
-  const std::vector<t_service*>& services() const {
-    return services_;
-  }
-  const std::vector<t_typedef*>& placeholder_typedefs() const {
+  const std::vector<t_typedef*>& typedefs() const { return typedefs_; }
+  const std::vector<t_enum*>& enums() const { return enums_; }
+  const std::vector<t_const*>& consts() const { return consts_; }
+  const std::vector<t_struct*>& structs() const { return structs_; }
+  const std::vector<t_exception*>& exceptions() const { return exceptions_; }
+  const std::vector<t_struct*>& objects() const { return objects_; }
+  const std::vector<t_service*>& services() const { return services_; }
+  const std::vector<t_placeholder_typedef*>& placeholder_typedefs() const {
     return placeholder_typedefs_;
   }
-  const std::vector<t_service*>& interactions() const {
+  const std::vector<t_interaction*>& interactions() const {
     return interactions_;
+  }
+  node_list_view<t_templated_type> type_instantiations() { return type_insts_; }
+  node_list_view<const t_templated_type> type_instantiations() const {
+    return type_insts_;
   }
 
   /**
@@ -175,26 +179,18 @@ class t_program : public t_node {
   /**
    * t_program getters
    */
-  const std::string& path() const {
-    return path_;
-  }
+  const std::string& path() const { return path_; }
 
-  const std::string& name() const {
-    return name_;
-  }
+  const std::string& name() const { return name_; }
 
-  const std::string& include_prefix() const {
-    return include_prefix_;
-  }
+  const std::string& include_prefix() const { return include_prefix_; }
 
   /**
    * Returns a list of includes that the program contains. Each include is of
    * type t_include*, and contains information about the program included, as
    * well as the location of the include statement.
    */
-  const std::vector<t_include*>& includes() const {
-    return includes_;
-  }
+  const std::vector<t_include*>& includes() const { return includes_; }
 
   /**
    * Returns a list of programs that are included by this program.
@@ -207,9 +203,7 @@ class t_program : public t_node {
     return included_programs;
   }
 
-  t_scope* scope() const {
-    return scope_.get();
-  }
+  t_scope* scope() const { return scope_.get(); }
 
   // Only used in py_frontend.tcc
   const std::map<std::string, std::string>& namespaces() const {
@@ -217,9 +211,7 @@ class t_program : public t_node {
   }
 
   // Only used in t_cpp_generator
-  const std::vector<std::string>& cpp_includes() const {
-    return cpp_includes_;
-  }
+  const std::vector<std::string>& cpp_includes() const { return cpp_includes_; }
 
   /**
    * Outputs a reference to the namespace corresponding to the
@@ -238,8 +230,8 @@ class t_program : public t_node {
    * @param include_site - A full or relative thrift file path
    * @param lineno       - The line number of the include statement
    */
-  std::unique_ptr<t_program>
-  add_include(std::string path, std::string include_site, int lineno);
+  std::unique_ptr<t_program> add_include(
+      std::string path, std::string include_site, int lineno);
 
   void add_include(std::unique_ptr<t_include> include) {
     includes_.push_back(include.get());
@@ -263,7 +255,8 @@ class t_program : public t_node {
 
  private:
   // All the elements owned by this program.
-  std::vector<std::unique_ptr<t_node>> nodes_;
+  node_list<t_node> nodes_;
+  node_list<t_templated_type> type_insts_;
 
   /**
    * Components to generate code for
@@ -275,8 +268,8 @@ class t_program : public t_node {
   std::vector<t_exception*> exceptions_;
   std::vector<t_service*> services_;
   std::vector<t_include*> includes_;
-  std::vector<t_service*> interactions_;
-  std::vector<t_typedef*> placeholder_typedefs_;
+  std::vector<t_interaction*> interactions_;
+  std::vector<t_placeholder_typedef*> placeholder_typedefs_;
   std::vector<t_struct*> objects_; // structs_ + exceptions_
 
   std::string path_; // initialized in ctor init-list
@@ -285,6 +278,14 @@ class t_program : public t_node {
   std::map<std::string, std::string> namespaces_;
   std::vector<std::string> cpp_includes_;
   std::unique_ptr<t_scope> scope_{new t_scope{}};
+
+  // TODO(afuller): Remove everything below this comment. It is only provided
+  // for backwards compatibility.
+ public:
+  void add_xception(std::unique_ptr<t_exception> tx) {
+    add_exception(std::move(tx));
+  }
+  const std::vector<t_exception*>& xceptions() const { return exceptions(); }
 };
 
 } // namespace compiler

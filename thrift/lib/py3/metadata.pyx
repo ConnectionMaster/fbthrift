@@ -215,25 +215,28 @@ cdef class ThriftTypedefProxy(ThriftTypeProxy):
 cdef class ThriftSinkProxy(ThriftTypeProxy):
     cdef readonly ThriftTypeProxy elemType
     cdef readonly ThriftTypeProxy initialResponseType
+    cdef readonly ThriftTypeProxy finalResponseType
 
     def __init__(self, ThriftSinkType thriftType not None, ThriftMetadata thriftMeta not None):
         super().__init__(thriftType, thriftMeta)
         self.kind = ThriftKind.SINK
         self.elemType = ThriftTypeProxy.create(self.thriftType.elemType, self.thriftMeta)
-        self.initialResponseType = ThriftTypeProxy.create(self.thriftType.initialResponseType, self.thriftMeta)
+        if self.thriftType.initialResponseType is not None:
+            self.initialResponseType = ThriftTypeProxy.create(self.thriftType.initialResponseType, self.thriftMeta)
+        if self.thriftType.finalResponseType is not None:
+            self.finalResponseType = ThriftTypeProxy.create(self.thriftType.finalResponseType, self.thriftMeta)
 
 
 cdef class ThriftStreamProxy(ThriftTypeProxy):
     cdef readonly ThriftTypeProxy elemType
-    cdef readonly ThriftTypeProxy finalResponseType
     cdef readonly ThriftTypeProxy initialResponseType
 
     def __init__(self, ThriftStreamType thriftType not None, ThriftMetadata thriftMeta not None):
         super().__init__(thriftType, thriftMeta)
         self.kind = ThriftKind.STREAM
         self.elemType = ThriftTypeProxy.create(self.thriftType.elemType, self.thriftMeta)
-        self.finalResponseType = ThriftTypeProxy.create(self.thriftType.finalResponseType, self.thriftMeta)
-        self.initialResponseType = ThriftTypeProxy.create(self.thriftType.initialResponseType, self.thriftMeta)
+        if self.thriftType.initialResponseType is not None:
+            self.initialResponseType = ThriftTypeProxy.create(self.thriftType.initialResponseType, self.thriftMeta)
 
 
 cdef class ThriftFieldProxy:
@@ -253,6 +256,13 @@ cdef class ThriftFieldProxy:
         self.name = self.thriftType.name
         self.is_optional = self.thriftType.is_optional
         self.structuredAnnotations = tuple(ThriftConstStructProxy(annotation) for annotation in self.thriftType.structured_annotations)
+
+    @property
+    def pyname(self):
+        if self.thriftType.unstructured_annotations is None:
+            raise TypeError('The pyname field requires the thrift option `thrift_cpp2_options = ["deprecated_unstructured_annotations_in_metadata"]` to be enabled')
+        return self.thriftType.unstructured_annotations.get("py3.name", self.name)
+
 
 
 cdef class ThriftStructProxy(ThriftTypeProxy):
@@ -285,11 +295,11 @@ cdef class ThriftConstValueProxy:
         self.thriftType = value
         if self.thriftType.type in (ThriftConstValue.Type.cv_bool, ThriftConstValue.Type.cv_integer, ThriftConstValue.Type.cv_double, ThriftConstValue.Type.cv_string):
             self.type = self.thriftType.value
-            if ThriftConstValue.Type.cv_bool:
+            if self.thriftType.type is ThriftConstValue.Type.cv_bool:
                 self.kind = CV_BOOL
-            elif ThriftConstValue.Type.cv_integer:
+            elif self.thriftType.type is ThriftConstValue.Type.cv_integer:
                 self.kind = CV_INT
-            elif ThriftConstValue.Type.cv_double:
+            elif self.thriftType.type is ThriftConstValue.Type.cv_double:
                 self.kind = CV_FLOAT
             else:
                 self.kind = CV_STRING

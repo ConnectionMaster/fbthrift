@@ -35,6 +35,7 @@ void TccStructTraits<::cpp2::BasicTypes>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 BasicTypes::BasicTypes(apache::thrift::FragileConstructor, ::std::int32_t first__arg, ::std::int32_t second__arg, ::std::int64_t third__arg, bool isTrue__arg) :
     first(std::move(first__arg)),
@@ -46,12 +47,13 @@ BasicTypes::BasicTypes(apache::thrift::FragileConstructor, ::std::int32_t first_
   __isset.isTrue = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void BasicTypes::__clear() {
   // clear all fields
-  first = 0;
-  second = 0;
-  third = 0;
-  isTrue = 0;
+  this->first = 0;
+  this->second = 0;
+  this->third = 0;
+  this->isTrue = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

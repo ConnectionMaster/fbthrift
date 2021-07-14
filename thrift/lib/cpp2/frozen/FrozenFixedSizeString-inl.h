@@ -19,7 +19,7 @@ namespace thrift {
 namespace frozen {
 namespace detail {
 
-class FixedSizeMismatchException : public std::length_error {
+class FOLLY_EXPORT FixedSizeMismatchException : public std::length_error {
  public:
   FixedSizeMismatchException(size_t expected, size_t actual)
       : std::length_error(folly::to<std::string>(
@@ -39,9 +39,7 @@ struct FixedSizeStringLayout : public LayoutBase {
   using Base = LayoutBase;
   FixedSizeStringLayout() : LayoutBase(typeid(T)) {}
 
-  FieldPosition maximize() {
-    return FieldPosition(T::kFixedSize, 0);
-  }
+  FieldPosition maximize() { return FieldPosition(T::kFixedSize, 0); }
 
   FieldPosition layout(LayoutRoot&, const T&, LayoutPosition /* start */) {
     return maximize();

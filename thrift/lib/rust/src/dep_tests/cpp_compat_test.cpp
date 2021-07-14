@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+#include <memory>
 #include <common/gtest/gtest_extensions.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include <memory>
 
 #include <thrift/lib/cpp/util/EnumUtils.h>
 #include <thrift/lib/cpp2/protocol/DebugProtocol.h>
@@ -149,6 +149,13 @@ TEST(JsonTest, nullStuff) {
 
   apache::thrift::SimpleJSONSerializer::deserialize(input, outStruct);
   ASSERT_EQ(stru, outStruct);
+}
+
+TEST(JsonTest, unknownUnion) {
+  azw::Un u;
+
+  auto t = apache::thrift::SimpleJSONSerializer::serialize<std::string>(u);
+  ASSERT_EQ(t, "{}");
 }
 
 } // namespace azw

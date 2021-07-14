@@ -135,6 +135,28 @@ void TccStructTraits<::cpp2::Internship>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+Internship::Internship(const Internship&) = default;
+Internship& Internship::operator=(const Internship&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+Internship::Internship(Internship&& other) noexcept  :
+    weeks(std::move(other.weeks)),
+    title(std::move(other.title)),
+    employer(std::move(other.employer)),
+    compensation(std::move(other.compensation)),
+    __isset(other.__isset) {}
+Internship& Internship::operator=(FOLLY_MAYBE_UNUSED Internship&& other) noexcept {
+    this->weeks = std::move(other.weeks);
+    this->title = std::move(other.title);
+    this->employer = std::move(other.employer);
+    this->compensation = std::move(other.compensation);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Internship::Internship(apache::thrift::FragileConstructor, ::std::int32_t weeks__arg, ::std::string title__arg, ::cpp2::Company employer__arg, double compensation__arg) :
     weeks(std::move(weeks__arg)),
     title(std::move(title__arg)),
@@ -145,12 +167,13 @@ Internship::Internship(apache::thrift::FragileConstructor, ::std::int32_t weeks_
   __isset.compensation = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void Internship::__clear() {
   // clear all fields
-  weeks = 0;
-  title = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  employer =  ::cpp2::Company::FACEBOOK;
-  compensation = 0;
+  this->weeks = 0;
+  this->title = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->employer =  ::cpp2::Company::FACEBOOK;
+  this->compensation = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -242,15 +265,17 @@ void TccStructTraits<::cpp2::Range>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Range::Range(apache::thrift::FragileConstructor, ::std::int32_t min__arg, ::std::int32_t max__arg) :
     min(std::move(min__arg)),
     max(std::move(max__arg)) {}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void Range::__clear() {
   // clear all fields
-  min = 0;
-  max = 0;
+  this->min = 0;
+  this->max = 0;
 }
 
 bool Range::operator==(const Range& rhs) const {
@@ -323,6 +348,24 @@ void TccStructTraits<::cpp2::struct1>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct1::struct1(const struct1&) = default;
+struct1& struct1::operator=(const struct1&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct1::struct1(struct1&& other) noexcept  :
+    a(std::move(other.a)),
+    b(std::move(other.b)),
+    __isset(other.__isset) {}
+struct1& struct1::operator=(FOLLY_MAYBE_UNUSED struct1&& other) noexcept {
+    this->a = std::move(other.a);
+    this->b = std::move(other.b);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct1::struct1(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::std::string b__arg) :
     a(std::move(a__arg)),
     b(std::move(b__arg)) {
@@ -330,10 +373,11 @@ struct1::struct1(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::st
   __isset.b = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct1::__clear() {
   // clear all fields
-  a = 1234567;
-  b = apache::thrift::StringTraits< std::string>::fromStringLiteral("<uninitialized>");
+  this->a = 1234567;
+  this->b = apache::thrift::StringTraits<std::string>::fromStringLiteral("<uninitialized>");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -412,6 +456,28 @@ void TccStructTraits<::cpp2::struct2>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct2::struct2(const struct2&) = default;
+struct2& struct2::operator=(const struct2&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct2::struct2(struct2&& other) noexcept  :
+    a(std::move(other.a)),
+    b(std::move(other.b)),
+    c(std::move(other.c)),
+    d(std::move(other.d)),
+    __isset(other.__isset) {}
+struct2& struct2::operator=(FOLLY_MAYBE_UNUSED struct2&& other) noexcept {
+    this->a = std::move(other.a);
+    this->b = std::move(other.b);
+    this->c = std::move(other.c);
+    this->d = std::move(other.d);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct2::struct2(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::std::string b__arg, ::cpp2::struct1 c__arg, ::std::vector<::std::int32_t> d__arg) :
     a(std::move(a__arg)),
     b(std::move(b__arg)),
@@ -423,12 +489,13 @@ struct2::struct2(apache::thrift::FragileConstructor, ::std::int32_t a__arg, ::st
   __isset.d = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct2::__clear() {
   // clear all fields
-  a = 0;
-  b = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  c.__clear();
-  d.clear();
+  this->a = 0;
+  this->b = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->c.__clear();
+  this->d.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -549,6 +616,26 @@ void TccStructTraits<::cpp2::struct3>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct3::struct3(const struct3&) = default;
+struct3& struct3::operator=(const struct3&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct3::struct3(struct3&& other) noexcept  :
+    a(std::move(other.a)),
+    b(std::move(other.b)),
+    c(std::move(other.c)),
+    __isset(other.__isset) {}
+struct3& struct3::operator=(FOLLY_MAYBE_UNUSED struct3&& other) noexcept {
+    this->a = std::move(other.a);
+    this->b = std::move(other.b);
+    this->c = std::move(other.c);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct3::struct3(apache::thrift::FragileConstructor, ::std::string a__arg, ::std::int32_t b__arg, ::cpp2::struct2 c__arg) :
     a(std::move(a__arg)),
     b(std::move(b__arg)),
@@ -558,11 +645,12 @@ struct3::struct3(apache::thrift::FragileConstructor, ::std::string a__arg, ::std
   __isset.c = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct3::__clear() {
   // clear all fields
-  a = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  b = 0;
-  c.__clear();
+  this->a = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->b = 0;
+  this->c.__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -668,6 +756,26 @@ void TccStructTraits<::cpp2::struct4>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct4::struct4(const struct4&) = default;
+struct4& struct4::operator=(const struct4&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+struct4::struct4(struct4&& other) noexcept  :
+    a(std::move(other.a)),
+    b(std::move(other.b)),
+    c(std::move(other.c)),
+    __isset(other.__isset) {}
+struct4& struct4::operator=(FOLLY_MAYBE_UNUSED struct4&& other) noexcept {
+    this->a = std::move(other.a);
+    this->b = std::move(other.b);
+    this->c = std::move(other.c);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 struct4::struct4(apache::thrift::FragileConstructor, ::std::int32_t a__arg, double b__arg, ::std::int8_t c__arg) :
     a(std::move(a__arg)),
     b(std::move(b__arg)),
@@ -677,11 +785,12 @@ struct4::struct4(apache::thrift::FragileConstructor, ::std::int32_t a__arg, doub
   __isset.c = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void struct4::__clear() {
   // clear all fields
-  a = 0;
-  b = 0;
-  c = 0;
+  this->a = 0;
+  this->b = 0;
+  this->c = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

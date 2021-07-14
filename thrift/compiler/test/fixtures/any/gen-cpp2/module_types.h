@@ -51,6 +51,13 @@ class MyException;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -69,46 +76,33 @@ class MyStruct final  {
 
  public:
 
-  MyStruct() {}
+  MyStruct() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::std::string myString__arg);
 
-  MyStruct(MyStruct&&) = default;
+  MyStruct(MyStruct&&) noexcept;
 
-  MyStruct(const MyStruct&) = default;
+  MyStruct(const MyStruct& src);
 
 
-  MyStruct& operator=(MyStruct&&) = default;
-
-  MyStruct& operator=(const MyStruct&) = default;
+  MyStruct& operator=(MyStruct&&) noexcept;
+  MyStruct& operator=(const MyStruct& src);
   void __clear();
  private:
   ::std::string myString;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool myString;
   } __isset = {};
-  bool operator==(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStruct& __x, const MyStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStruct&) const;
+  bool operator<(const MyStruct&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> myString_ref() const& {
@@ -139,6 +133,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_myString_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.myString_ref() = BAR;` instead of `FOO.set_myString(BAR);`")]]
   ::std::string& set_myString(T_MyStruct_myString_struct_setter&& myString_) {
     myString = std::forward<T_MyStruct_myString_struct_setter>(myString_);
     __isset.myString = true;
@@ -158,7 +153,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 
@@ -171,6 +166,13 @@ uint32_t MyStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -196,7 +198,7 @@ class MyUnion final  {
   MyUnion()
       : type_(Type::__EMPTY__) {}
 
-  MyUnion(MyUnion&& rhs)
+  MyUnion(MyUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -233,7 +235,7 @@ class MyUnion final  {
     }
   }
 
-  MyUnion& operator=(MyUnion&& rhs) {
+  MyUnion& operator=(MyUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -282,24 +284,9 @@ class MyUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const MyUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyUnion& __x, const MyUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const MyUnion&) const;
+  bool operator<(const MyUnion&) const;
 
   ::std::string& set_myString(::std::string const &t) {
     __clear();
@@ -322,12 +309,14 @@ class MyUnion final  {
     return value_.myString;
   }
 
-  ::std::string const & get_myString() const {
-    assert(type_ == Type::myString);
+  ::std::string const& get_myString() const {
+    if (type_ != Type::myString) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myString;
   }
 
-  ::std::string & mutable_myString() {
+  ::std::string& mutable_myString() {
     assert(type_ == Type::myString);
     return value_.myString;
   }
@@ -379,7 +368,7 @@ class MyUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyUnion >;
+  friend class ::apache::thrift::Cpp2Ops<MyUnion>;
   friend void swap(MyUnion& a, MyUnion& b);
 };
 
@@ -392,7 +381,14 @@ uint32_t MyUnion::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class MyException final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT MyException final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -401,6 +397,12 @@ class MyException final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = true;
   static const char* __fbthrift_cpp2_gen_thrift_uri();
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = MyException;
@@ -410,46 +412,36 @@ class MyException final : public apache::thrift::TException {
 
  public:
 
-  MyException() {}
+  MyException();
+
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyException(apache::thrift::FragileConstructor, ::std::string myString__arg);
 
-  MyException(MyException&&) = default;
+  MyException(MyException&&) noexcept;
 
-  MyException(const MyException&) = default;
+  MyException(const MyException& src);
 
 
-  MyException& operator=(MyException&&) = default;
-
-  MyException& operator=(const MyException&) = default;
+  MyException& operator=(MyException&&) noexcept;
+  MyException& operator=(const MyException& src);
   void __clear();
+
+  ~MyException() override;
+
  private:
   ::std::string myString;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool myString;
   } __isset = {};
-  bool operator==(const MyException& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyException& __x, const MyException& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyException& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyException& __x, const MyException& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyException& __x, const MyException& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyException& __x, const MyException& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyException&) const;
+  bool operator<(const MyException&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> myString_ref() const& {
@@ -480,6 +472,7 @@ class MyException final : public apache::thrift::TException {
   }
 
   template <typename T_MyException_myString_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.myString_ref() = BAR;` instead of `FOO.set_myString(BAR);`")]]
   ::std::string& set_myString(T_MyException_myString_struct_setter&& myString_) {
     myString = std::forward<T_MyException_myString_struct_setter>(myString_);
     __isset.myString = true;
@@ -503,7 +496,7 @@ class MyException final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyException >;
+  friend class ::apache::thrift::Cpp2Ops<MyException>;
   friend void swap(MyException& a, MyException& b);
 };
 

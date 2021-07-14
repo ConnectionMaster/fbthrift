@@ -55,7 +55,7 @@ std::unique_ptr<folly::IOBuf> process_serialize_xform_app_exn(
   folly::IOBufQueue queue(folly::IOBufQueue::cacheChainLength());
   prot.setOutput(&queue, bufSize);
   prot.writeMessageBegin(
-      method, apache::thrift::T_EXCEPTION, ctx->getProtoSeqId());
+      method, MessageType::T_EXCEPTION, ctx->getProtoSeqId());
   x.write(&prot);
   prot.writeMessageEnd();
   queue.append(transport::THeader::transform(
@@ -63,32 +63,41 @@ std::unique_ptr<folly::IOBuf> process_serialize_xform_app_exn(
   return queue.move();
 }
 
+void inline sendExceptionHelper(
+    ResponseChannelRequest::UniquePtr req, ResponsePayload&& payload) {
+#if !FOLLY_HAS_COROUTINES
+  if (req->isSink()) {
+    DCHECK(false);
+    return;
+  }
+#endif
+  req->sendException(std::move(payload));
+}
+
 template <typename Prot>
 void process_handle_exn_deserialization(
-    std::exception const& ex,
+    const folly::exception_wrapper& ew,
     ResponseChannelRequest::UniquePtr req,
     Cpp2RequestContext* const ctx,
     folly::EventBase* const eb,
     char const* const method) {
-  LOG(ERROR) << folly::exceptionStr(ex) << " in function " << method;
-  TApplicationException x(
-      TApplicationException::TApplicationExceptionType::PROTOCOL_ERROR,
-      ex.what());
-  auto buf = process_serialize_xform_app_exn<Prot>(x, ctx, method);
+  if (auto rpe = dynamic_cast<const RequestParsingError*>(ew.get_exception())) {
+    eb->runInEventBaseThread([request = std::move(req),
+                              msg = std::string(rpe->what())]() {
+      request->sendErrorWrapped(
+          folly::make_exception_wrapper<TApplicationException>(
+              TApplicationException::TApplicationExceptionType::PROTOCOL_ERROR,
+              msg),
+          kRequestParsingErrorCode);
+    });
+    return;
+  }
+  ::apache::thrift::util::appendExceptionToHeader(ew, *ctx);
+  auto buf = process_serialize_xform_app_exn<Prot>(
+      ::apache::thrift::util::toTApplicationException(ew), ctx, method);
   eb->runInEventBaseThread(
       [buf = std::move(buf), req = std::move(req)]() mutable {
-        if (req->isStream()) {
-          std::ignore = req->sendStreamReply(
-              std::move(buf), StreamServerCallbackPtr(nullptr));
-        } else if (req->isSink()) {
-#if FOLLY_HAS_COROUTINES
-          req->sendSinkReply(std::move(buf), {});
-#else
-          DCHECK(false);
-#endif
-        } else {
-          req->sendReply(std::move(buf));
-        }
+        sendExceptionHelper(std::move(req), std::move(buf));
       });
 }
 
@@ -100,23 +109,15 @@ void process_throw_wrapped_handler_error(
     ContextStack* const stack,
     char const* const method) {
   LOG(ERROR) << ew << " in function " << method;
-  stack->userExceptionWrapped(false, ew);
-  stack->handlerErrorWrapped(ew);
+  if (stack) {
+    stack->userExceptionWrapped(false, ew);
+    stack->handlerErrorWrapped(ew);
+  }
+  ::apache::thrift::util::appendExceptionToHeader(ew, *ctx);
   auto xp = ew.get_exception<TApplicationException>();
   auto x = xp ? std::move(*xp) : TApplicationException(ew.what().toStdString());
   auto buf = process_serialize_xform_app_exn<Prot>(x, ctx, method);
-  if (req->isStream()) {
-    std::ignore =
-        req->sendStreamReply(std::move(buf), StreamServerCallbackPtr(nullptr));
-  } else if (req->isSink()) {
-#if FOLLY_HAS_COROUTINES
-    req->sendSinkReply(std::move(buf), {});
-#else
-    DCHECK(false);
-#endif
-  } else {
-    req->sendReply(std::move(buf));
-  }
+  sendExceptionHelper(std::move(req), std::move(buf));
 }
 
 } // namespace ap

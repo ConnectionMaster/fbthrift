@@ -57,6 +57,9 @@ cdef extern from "thrift/lib/py3/types.h" namespace "::thrift::py3" nogil:
         REVSUB
     shared_ptr[T] constant_shared_ptr[T](T)
     shared_ptr[T] reference_shared_ptr[T](const T& ref, ...)
+    void assign_unique_ptr[T](unique_ptr[T]& x, unique_ptr[T] y)
+    void assign_shared_ptr[T](shared_ptr[T]& x, shared_ptr[T] y)
+    void assign_shared_const_ptr[T](shared_ptr[const T]& x, shared_ptr[const T] y)
     const T& default_inst[T]()
     bint richcmp[T](const shared_ptr[T]& a, const shared_ptr[T]& b, int op)
     bint setcmp[T](const shared_ptr[T]& a, const shared_ptr[T]& b, int op)
@@ -135,16 +138,16 @@ cdef __NotSet NOTSET
 
 
 cdef class Struct:
-    cdef object __hash
+    cdef object _fbthrift_hash
     cdef object __weakref__
-    cdef size_t __fbthrift_struct_size
+    cdef size_t _fbthrift_struct_size
     cdef IOBuf _serialize(self, Protocol proto)
     cdef uint32_t _deserialize(self, const cIOBuf* buf, Protocol proto) except? 0
-    cdef object __fbthrift_isset(self)
-    cdef bint __noncomparable_eq(self, other)
-    cdef object __cmp_sametype(self, other, int op)
-    cdef void __fbthrift_set_field(self, str name, object value) except *
-    cdef string_view __fbthrift_get_field_name_by_index(self, size_t idx)
+    cdef object _fbthrift_isset(self)
+    cdef bint _fbthrift_noncomparable_eq(self, other)
+    cdef object _fbthrift_cmp_sametype(self, other, int op)
+    cdef void _fbthrift_set_field(self, str name, object value) except *
+    cdef string_view _fbthrift_get_field_name_by_index(self, size_t idx)
 
 
 cdef class Union(Struct):
@@ -152,7 +155,7 @@ cdef class Union(Struct):
 
 
 cdef class Container:
-    cdef object __hash
+    cdef object _fbthrift_hash
     cdef object __weakref__
 
 
@@ -163,8 +166,8 @@ cdef class List(Container):
     cdef _check_item_type(self, item)
 
 cdef class Set(Container):
-    cdef __py_richcmp(self, other, int op)
-    cdef __do_set_op(self, other, cSetOp op)
+    cdef _fbthrift_py_richcmp(self, other, int op)
+    cdef _fbthrift_do_set_op(self, other, cSetOp op)
 
 
 cdef class Map(Container):
@@ -175,7 +178,7 @@ cdef class CompiledEnum:
     cdef object __weakref__
     cdef readonly int value
     cdef readonly str name
-    cdef object __hash
+    cdef object _fbthrift_hash
     cdef object __str
     cdef object __repr
     cdef get_by_name(self, str name)
@@ -244,6 +247,14 @@ cdef extern from "thrift/lib/cpp2/FieldRef.h" namespace "apache::thrift" nogil:
         bint has_value()
 
     cdef cppclass required_field_ref[T]:
+        void assign "operator="(T)
+        T value()
+        # Cython doesn't handle references very well, so use a different name
+        # for value in the contexts where references actually work.
+        T& ref "value" ()
+        bint has_value()
+
+    cdef cppclass optional_boxed_field_ref[T]:
         void assign "operator="(T)
         T value()
         # Cython doesn't handle references very well, so use a different name

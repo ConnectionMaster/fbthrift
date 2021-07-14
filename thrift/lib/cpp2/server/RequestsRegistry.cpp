@@ -16,23 +16,15 @@
 
 #include <thrift/lib/cpp2/server/RequestsRegistry.h>
 
+#include <atomic>
 #include <fmt/format.h>
 #include <thrift/lib/cpp2/PluggableFunction.h>
 #include <thrift/lib/cpp2/server/Cpp2ConnContext.h>
-#include <atomic>
 
 namespace apache {
 namespace thrift {
 
 namespace {
-THRIFT_PLUGGABLE_FUNC_REGISTER(
-    bool,
-    includeInRecentRequestsCount,
-    const std::string_view /*methodName*/) {
-  // Users of the module will override the behavior
-  return true;
-}
-
 // RequestId storage.
 // Reserve some high bits for future use. Currently the maximum id supported
 // is 10^52, so thrift servers theoretically can generate unique request id
@@ -87,7 +79,16 @@ THRIFT_PLUGGABLE_FUNC_REGISTER(uint64_t, getCurrentServerTick) {
 } // namespace
 
 void RecentRequestCounter::increment() {
-  counts_[getCurrentBucket()] += 1;
+  auto currBucket = getCurrentBucket();
+  counts_[currBucket].first += 1;
+  counts_[currBucket].second = ++currActiveCount_;
+}
+
+void RecentRequestCounter::decrement() {
+  if (currActiveCount_ > 0) {
+    auto currBucket = getCurrentBucket();
+    counts_[currBucket].second = --currActiveCount_;
+  }
 }
 
 RecentRequestCounter::Values RecentRequestCounter::get() const {
@@ -111,7 +112,9 @@ uint64_t RecentRequestCounter::getCurrentBucket() const {
     uint64_t ticksToClear = tickDiff < kBuckets ? tickDiff : kBuckets;
 
     while (ticksToClear) {
-      counts_[(lastTick_ + ticksToClear--) % kBuckets] = 0;
+      auto index = (lastTick_ + ticksToClear--) % kBuckets;
+      counts_[index].first = 0;
+      counts_[index].second = currActiveCount_;
     }
     lastTick_ = currentTick;
     currentBucket_ = lastTick_ % kBuckets;
@@ -157,9 +160,7 @@ intptr_t RequestsRegistry::genRootId() {
 }
 
 void RequestsRegistry::registerStub(DebugStub& req) {
-  bool canIncCount =
-      THRIFT_PLUGGABLE_FUNC(includeInRecentRequestsCount)(req.getMethodName());
-  if (canIncCount) {
+  if (req.stateMachine_.includeInRecentRequests()) {
     requestCounter_.increment();
   }
   uint64_t payloadSize = req.getPayloadSize();
@@ -174,6 +175,9 @@ void RequestsRegistry::registerStub(DebugStub& req) {
 }
 
 void RequestsRegistry::moveToFinishedList(RequestsRegistry::DebugStub& stub) {
+  if (stub.stateMachine_.includeInRecentRequests()) {
+    requestCounter_.decrement();
+  }
   if (finishedRequestsLimit_ == 0) {
     return;
   }
@@ -198,6 +202,12 @@ const std::string& RequestsRegistry::DebugStub::getMethodName() const {
                                  : methodNameIfFinished_;
 }
 
+const folly::SocketAddress* RequestsRegistry::DebugStub::getLocalAddress()
+    const {
+  return getCpp2RequestContext() ? getCpp2RequestContext()->getLocalAddress()
+                                 : &localAddressIfFinished_;
+}
+
 const folly::SocketAddress* RequestsRegistry::DebugStub::getPeerAddress()
     const {
   return getCpp2RequestContext() ? getCpp2RequestContext()->getPeerAddress()
@@ -209,8 +219,8 @@ void RequestsRegistry::DebugStub::prepareAsFinished() {
   rctx_.reset();
   methodNameIfFinished_ =
       const_cast<Cpp2RequestContext*>(reqContext_)->releaseMethodName();
-  peerAddressIfFinished_ =
-      *const_cast<Cpp2RequestContext*>(reqContext_)->getPeerAddress();
+  peerAddressIfFinished_ = *reqContext_->getPeerAddress();
+  localAddressIfFinished_ = *reqContext_->getLocalAddress();
   reqContext_ = nullptr;
   req_ = nullptr;
 }

@@ -69,14 +69,31 @@ void TccStructTraits<::cpp2::MyStructNestedAnnotation>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStructNestedAnnotation::MyStructNestedAnnotation(const MyStructNestedAnnotation&) = default;
+MyStructNestedAnnotation& MyStructNestedAnnotation::operator=(const MyStructNestedAnnotation&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStructNestedAnnotation::MyStructNestedAnnotation(MyStructNestedAnnotation&& other) noexcept  :
+    name(std::move(other.name)),
+    __isset(other.__isset) {}
+MyStructNestedAnnotation& MyStructNestedAnnotation::operator=(FOLLY_MAYBE_UNUSED MyStructNestedAnnotation&& other) noexcept {
+    this->name = std::move(other.name);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStructNestedAnnotation::MyStructNestedAnnotation(apache::thrift::FragileConstructor, ::std::string name__arg) :
     name(std::move(name__arg)) {
   __isset.name = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyStructNestedAnnotation::__clear() {
   // clear all fields
-  name = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
+  this->name = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -148,12 +165,39 @@ void TccStructTraits<::cpp2::MyStruct>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(const MyStruct&) = default;
+MyStruct& MyStruct::operator=(const MyStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct() :
-      majorVer(0) {}
+      majorVer(0) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 MyStruct::~MyStruct() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(MyStruct&& other) noexcept  :
+    majorVer(std::move(other.majorVer)),
+    package(std::move(other.package)),
+    annotation_with_quote(std::move(other.annotation_with_quote)),
+    class_(std::move(other.class_)),
+    annotation_with_trailing_comma(std::move(other.annotation_with_trailing_comma)),
+    empty_annotations(std::move(other.empty_annotations)),
+    __isset(other.__isset) {}
+MyStruct& MyStruct::operator=(FOLLY_MAYBE_UNUSED MyStruct&& other) noexcept {
+    this->majorVer = std::move(other.majorVer);
+    this->package = std::move(other.package);
+    this->annotation_with_quote = std::move(other.annotation_with_quote);
+    this->class_ = std::move(other.class_);
+    this->annotation_with_trailing_comma = std::move(other.annotation_with_trailing_comma);
+    this->empty_annotations = std::move(other.empty_annotations);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct(apache::thrift::FragileConstructor, ::std::int64_t majorVer__arg, ::std::string package__arg, ::std::string annotation_with_quote__arg, ::std::string class___arg, ::std::string annotation_with_trailing_comma__arg, ::std::string empty_annotations__arg) :
@@ -171,14 +215,15 @@ MyStruct::MyStruct(apache::thrift::FragileConstructor, ::std::int64_t majorVer__
   __isset.empty_annotations = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyStruct::__clear() {
   // clear all fields
-  majorVer = 0;
-  package = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  annotation_with_quote = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  class_ = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  annotation_with_trailing_comma = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  empty_annotations = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
+  this->majorVer = 0;
+  this->package = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->annotation_with_quote = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->class_ = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->annotation_with_trailing_comma = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->empty_annotations = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -285,6 +330,24 @@ void TccStructTraits<::cpp2::SecretStruct>::translateFieldName(
 namespace cpp2 {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+SecretStruct::SecretStruct(const SecretStruct&) = default;
+SecretStruct& SecretStruct::operator=(const SecretStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+SecretStruct::SecretStruct(SecretStruct&& other) noexcept  :
+    id(std::move(other.id)),
+    password(std::move(other.password)),
+    __isset(other.__isset) {}
+SecretStruct& SecretStruct::operator=(FOLLY_MAYBE_UNUSED SecretStruct&& other) noexcept {
+    this->id = std::move(other.id);
+    this->password = std::move(other.password);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 SecretStruct::SecretStruct(apache::thrift::FragileConstructor, ::std::int64_t id__arg, ::std::string password__arg) :
     id(std::move(id__arg)),
     password(std::move(password__arg)) {
@@ -292,10 +355,11 @@ SecretStruct::SecretStruct(apache::thrift::FragileConstructor, ::std::int64_t id
   __isset.password = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void SecretStruct::__clear() {
   // clear all fields
-  id = 0;
-  password = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
+  this->id = 0;
+  this->password = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

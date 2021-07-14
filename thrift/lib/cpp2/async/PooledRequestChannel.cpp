@@ -30,8 +30,7 @@ struct InteractionState {
 };
 
 static void maybeCreateInteraction(
-    const RpcOptions& options,
-    PooledRequestChannel::Impl& channel) {
+    const RpcOptions& options, PooledRequestChannel::Impl& channel) {
   if (auto id = options.getInteractionId()) {
     auto* state = reinterpret_cast<InteractionState*>(id);
     if (!state->id) {
@@ -55,19 +54,21 @@ folly::EventBase& PooledRequestChannel::getEvb(const RpcOptions& options) {
 }
 
 uint16_t PooledRequestChannel::getProtocolId() {
-  folly::call_once(protocolIdInitFlag_, [&] {
-    auto& evb = getEvb({});
-    evb.runImmediatelyOrRunInEventBaseThreadAndWait(
-        [&] { protocolId_ = impl(evb).getProtocolId(); });
+  if (auto value = protocolId_.load(std::memory_order_relaxed)) {
+    return value;
+  }
+
+  auto& evb = getEvb({});
+  evb.runImmediatelyOrRunInEventBaseThreadAndWait([&] {
+    protocolId_.store(impl(evb).getProtocolId(), std::memory_order_relaxed);
   });
 
-  return protocolId_;
+  return protocolId_.load(std::memory_order_relaxed);
 }
 
 template <typename SendFunc>
 void PooledRequestChannel::sendRequestImpl(
-    SendFunc&& sendFunc,
-    folly::EventBase& evb) {
+    SendFunc&& sendFunc, folly::EventBase& evb) {
   evb.runInEventBaseThread(
       [this,
        keepAlive = getKeepAliveToken(evb),
@@ -128,7 +129,7 @@ class ExecutorRequestCallback final : public RequestClientCallback {
 
 void PooledRequestChannel::sendRequestResponse(
     const RpcOptions& options,
-    apache::thrift::ManagedStringView&& methodName,
+    apache::thrift::MethodMetadata&& methodMetadata,
     SerializedRequest&& request,
     std::shared_ptr<transport::THeader> header,
     RequestClientCallback::Ptr cob) {
@@ -138,14 +139,14 @@ void PooledRequestChannel::sendRequestResponse(
   }
   sendRequestImpl(
       [options,
-       methodName = std::move(methodName),
+       methodMetadata = std::move(methodMetadata),
        request = std::move(request),
        header = std::move(header),
        cob = std::move(cob)](Impl& channel) mutable {
         maybeCreateInteraction(options, channel);
         channel.sendRequestResponse(
             options,
-            std::move(methodName),
+            std::move(methodMetadata),
             std::move(request),
             std::move(header),
             std::move(cob));
@@ -155,7 +156,7 @@ void PooledRequestChannel::sendRequestResponse(
 
 void PooledRequestChannel::sendRequestNoResponse(
     const RpcOptions& options,
-    apache::thrift::ManagedStringView&& methodName,
+    apache::thrift::MethodMetadata&& methodMetadata,
     SerializedRequest&& request,
     std::shared_ptr<transport::THeader> header,
     RequestClientCallback::Ptr cob) {
@@ -165,14 +166,14 @@ void PooledRequestChannel::sendRequestNoResponse(
   }
   sendRequestImpl(
       [options,
-       methodName = std::move(methodName),
+       methodMetadata = std::move(methodMetadata),
        request = std::move(request),
        header = std::move(header),
        cob = std::move(cob)](Impl& channel) mutable {
         maybeCreateInteraction(options, channel);
         channel.sendRequestNoResponse(
             options,
-            std::move(methodName),
+            std::move(methodMetadata),
             std::move(request),
             std::move(header),
             std::move(cob));
@@ -182,20 +183,20 @@ void PooledRequestChannel::sendRequestNoResponse(
 
 void PooledRequestChannel::sendRequestStream(
     const RpcOptions& options,
-    apache::thrift::ManagedStringView&& methodName,
+    apache::thrift::MethodMetadata&& methodMetadata,
     SerializedRequest&& request,
     std::shared_ptr<transport::THeader> header,
     StreamClientCallback* cob) {
   sendRequestImpl(
       [options,
-       methodName = std::move(methodName),
+       methodMetadata = std::move(methodMetadata),
        request = std::move(request),
        header = std::move(header),
        cob](Impl& channel) mutable {
         maybeCreateInteraction(options, channel);
         channel.sendRequestStream(
             options,
-            std::move(methodName),
+            std::move(methodMetadata),
             std::move(request),
             std::move(header),
             cob);
@@ -205,20 +206,20 @@ void PooledRequestChannel::sendRequestStream(
 
 void PooledRequestChannel::sendRequestSink(
     const RpcOptions& options,
-    apache::thrift::ManagedStringView&& methodName,
+    apache::thrift::MethodMetadata&& methodMetadata,
     SerializedRequest&& request,
     std::shared_ptr<transport::THeader> header,
     SinkClientCallback* cob) {
   sendRequestImpl(
       [options,
-       methodName = std::move(methodName),
+       methodMetadata = std::move(methodMetadata),
        request = std::move(request),
        header = std::move(header),
        cob](Impl& channel) mutable {
         maybeCreateInteraction(options, channel);
         channel.sendRequestSink(
             options,
-            std::move(methodName),
+            std::move(methodMetadata),
             std::move(request),
             std::move(header),
             cob);

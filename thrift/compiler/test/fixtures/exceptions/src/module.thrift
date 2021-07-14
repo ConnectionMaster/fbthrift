@@ -16,26 +16,35 @@
 
 namespace java.swift test.fixtures.exceptions
 
-safe permanent client exception Banal {
-}
 transient server exception Fiery {
   1: required string message;
 } (message = "message")
+
 safe stateful exception Serious {
   1: optional string sonnet;
 } (message = "sonnet")
+
 client exception ComplexFieldNames {
   1: string error_message;
   2: string internal_error_message;
 } (message = "internal_error_message")
+
 exception CustomFieldNames {
   1: string error_message;
   2: string internal_error_message (java.swift.name = "internalGreatMessage");
 } (message = "internal_error_message")
+
+exception ExceptionWithPrimitiveField {
+  1: string message;
+  2: i32 error_code;
+} (message = "message")
 
 service Raiser {
   void doBland();
   void doRaise() throws (1: Banal b, 2: Fiery f, 3: Serious s);
   string get200();
   string get500() throws (1: Fiery f, 2: Banal b, 3: Serious s);
+}
+
+safe permanent client exception Banal {
 }

@@ -27,6 +27,10 @@ void MyServicePrioParentAsyncProcessor::setUpAndProcess_ping(apache::thrift::Res
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void MyServicePrioParentAsyncProcessor::process_ping(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -36,12 +40,9 @@ void MyServicePrioParentAsyncProcessor::process_ping(apache::thrift::ResponseCha
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "ping");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "ping");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<void>>(std::move(req), std::move(ctxStack), return_ping<ProtocolIn_,ProtocolOut_>, throw_wrapped_ping<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -49,10 +50,10 @@ void MyServicePrioParentAsyncProcessor::process_ping(apache::thrift::ResponseCha
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue MyServicePrioParentAsyncProcessor::return_ping(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
+apache::thrift::LegacySerializedResponse MyServicePrioParentAsyncProcessor::return_ping(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
   ProtocolOut_ prot;
   MyServicePrioParent_ping_presult result;
-  return serializeResponse("ping", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("ping", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
@@ -80,6 +81,10 @@ void MyServicePrioParentAsyncProcessor::setUpAndProcess_pong(apache::thrift::Res
 
 template <typename ProtocolIn_, typename ProtocolOut_>
 void MyServicePrioParentAsyncProcessor::process_pong(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, apache::thrift::Cpp2RequestContext* ctx, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  if (!req->getShouldStartProcessing()) {
+    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+    return;
+  }
   // make sure getRequestContext is null
   // so async calls don't accidentally use it
   iface_->setRequestContext(nullptr);
@@ -89,12 +94,9 @@ void MyServicePrioParentAsyncProcessor::process_pong(apache::thrift::ResponseCha
     deserializeRequest<ProtocolIn_>(args, ctx->getMethodName(), std::move(serializedRequest).uncompress(), ctxStack.get());
   }
   catch (const std::exception& ex) {
+    folly::exception_wrapper ew(std::current_exception(), ex);
     apache::thrift::detail::ap::process_handle_exn_deserialization<ProtocolOut_>(
-        ex, std::move(req), ctx, eb, "pong");
-    return;
-  }
-  if (!req->getShouldStartProcessing()) {
-    apache::thrift::HandlerCallbackBase::releaseRequest(std::move(req), eb);
+        ew, std::move(req), ctx, eb, "pong");
     return;
   }
   auto callback = std::make_unique<apache::thrift::HandlerCallback<void>>(std::move(req), std::move(ctxStack), return_pong<ProtocolIn_,ProtocolOut_>, throw_wrapped_pong<ProtocolIn_, ProtocolOut_>, ctx->getProtoSeqId(), eb, tm, ctx);
@@ -102,10 +104,10 @@ void MyServicePrioParentAsyncProcessor::process_pong(apache::thrift::ResponseCha
 }
 
 template <class ProtocolIn_, class ProtocolOut_>
-folly::IOBufQueue MyServicePrioParentAsyncProcessor::return_pong(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
+apache::thrift::LegacySerializedResponse MyServicePrioParentAsyncProcessor::return_pong(int32_t protoSeqId, apache::thrift::ContextStack* ctx) {
   ProtocolOut_ prot;
   MyServicePrioParent_pong_presult result;
-  return serializeResponse("pong", &prot, protoSeqId, ctx, result);
+  return serializeLegacyResponse("pong", &prot, protoSeqId, ctx, result);
 }
 
 template <class ProtocolIn_, class ProtocolOut_>

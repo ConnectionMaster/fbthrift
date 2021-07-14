@@ -18,6 +18,8 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 
+#include <thrift/compiler/ast/t_service.h>
+#include <thrift/compiler/gen/cpp/reference_type.h>
 #include <thrift/compiler/generate/common.h>
 #include <thrift/compiler/generate/t_mstch_generator.h>
 #include <thrift/compiler/generate/t_mstch_objects.h>
@@ -149,81 +151,49 @@ class mstch_py3_type : public mstch_type {
   }
 
   mstch::node isExternalProgram() {
-    auto p = type_->get_program();
+    auto p = type_->program();
     return p && p != prog_;
   }
 
-  mstch::node flatName() {
-    return cachedProps_.flatName;
-  }
+  mstch::node flatName() { return cachedProps_.flatName; }
 
   mstch::node cppNamespaces() {
     return createStringArray(get_type_cpp2_namespace());
   }
 
-  mstch::node cppTemplate() {
-    return cachedProps_.cppTemplate;
-  }
+  mstch::node cppTemplate() { return cachedProps_.cppTemplate; }
 
-  mstch::node cythonTemplate() {
-    return to_cython_template();
-  }
+  mstch::node cythonTemplate() { return to_cython_template(); }
 
-  mstch::node isDefaultTemplate() {
-    return is_default_template();
-  }
+  mstch::node isDefaultTemplate() { return is_default_template(); }
 
-  mstch::node cppType() {
-    return cachedProps_.cppType;
-  }
+  mstch::node cppType() { return cachedProps_.cppType; }
 
-  mstch::node cythonType() {
-    return to_cython_type();
-  }
+  mstch::node cythonType() { return to_cython_type(); }
 
-  mstch::node hasCustomType() {
-    return has_custom_cpp_type();
-  }
+  mstch::node hasCustomType() { return has_custom_cpp_type(); }
 
-  mstch::node isNumber() {
-    return is_number();
-  }
+  mstch::node isNumber() { return is_number(); }
 
-  mstch::node isInteger() {
-    return is_integer();
-  }
+  mstch::node isInteger() { return is_integer(); }
 
   mstch::node isContainerOfString() {
     return is_list_of_string() || is_set_of_string();
   }
 
-  mstch::node cythonTypeNoneable() {
-    return !is_number() && has_cython_type();
-  }
+  mstch::node cythonTypeNoneable() { return !is_number() && has_cython_type(); }
 
-  mstch::node hasCythonType() {
-    return has_cython_type();
-  }
+  mstch::node hasCythonType() { return has_cython_type(); }
 
-  mstch::node isIOBuf() {
-    return is_iobuf();
-  }
+  mstch::node isIOBuf() { return is_iobuf(); }
 
-  mstch::node isIOBufRef() {
-    return is_iobuf_ref();
-  }
+  mstch::node isIOBufRef() { return is_iobuf_ref(); }
 
-  mstch::node isIOBufWrapper() {
-    return is_iobuf() || is_iobuf_ref();
-  }
+  mstch::node isIOBufWrapper() { return is_iobuf() || is_iobuf_ref(); }
 
-  mstch::node isFlexibleBinary() {
-    return is_flexible_binary();
-  }
+  mstch::node isFlexibleBinary() { return is_flexible_binary(); }
 
-  mstch::node hasCustomTypeBehavior() {
-    return has_custom_type_behavior();
-  }
+  mstch::node hasCustomTypeBehavior() { return has_custom_type_behavior(); }
 
   mstch::node isSimple() {
     return (type_->is_base_type() || type_->is_enum()) &&
@@ -236,9 +206,7 @@ class mstch_py3_type : public mstch_type {
         resolved_type_->is_xception();
   }
 
-  const std::string& get_flat_name() const {
-    return cachedProps_.flatName;
-  }
+  const std::string& get_flat_name() const { return cachedProps_.flatName; }
 
   void set_flat_name(std::string extra) {
     std::string custom_prefix;
@@ -249,7 +217,7 @@ class mstch_py3_type : public mstch_type {
         custom_prefix = to_cython_type() + "__";
       }
     }
-    const t_program* typeProgram = type_->get_program();
+    const t_program* typeProgram = type_->program();
     if (typeProgram && typeProgram != prog_) {
       custom_prefix += typeProgram->name() + "_";
     }
@@ -264,13 +232,11 @@ class mstch_py3_type : public mstch_type {
         (type_->is_map() && cachedProps_.cppTemplate == "std::map");
   }
 
-  bool has_custom_cpp_type() const {
-    return cachedProps_.cppType != "";
-  }
+  bool has_custom_cpp_type() const { return cachedProps_.cppType != ""; }
 
  protected:
   const t_program* get_type_program() const {
-    if (const t_program* p = type_->get_program()) {
+    if (const t_program* p = type_->program()) {
       return p;
     }
     return prog_;
@@ -314,13 +280,9 @@ class mstch_py3_type : public mstch_type {
     return cython_type;
   }
 
-  bool is_integer() const {
-    return type_->is_any_int() || type_->is_byte();
-  }
+  bool is_integer() const { return type_->is_any_int() || type_->is_byte(); }
 
-  bool is_number() const {
-    return is_integer() || type_->is_floating_point();
-  }
+  bool is_number() const { return is_integer() || type_->is_floating_point(); }
 
   bool is_list_of_string() {
     if (!type_->is_list()) {
@@ -336,13 +298,9 @@ class mstch_py3_type : public mstch_type {
     return get_set_elem_type(*type_)->is_string_or_binary();
   }
 
-  bool has_cython_type() const {
-    return !type_->is_container();
-  }
+  bool has_cython_type() const { return !type_->is_container(); }
 
-  bool is_iobuf() const {
-    return cachedProps_.cppType == "folly::IOBuf";
-  }
+  bool is_iobuf() const { return cachedProps_.cppType == "folly::IOBuf"; }
 
   bool is_iobuf_ref() const {
     return cachedProps_.cppType == "std::unique_ptr<folly::IOBuf>";
@@ -414,7 +372,7 @@ class mstch_py3_program : public mstch_program {
              &mstch_py3_program::getStreamExceptions},
         });
     gather_included_program_namespaces();
-    visit_types_for_services();
+    visit_types_for_services_and_interactions();
     visit_types_for_objects();
     visit_types_for_constants();
     visit_types_for_typedefs();
@@ -448,9 +406,7 @@ class mstch_py3_program : public mstch_program {
     return generate_types_array(customTemplates_);
   }
 
-  mstch::node getCustomTypes() {
-    return generate_types_array(customTypes_);
-  }
+  mstch::node getCustomTypes() { return generate_types_array(customTypes_); }
 
   mstch::node getMoveContainerTypes() {
     std::vector<const t_type*> types;
@@ -510,13 +466,9 @@ class mstch_py3_program : public mstch_program {
     return !has_option("no_stream") && !streamTypes_.empty();
   }
 
-  mstch::node isTypeContext() {
-    return typeContext_;
-  }
+  mstch::node isTypeContext() { return typeContext_; }
 
-  void setTypeContext(bool val) {
-    typeContext_ = val;
-  }
+  void setTypeContext(bool val) { typeContext_ = val; }
 
  protected:
   struct Namespace {
@@ -546,7 +498,7 @@ class mstch_py3_program : public mstch_program {
   }
 
   void add_typedef_namespace(const t_type* type) {
-    auto prog = type->get_program();
+    auto prog = type->program();
     if (prog && prog != program_) {
       const auto& path = prog->path();
       if (includeNamespaces_.find(path) != includeNamespaces_.end()) {
@@ -560,28 +512,35 @@ class mstch_py3_program : public mstch_program {
     }
   }
 
-  void visit_types_for_services() {
-    for (const auto* service : program_->services()) {
-      for (const auto* function : service->get_functions()) {
-        for (const auto* field : function->get_paramlist()->fields()) {
-          visit_type(field->get_type());
-        }
-        for (const auto* field : function->get_stream_xceptions()->fields()) {
-          const t_type* exType = field->get_type();
-          streamExceptions_.emplace(visit_type(field->get_type()), exType);
-        }
-        const t_type* return_type = function->get_returntype();
-        auto sa = cpp2::is_stack_arguments(cache_->parsed_options_, *function);
-        uniqueFunctionsByReturnType_.insert(
-            {{visit_type(return_type), sa}, function});
+  void visit_type_single_service(const t_service* service) {
+    for (const auto& function : service->functions()) {
+      for (const auto& field : function.get_paramlist()->fields()) {
+        visit_type(field.get_type());
       }
+      for (const auto& field : function.get_stream_xceptions()->fields()) {
+        const t_type* exType = field.get_type();
+        streamExceptions_.emplace(visit_type(field.get_type()), exType);
+      }
+      const t_type* return_type = function.get_returntype();
+      auto sa = cpp2::is_stack_arguments(cache_->parsed_options_, function);
+      uniqueFunctionsByReturnType_.insert(
+          {{visit_type(return_type), sa}, &function});
+    }
+  }
+
+  void visit_types_for_services_and_interactions() {
+    for (const auto* service : program_->services()) {
+      visit_type_single_service(service);
+    }
+    for (const auto* interaction : program_->interactions()) {
+      visit_type_single_service(interaction);
     }
   }
 
   void visit_types_for_objects() {
     for (const auto& object : program_->objects()) {
-      for (const auto& field : object->fields()) {
-        visit_type(field->get_type());
+      for (auto&& field : object->fields()) {
+        visit_type(field.get_type());
       }
     }
   }
@@ -613,8 +572,7 @@ class mstch_py3_program : public mstch_program {
   }
 
   std::string visit_type_with_typedef(
-      const t_type* orig_type,
-      TypeDef isTypedef) {
+      const t_type* orig_type, TypeDef isTypedef) {
     auto trueType = orig_type->get_true_type();
     auto baseType =
         generators_->type_generator_->generate(trueType, generators_, cache_);
@@ -718,9 +676,7 @@ class mstch_py3_function : public mstch_function {
          {"function:cppName", &mstch_py3_function::cppName}});
   }
 
-  mstch::node cppName() {
-    return cppName_;
-  }
+  mstch::node cppName() { return cppName_; }
 
   mstch::node event_based() {
     return function_->get_annotation("thread") == "eb";
@@ -751,31 +707,31 @@ class mstch_py3_service : public mstch_service {
             {"service:py3Namespaces", &mstch_py3_service::py3Namespaces},
             {"service:programName", &mstch_py3_service::programName},
             {"service:includePrefix", &mstch_py3_service::includePrefix},
+            {"service:parent_service_name",
+             &mstch_py3_service::parent_service_name},
             {"service:supportedFunctions",
              &mstch_py3_service::get_supported_functions},
         });
   }
 
-  mstch::node isExternalProgram() {
-    return prog_ != service_->get_program();
-  }
+  mstch::node isExternalProgram() { return prog_ != service_->program(); }
 
   mstch::node cppNamespaces() {
     return createStringArray(
-        cpp2::get_gen_namespace_components(*service_->get_program()));
+        cpp2::get_gen_namespace_components(*service_->program()));
   }
 
   mstch::node py3Namespaces() {
     return createStringArray(
-        split_namespace(service_->get_program()->get_namespace("py3")));
+        split_namespace(service_->program()->get_namespace("py3")));
   }
 
-  mstch::node programName() {
-    return service_->get_program()->name();
-  }
+  mstch::node programName() { return service_->program()->name(); }
 
-  mstch::node includePrefix() {
-    return service_->get_program()->include_prefix();
+  mstch::node includePrefix() { return service_->program()->include_prefix(); }
+
+  mstch::node parent_service_name() {
+    return cache_->parsed_options_.at("parent_service_name");
   }
 
   mstch::node get_supported_functions() {
@@ -828,41 +784,30 @@ class mstch_py3_field : public mstch_field {
             {"field:cppName", &mstch_py3_field::cppName},
             {"field:hasModifiedName?", &mstch_py3_field::hasModifiedName},
             {"field:hasPyName?", &mstch_py3_field::hasPyName},
+            {"field:boxed_ref?", &mstch_py3_field::boxed_ref},
         });
   }
 
-  mstch::node isRef() {
-    return is_ref();
-  }
+  mstch::node isRef() { return is_ref(); }
 
-  mstch::node isUniqueRef() {
-    return get_ref_type() == RefType::Unique;
-  }
+  mstch::node isUniqueRef() { return get_ref_type() == RefType::Unique; }
 
-  mstch::node isSharedRef() {
-    return get_ref_type() == RefType::Shared;
-  }
+  mstch::node isSharedRef() { return get_ref_type() == RefType::Shared; }
 
   mstch::node isSharedConstRef() {
     return get_ref_type() == RefType::SharedConst;
   }
 
-  mstch::node isIOBufRef() {
-    return get_ref_type() == RefType::IOBuf;
-  }
+  mstch::node isIOBufRef() { return get_ref_type() == RefType::IOBuf; }
 
   mstch::node hasRefAccessor() {
     auto ref_type = get_ref_type();
     return (ref_type == RefType::NotRef || ref_type == RefType::IOBuf);
   }
 
-  mstch::node hasDefaultValue() {
-    return has_default_value();
-  }
+  mstch::node hasDefaultValue() { return has_default_value(); }
 
-  mstch::node isPEP484Optional() {
-    return !has_default_value();
-  }
+  mstch::node isPEP484Optional() { return !has_default_value(); }
 
   mstch::node isSet() {
     auto ref_type = get_ref_type();
@@ -870,24 +815,17 @@ class mstch_py3_field : public mstch_field {
         field_->get_req() != t_field::e_req::required;
   }
 
-  mstch::node pyName() {
-    return pyName_;
-  }
-
-  mstch::node cppName() {
-    return cppName_;
-  }
-
-  mstch::node hasModifiedName() {
-    return pyName_ != cppName_;
-  }
-
-  mstch::node hasPyName() {
-    return pyName_ != field_->get_name();
-  }
+  mstch::node pyName() { return pyName_; }
+  mstch::node cppName() { return cppName_; }
+  mstch::node hasModifiedName() { return pyName_ != cppName_; }
+  mstch::node hasPyName() { return pyName_ != field_->get_name(); }
 
   bool has_default_value() {
     return !is_ref() && (field_->get_value() != nullptr || !is_optional());
+  }
+
+  mstch::node boxed_ref() {
+    return gen::cpp::find_ref_type(*field_) == gen::cpp::reference_type::boxed;
   }
 
  protected:
@@ -921,9 +859,7 @@ class mstch_py3_field : public mstch_field {
     return field_->get_req() == t_field::e_req::optional;
   }
 
-  bool is_ref() {
-    return get_ref_type() != RefType::NotRef;
-  }
+  bool is_ref() { return get_ref_type() != RefType::NotRef; }
 
   RefType ref_type_{RefType::NotRef};
   bool ref_type_cached_ = false;
@@ -945,7 +881,6 @@ class mstch_py3_struct : public mstch_struct {
             {"struct:size", &mstch_py3_struct::getSize},
             {"struct:is_struct_orderable?",
              &mstch_py3_struct::isStructOrderable},
-            {"struct:is_always_set?", &mstch_py3_struct::isAlwaysSet},
             {"struct:cpp_noncomparable", &mstch_py3_struct::cppNonComparable},
             {"struct:cpp_noncopyable?", &mstch_py3_struct::cppNonCopyable},
             {"struct:exception_message?",
@@ -953,25 +888,25 @@ class mstch_py3_struct : public mstch_struct {
             {"struct:exception_message", &mstch_py3_struct::exceptionMessage},
             {"struct:fields_and_mixin_fields",
              &mstch_py3_struct::fields_and_mixin_fields},
+            {"struct:py3_fields", &mstch_py3_struct::py3_fields},
+            {"struct:py3_fields?", &mstch_py3_struct::has_py3_fields},
         });
+    py3_fields_ = strct_->fields().copy();
+    py3_fields_.erase(
+        std::remove_if(
+            py3_fields_.begin(),
+            py3_fields_.end(),
+            [](t_field const* field) {
+              return field->has_annotation("py3.hidden");
+            }),
+        py3_fields_.end());
   }
 
-  mstch::node getSize() {
-    return std::to_string(strct_->fields().size());
-  }
+  mstch::node getSize() { return std::to_string(py3_fields_.size()); }
 
   mstch::node isStructOrderable() {
     return cpp2::is_orderable(*strct_) &&
         !strct_->has_annotation("no_default_comparators");
-  }
-
-  mstch::node isAlwaysSet() {
-    const auto& members = strct_->fields();
-    return std::any_of(
-        members.begin(), members.end(), [this](const auto* field) {
-          mstch_py3_field f{field, generators_, cache_, pos_, 0};
-          return f.has_default_value();
-        });
   }
 
   mstch::node cppNonComparable() {
@@ -986,17 +921,22 @@ class mstch_py3_struct : public mstch_struct {
     return strct_->has_annotation("message");
   }
 
-  mstch::node exceptionMessage() {
-    return strct_->get_annotation("message");
-  }
+  mstch::node exceptionMessage() { return strct_->get_annotation("message"); }
+
+  mstch::node py3_fields() { return generate_fields(py3_fields_); }
+
+  mstch::node has_py3_fields() { return !py3_fields_.empty(); }
 
   mstch::node fields_and_mixin_fields() {
-    std::vector<t_field const*> fields = strct_->fields();
+    std::vector<t_field const*> fields = py3_fields_;
     for (auto m : cpp2::get_mixins_and_members(*strct_)) {
       fields.push_back(m.member);
     }
     return generate_fields(fields);
   }
+
+ private:
+  std::vector<t_field const*> py3_fields_;
 };
 
 class mstch_py3_enum : public mstch_enum {
@@ -1014,9 +954,7 @@ class mstch_py3_enum : public mstch_enum {
         });
   }
 
-  mstch::node hasFlags() {
-    return enm_->has_annotation("py3.flags");
-  }
+  mstch::node hasFlags() { return enm_->has_annotation("py3.flags"); }
 };
 
 class mstch_py3_enum_value : public mstch_enum_value {
@@ -1036,13 +974,9 @@ class mstch_py3_enum_value : public mstch_enum_value {
         });
   }
 
-  mstch::node pyName() {
-    return py3::get_py3_name(*enm_value_);
-  }
+  mstch::node pyName() { return py3::get_py3_name(*enm_value_); }
 
-  mstch::node cppName() {
-    return cpp2::get_name(enm_value_);
-  }
+  mstch::node cppName() { return cpp2::get_name(enm_value_); }
 
   mstch::node hasPyName() {
     return py3::get_py3_name(*enm_value_) != enm_value_->get_name();
@@ -1099,17 +1033,11 @@ class mstch_py3_annotation : public mstch_annotation {
         });
   }
 
-  mstch::node hasValue() {
-    return !val_.empty();
-  }
+  mstch::node hasValue() { return !val_.empty(); }
 
-  mstch::node pyQuotedKey() {
-    return to_python_string_literal(key_);
-  }
+  mstch::node pyQuotedKey() { return to_python_string_literal(key_); }
 
-  mstch::node pyQuotedValue() {
-    return to_python_string_literal(val_);
-  }
+  mstch::node pyQuotedValue() { return to_python_string_literal(val_); }
 
  protected:
   std::string to_python_string_literal(std::string val) const {
@@ -1306,14 +1234,14 @@ class enum_member_union_field_names_validator : virtual public validator {
     if (!s->is_union()) {
       return false;
     }
-    for (const t_field* f : s->fields()) {
-      validate(f, f->get_name());
+    for (const t_field& f : s->fields()) {
+      validate(&f, f.name());
     }
     return true;
   }
 
  private:
-  void validate(const t_annotated* node, const std::string& name) {
+  void validate(const t_named* node, const std::string& name) {
     const auto& pyname = node->get_annotation("py3.name", &name);
     if (pyname == "name" || pyname == "value") {
       std::ostringstream ss;
@@ -1354,14 +1282,11 @@ class t_mstch_py3_generator : public t_mstch_generator {
   }
 
  protected:
-  bool should_resolve_typedefs() const override {
-    return true;
-  }
+  bool should_resolve_typedefs() const override { return true; }
   void set_mstch_generators();
   void generate_init_files();
   void generate_file(
-      const std::string& file,
-      const boost::filesystem::path& base);
+      const std::string& file, const boost::filesystem::path& base);
   void setTypeContext(bool val);
   void generate_types();
   void generate_services();
@@ -1436,8 +1361,7 @@ void t_mstch_py3_generator::setTypeContext(bool val) {
 }
 
 void t_mstch_py3_generator::generate_file(
-    const std::string& file,
-    const boost::filesystem::path& base = {}) {
+    const std::string& file, const boost::filesystem::path& base = {}) {
   auto program = get_program();
   const auto& name = program->name();
   auto nodePtr =

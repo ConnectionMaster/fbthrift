@@ -6,26 +6,4 @@
  */
 
 package test.fixtures.annotation;
-
-import java.util.*;
-
-public class MyAnnotationServiceReactiveBlockingWrapper 
-  implements MyAnnotationService {
-  private final MyAnnotationService.Reactive _delegate;
-
-  public MyAnnotationServiceReactiveBlockingWrapper(MyAnnotationService.Reactive _delegate) {
-    
-    this._delegate = _delegate;
-  }
-
-  @java.lang.Override
-  public void close() {
-    _delegate.close();
-  }
-
-  @java.lang.Override
-  public void ping() throws org.apache.thrift.TException {
-      _delegate.ping().block();
-  }
-
-}
+// Generation of this class is disabled using (java.swift.disable_reactive)

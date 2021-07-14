@@ -26,8 +26,8 @@
 #include <utility>
 #include <vector>
 
+#include <thrift/compiler/detail/mustache/mstch.h>
 #include <thrift/compiler/generate/t_generator.h>
-#include <thrift/compiler/mustache/mstch.h>
 
 namespace apache {
 namespace thrift {
@@ -59,7 +59,7 @@ class enum_value_generator {
       std::shared_ptr<mstch_generators const> generators,
       std::shared_ptr<mstch_cache> cache,
       ELEMENT_POSITION pos = ELEMENT_POSITION::NONE,
-      int32_t /*index*/ = 0) const;
+      int32_t index = 0) const;
 };
 
 class enum_generator {
@@ -70,7 +70,7 @@ class enum_generator {
       std::shared_ptr<mstch_generators const> generators,
       std::shared_ptr<mstch_cache> cache,
       ELEMENT_POSITION pos = ELEMENT_POSITION::NONE,
-      int32_t /*index*/ = 0) const;
+      int32_t index = 0) const;
 };
 
 class const_value_generator {
@@ -93,8 +93,7 @@ class const_value_generator {
       int32_t index = 0,
       t_const const* current_const = nullptr,
       std::pair<const t_type*, const t_type*> const& expected_types = {
-          nullptr,
-          nullptr}) const;
+          nullptr, nullptr}) const;
 };
 
 class type_generator {
@@ -106,7 +105,7 @@ class type_generator {
       std::shared_ptr<mstch_generators const> generators,
       std::shared_ptr<mstch_cache> cache,
       ELEMENT_POSITION pos = ELEMENT_POSITION::NONE,
-      int32_t /*index*/ = 0) const;
+      int32_t index = 0) const;
 };
 
 class field_generator {
@@ -154,7 +153,7 @@ class struct_generator {
       std::shared_ptr<mstch_generators const> generators,
       std::shared_ptr<mstch_cache> cache,
       ELEMENT_POSITION pos = ELEMENT_POSITION::NONE,
-      int32_t /*index*/ = 0) const;
+      int32_t index = 0) const;
 };
 
 class function_generator {
@@ -166,7 +165,7 @@ class function_generator {
       std::shared_ptr<mstch_generators const> generators,
       std::shared_ptr<mstch_cache> cache,
       ELEMENT_POSITION pos = ELEMENT_POSITION::NONE,
-      int32_t /*index*/ = 0) const;
+      int32_t index = 0) const;
 };
 
 class service_generator {
@@ -178,7 +177,7 @@ class service_generator {
       std::shared_ptr<mstch_generators const> generators,
       std::shared_ptr<mstch_cache> cache,
       ELEMENT_POSITION pos = ELEMENT_POSITION::NONE,
-      int32_t /*index*/ = 0) const;
+      int32_t index = 0) const;
 
   std::shared_ptr<mstch_base> generate_cached(
       t_program const* program,
@@ -206,7 +205,7 @@ class typedef_generator {
       std::shared_ptr<mstch_generators const> generators,
       std::shared_ptr<mstch_cache> cache,
       ELEMENT_POSITION pos = ELEMENT_POSITION::NONE,
-      int32_t /*index*/ = 0) const;
+      int32_t index = 0) const;
 };
 
 class const_generator {
@@ -233,7 +232,7 @@ class program_generator {
       std::shared_ptr<mstch_generators const> generators,
       std::shared_ptr<mstch_cache> cache,
       ELEMENT_POSITION pos = ELEMENT_POSITION::NONE,
-      int32_t /*index*/ = 0) const;
+      int32_t index = 0) const;
 
   std::shared_ptr<mstch_base> generate_cached(
       t_program const* program,
@@ -359,11 +358,11 @@ class mstch_base : public mstch::object {
         pos_ == ELEMENT_POSITION::FIRST_AND_LAST;
   }
 
-  mstch::node annotations(t_annotated const* annotated) {
+  mstch::node annotations(t_named const* annotated) {
     return generate_annotations(annotated->annotations());
   }
 
-  mstch::node structured_annotations(t_annotated const* annotated) {
+  mstch::node structured_annotations(t_named const* annotated) {
     return generate_elements(
         annotated->structured_annotations(),
         generators_->structured_annotation_generator_.get());
@@ -390,7 +389,7 @@ class mstch_base : public mstch::object {
       Args const&... args) {
     mstch::array a;
     size_t i = 0;
-    for (auto& element : container) {
+    for (auto&& element : container) {
       auto pos = element_position(i, container.size());
       a.push_back(
           generator->generate(element, generators_, cache_, pos, i, args...));
@@ -509,12 +508,8 @@ class mstch_enum_value : public mstch_base {
             {"enumValue:value", &mstch_enum_value::value},
         });
   }
-  mstch::node name() {
-    return enm_value_->get_name();
-  }
-  mstch::node value() {
-    return std::to_string(enm_value_->get_value());
-  }
+  mstch::node name() { return enm_value_->get_name(); }
+  mstch::node value() { return std::to_string(enm_value_->get_value()); }
 
  protected:
   t_enum_value const* enm_value_;
@@ -539,9 +534,7 @@ class mstch_enum : public mstch_base {
         });
   }
 
-  mstch::node name() {
-    return enm_->get_name();
-  }
+  mstch::node name() { return enm_->get_name(); }
   mstch::node values();
   mstch::node structured_annotations() {
     return mstch_base::structured_annotations(enm_);
@@ -609,12 +602,8 @@ class mstch_const_value : public mstch_base {
     oss << std::setprecision(std::numeric_limits<double>::digits10) << d;
     return oss.str();
   }
-  mstch::node is_bool() {
-    return type_ == cv::CV_BOOL;
-  }
-  mstch::node is_double() {
-    return type_ == cv::CV_DOUBLE;
-  }
+  mstch::node is_bool() { return type_ == cv::CV_BOOL; }
+  mstch::node is_double() { return type_ == cv::CV_DOUBLE; }
   mstch::node is_integer() {
     return type_ == cv::CV_INTEGER && !const_value_->is_enum();
   }
@@ -624,9 +613,7 @@ class mstch_const_value : public mstch_base {
   mstch::node has_enum_value() {
     return const_value_->get_enum_value() != nullptr;
   }
-  mstch::node is_string() {
-    return type_ == cv::CV_STRING;
-  }
+  mstch::node is_string() { return type_ == cv::CV_STRING; }
   mstch::node is_string_multi_line() {
     return type_ == cv::CV_STRING &&
         const_value_->get_string().find("\n") != std::string::npos;
@@ -635,12 +622,8 @@ class mstch_const_value : public mstch_base {
     return type_ == cv::CV_BOOL || type_ == cv::CV_DOUBLE ||
         type_ == cv::CV_INTEGER || type_ == cv::CV_STRING;
   }
-  mstch::node is_map() {
-    return type_ == cv::CV_MAP;
-  }
-  mstch::node is_list() {
-    return type_ == cv::CV_LIST;
-  }
+  mstch::node is_map() { return type_ == cv::CV_MAP; }
+  mstch::node is_list() { return type_ == cv::CV_LIST; }
   mstch::node is_container() {
     return type_ == cv::CV_MAP || type_ == cv::CV_LIST;
   }
@@ -677,9 +660,7 @@ class mstch_const_value : public mstch_base {
   cv const type_;
   int32_t index_;
 
-  virtual bool same_type_as_expected() const {
-    return false;
-  }
+  virtual bool same_type_as_expected() const { return false; }
 };
 
 class mstch_const_value_key_mapped_pair : public mstch_base {
@@ -776,54 +757,26 @@ class mstch_type : public mstch_base {
         });
   }
 
-  mstch::node name() {
-    return type_->get_name();
-  }
-  mstch::node is_void() {
-    return resolved_type_->is_void();
-  }
-  mstch::node is_string() {
-    return resolved_type_->is_string();
-  }
-  mstch::node is_binary() {
-    return resolved_type_->is_binary();
-  }
-  mstch::node is_bool() {
-    return resolved_type_->is_bool();
-  }
-  mstch::node is_byte() {
-    return resolved_type_->is_byte();
-  }
-  mstch::node is_i16() {
-    return resolved_type_->is_i16();
-  }
-  mstch::node is_i32() {
-    return resolved_type_->is_i32();
-  }
-  mstch::node is_i64() {
-    return resolved_type_->is_i64();
-  }
-  mstch::node is_double() {
-    return resolved_type_->is_double();
-  }
-  mstch::node is_float() {
-    return resolved_type_->is_float();
-  }
+  mstch::node name() { return type_->get_name(); }
+  mstch::node is_void() { return resolved_type_->is_void(); }
+  mstch::node is_string() { return resolved_type_->is_string(); }
+  mstch::node is_binary() { return resolved_type_->is_binary(); }
+  mstch::node is_bool() { return resolved_type_->is_bool(); }
+  mstch::node is_byte() { return resolved_type_->is_byte(); }
+  mstch::node is_i16() { return resolved_type_->is_i16(); }
+  mstch::node is_i32() { return resolved_type_->is_i32(); }
+  mstch::node is_i64() { return resolved_type_->is_i64(); }
+  mstch::node is_double() { return resolved_type_->is_double(); }
+  mstch::node is_float() { return resolved_type_->is_float(); }
   mstch::node is_floating_point() {
     return resolved_type_->is_floating_point();
   }
   mstch::node is_struct() {
     return resolved_type_->is_struct() || resolved_type_->is_xception();
   }
-  mstch::node is_union() {
-    return resolved_type_->is_union();
-  }
-  mstch::node is_enum() {
-    return resolved_type_->is_enum();
-  }
-  mstch::node is_sink() {
-    return resolved_type_->is_sink();
-  }
+  mstch::node is_union() { return resolved_type_->is_union(); }
+  mstch::node is_enum() { return resolved_type_->is_enum(); }
+  mstch::node is_sink() { return resolved_type_->is_sink(); }
   mstch::node sink_has_first_response() {
     return resolved_type_->is_sink() &&
         dynamic_cast<const t_sink*>(resolved_type_)->sink_has_first_response();
@@ -837,32 +790,16 @@ class mstch_type : public mstch_base {
   mstch::node stream_has_first_response() {
     return resolved_type_->is_streamresponse() &&
         dynamic_cast<const t_stream_response*>(resolved_type_)
-            ->has_first_response();
+            ->first_response_type() != boost::none;
   }
-  mstch::node is_service() {
-    return resolved_type_->is_service();
-  }
-  mstch::node is_base() {
-    return resolved_type_->is_base_type();
-  }
-  mstch::node is_container() {
-    return resolved_type_->is_container();
-  }
-  mstch::node is_list() {
-    return resolved_type_->is_list();
-  }
-  mstch::node is_set() {
-    return resolved_type_->is_set();
-  }
-  mstch::node is_map() {
-    return resolved_type_->is_map();
-  }
-  mstch::node is_typedef() {
-    return type_->is_typedef();
-  }
-  virtual std::string get_type_namespace(t_program const*) {
-    return "";
-  }
+  mstch::node is_service() { return resolved_type_->is_service(); }
+  mstch::node is_base() { return resolved_type_->is_base_type(); }
+  mstch::node is_container() { return resolved_type_->is_container(); }
+  mstch::node is_list() { return resolved_type_->is_list(); }
+  mstch::node is_set() { return resolved_type_->is_set(); }
+  mstch::node is_map() { return resolved_type_->is_map(); }
+  mstch::node is_typedef() { return type_->is_typedef(); }
+  virtual std::string get_type_namespace(t_program const*) { return ""; }
   mstch::node get_struct();
   mstch::node get_enum();
   mstch::node get_list_type();
@@ -875,9 +812,7 @@ class mstch_type : public mstch_base {
   mstch::node get_sink_final_reponse_type();
   mstch::node get_stream_elem_type();
   mstch::node get_stream_first_response_type();
-  mstch::node is_interaction() {
-    return type_->is_service();
-  }
+  mstch::node is_interaction() { return type_->is_service(); }
 
  protected:
   t_type const* type_;
@@ -909,17 +844,11 @@ class mstch_field : public mstch_base {
              &mstch_field::structured_annotations},
         });
   }
-  mstch::node name() {
-    return field_->get_name();
-  }
-  mstch::node key() {
-    return std::to_string(field_->get_key());
-  }
+  mstch::node name() { return field_->get_name(); }
+  mstch::node key() { return std::to_string(field_->get_key()); }
   mstch::node value();
   mstch::node type();
-  mstch::node index() {
-    return std::to_string(index_);
-  }
+  mstch::node index() { return std::to_string(index_); }
   mstch::node is_required() {
     return field_->get_req() == t_field::e_req::required;
   }
@@ -929,9 +858,7 @@ class mstch_field : public mstch_base {
   mstch::node is_optInReqOut() {
     return field_->get_req() == t_field::e_req::opt_in_req_out;
   }
-  mstch::node annotations() {
-    return mstch_base::annotations(field_);
-  }
+  mstch::node annotations() { return mstch_base::annotations(field_); }
   mstch::node structured_annotations() {
     return mstch_base::structured_annotations(field_);
   }
@@ -961,12 +888,8 @@ class mstch_annotation : public mstch_base {
             {"annotation:value", &mstch_annotation::value},
         });
   }
-  mstch::node key() {
-    return key_;
-  }
-  mstch::node value() {
-    return val_;
-  }
+  mstch::node key() { return key_; }
+  mstch::node value() { return val_; }
 
  protected:
   const std::string key_;
@@ -992,11 +915,17 @@ class mstch_structured_annotation : public mstch_base {
   }
   mstch::node constant() {
     return generators_->const_generator_->generate(
-        &cnst_, generators_, cache_, pos_, index_, &cnst_, cnst_.get_type());
+        &cnst_,
+        generators_,
+        cache_,
+        pos_,
+        index_,
+        &cnst_,
+        cnst_.type()->get_true_type());
   }
 
   mstch::node is_const_struct() {
-    return cnst_.get_type()->is_struct();
+    return cnst_.type()->get_true_type()->is_struct();
   }
 
  protected:
@@ -1025,31 +954,30 @@ class mstch_struct : public mstch_base {
             {"struct:thrift_uri", &mstch_struct::thrift_uri},
             {"struct:structured_annotations",
              &mstch_struct::structured_annotations},
+            {"struct:exception_kind", &mstch_struct::exception_kind},
+            {"struct:exception_safety", &mstch_struct::exception_safety},
+            {"struct:exception_blame", &mstch_struct::exception_blame},
         });
   }
-  mstch::node name() {
-    return strct_->get_name();
-  }
-  mstch::node has_fields() {
-    return strct_->has_fields();
-  }
+  mstch::node name() { return strct_->get_name(); }
+  mstch::node has_fields() { return strct_->has_fields(); }
   mstch::node fields();
-  mstch::node is_exception() {
-    return strct_->is_xception();
-  }
-  mstch::node is_union() {
-    return strct_->is_union();
-  }
+  mstch::node is_exception() { return strct_->is_xception(); }
+  mstch::node is_union() { return strct_->is_union(); }
   mstch::node is_plain() {
     return !strct_->is_xception() && !strct_->is_union();
   }
-  mstch::node annotations() {
-    return mstch_base::annotations(strct_);
-  }
+  mstch::node annotations() { return mstch_base::annotations(strct_); }
   mstch::node thrift_uri();
   mstch::node structured_annotations() {
     return mstch_base::structured_annotations(strct_);
   }
+
+  mstch::node exception_safety();
+
+  mstch::node exception_blame();
+
+  mstch::node exception_kind();
 
  protected:
   t_struct const* strct_;
@@ -1093,14 +1021,13 @@ class mstch_function : public mstch_base {
              &mstch_function::starts_interaction},
             {"function:structured_annotations",
              &mstch_function::structured_annotations},
+            {"function:qualifier", &mstch_function::qualifier},
         });
   }
 
-  mstch::node name() {
-    return function_->get_name();
-  }
+  mstch::node name() { return function_->get_name(); }
   mstch::node oneway() {
-    return function_->is_oneway();
+    return function_->qualifier() == t_function_qualifier::one_way;
   }
   mstch::node has_exceptions() {
     return function_->get_xceptions()->has_fields();
@@ -1115,9 +1042,9 @@ class mstch_function : public mstch_base {
     return function_->get_sink_final_response_xceptions()->has_fields();
   }
   mstch::node stream_has_first_response() {
-    auto rettype = function_->get_returntype();
-    auto stream = dynamic_cast<const t_stream_response*>(rettype);
-    return stream && stream->has_first_response();
+    const auto& rettype = *function_->return_type();
+    auto stream = dynamic_cast<const t_stream_response*>(&rettype);
+    return stream && stream->first_response_type() != boost::none;
   }
   mstch::node has_args() {
     if (function_->get_paramlist()->has_fields()) {
@@ -1128,12 +1055,8 @@ class mstch_function : public mstch_base {
   mstch::node priority() {
     return function_->get_annotation("priority", "NORMAL");
   }
-  mstch::node returns_sink() {
-    return function_->returns_sink();
-  }
-  mstch::node annotations() {
-    return mstch_base::annotations(function_);
-  }
+  mstch::node returns_sink() { return function_->returns_sink(); }
+  mstch::node annotations() { return mstch_base::annotations(function_); }
 
   mstch::node return_type();
   mstch::node exceptions();
@@ -1148,6 +1071,20 @@ class mstch_function : public mstch_base {
 
   mstch::node structured_annotations() {
     return mstch_base::structured_annotations(function_);
+  }
+
+  mstch::node qualifier() {
+    auto q = function_->qualifier();
+    switch (q) {
+      case t_function_qualifier::one_way:
+        return std::string("OneWay");
+      case t_function_qualifier::idempotent:
+        return std::string("Idempotent");
+      case t_function_qualifier::read_only:
+        return std::string("ReadOnly");
+      default:
+        return std::string("Unspecified");
+    }
   }
 
  protected:
@@ -1173,6 +1110,7 @@ class mstch_service : public mstch_base {
             {"service:streams?", &mstch_service::has_streams},
             {"service:sinks?", &mstch_service::has_sinks},
             {"service:annotations", &mstch_service::annotations},
+            {"service:parent", &mstch_service::parent},
             {"service:interaction?", &mstch_service::is_interaction},
             {"service:interactions", &mstch_service::interactions},
             {"service:interactions?", &mstch_service::has_interactions},
@@ -1182,23 +1120,17 @@ class mstch_service : public mstch_base {
         });
   }
 
-  virtual std::string get_service_namespace(t_program const*) {
-    return {};
-  }
+  virtual std::string get_service_namespace(t_program const*) { return {}; }
 
-  mstch::node name() {
-    return service_->get_name();
-  }
-  mstch::node has_functions() {
-    return !service_->get_functions().empty();
-  }
-  mstch::node has_extends() {
-    return service_->get_extends() != nullptr;
-  }
+  mstch::node name() { return service_->get_name(); }
+  mstch::node has_functions() { return !service_->get_functions().empty(); }
+  mstch::node has_extends() { return service_->get_extends() != nullptr; }
   mstch::node functions();
   mstch::node extends();
-  mstch::node annotations() {
-    return mstch_base::annotations(service_);
+  mstch::node annotations() { return mstch_base::annotations(service_); }
+
+  mstch::node parent() {
+    return cache_->parsed_options_["parent_service_name"];
   }
 
   mstch::node has_streams() {
@@ -1222,6 +1154,9 @@ class mstch_service : public mstch_base {
     });
   }
   mstch::node interactions() {
+    if (!service_->is_interaction()) {
+      cache_->parsed_options_["parent_service_name"] = service_->get_name();
+    }
     std::vector<t_service const*> interactions;
     for (auto const* function : service_->get_functions()) {
       if (function->get_returntype()->is_service()) {
@@ -1234,9 +1169,7 @@ class mstch_service : public mstch_base {
   mstch::node structured_annotations() {
     return mstch_base::structured_annotations(service_);
   }
-  mstch::node is_interaction() {
-    return service_->is_interaction();
-  }
+  mstch::node is_interaction() { return service_->is_interaction(); }
   mstch::node is_serial_interaction() {
     return service_->is_serial_interaction();
   }
@@ -1260,13 +1193,11 @@ class mstch_typedef : public mstch_base {
         {
             {"typedef:type", &mstch_typedef::type},
             {"typedef:is_same_type", &mstch_typedef::is_same_type},
-            {"typedef:symbolic", &mstch_typedef::symbolic},
+            {"typedef:name", &mstch_typedef::name},
         });
   }
   mstch::node type();
-  mstch::node symbolic() {
-    return typedf_->get_symbolic();
-  }
+  mstch::node name() { return typedf_->name(); }
   mstch::node is_same_type() {
     return typedf_->get_name() == typedf_->get_type()->get_name();
   }
@@ -1302,12 +1233,8 @@ class mstch_const : public mstch_base {
             {"constant:program", &mstch_const::program},
         });
   }
-  mstch::node name() {
-    return cnst_->get_name();
-  }
-  mstch::node index() {
-    return index_;
-  }
+  mstch::node name() { return cnst_->get_name(); }
+  mstch::node index() { return index_; }
   mstch::node type();
   mstch::node value();
   mstch::node program();
@@ -1351,36 +1278,23 @@ class mstch_program : public mstch_base {
     register_has_option("program:json?", "json");
     register_has_option("program:nimble?", "nimble");
     register_has_option("program:any?", "any");
+    register_has_option(
+        "program:unstructured_annotations_in_metadata?",
+        "deprecated_unstructured_annotations_in_metadata");
   }
 
-  virtual std::string get_program_namespace(t_program const*) {
-    return {};
-  }
+  virtual std::string get_program_namespace(t_program const*) { return {}; }
 
-  mstch::node name() {
-    return program_->name();
-  }
-  mstch::node path() {
-    return program_->path();
-  }
-  mstch::node include_prefix() {
-    return program_->include_prefix();
-  }
-  mstch::node has_enums() {
-    return !program_->enums().empty();
-  }
+  mstch::node name() { return program_->name(); }
+  mstch::node path() { return program_->path(); }
+  mstch::node include_prefix() { return program_->include_prefix(); }
+  mstch::node has_enums() { return !program_->enums().empty(); }
   mstch::node has_structs() {
     return !program_->structs().empty() || !program_->xceptions().empty();
   }
-  mstch::node has_services() {
-    return !program_->services().empty();
-  }
-  mstch::node has_typedefs() {
-    return !program_->typedefs().empty();
-  }
-  mstch::node has_constants() {
-    return !program_->consts().empty();
-  }
+  mstch::node has_services() { return !program_->services().empty(); }
+  mstch::node has_typedefs() { return !program_->typedefs().empty(); }
+  mstch::node has_constants() { return !program_->consts().empty(); }
   mstch::node has_unions() {
     auto& structs = program_->structs();
     return std::any_of(

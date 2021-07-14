@@ -14,60 +14,107 @@ std::unique_ptr<apache::thrift::AsyncProcessor> MyServiceSvIf::getProcessor() {
   return std::make_unique<MyServiceAsyncProcessor>(this);
 }
 
+MyServiceSvIf::CreateMethodMetadataResult MyServiceSvIf::createMethodMetadata() {
+  return ::apache::thrift::detail::ap::createMethodMetadataMap<MyServiceAsyncProcessor>();
+}
+
 
 void MyServiceSvIf::ping() {
   apache::thrift::detail::si::throw_app_exn_unimplemented("ping");
 }
 
 folly::SemiFuture<folly::Unit> MyServiceSvIf::semifuture_ping() {
-  return apache::thrift::detail::si::semifuture([&] {
-    return ping();
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_ping.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  ping();
+  return folly::makeSemiFuture();
 }
 
 folly::Future<folly::Unit> MyServiceSvIf::future_ping() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_ping(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_ping.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_ping(), getInternalKeepAlive());
 }
 
 #if FOLLY_HAS_COROUTINES
 folly::coro::Task<void> MyServiceSvIf::co_ping() {
+  auto expected{apache::thrift::detail::si::InvocationType::Coro};
+  __fbthrift_invocation_ping.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
   return folly::coro::toTask(future_ping());
 }
 
 folly::coro::Task<void> MyServiceSvIf::co_ping(apache::thrift::RequestParams /* params */) {
+  auto expected{apache::thrift::detail::si::InvocationType::CoroParam};
+  __fbthrift_invocation_ping.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Coro, std::memory_order_relaxed);
   return co_ping();
 }
 #endif // FOLLY_HAS_COROUTINES
 
 void MyServiceSvIf::async_tm_ping(std::unique_ptr<apache::thrift::HandlerCallback<void>> callback) {
-#if FOLLY_HAS_COROUTINES
   // It's possible the coroutine versions will delegate to a future-based
   // version. If that happens, we need the RequestParams arguments to be
-  // available to the future through the thread-local backchannel, so we have to
-  // set them up now. This is just a short-term shim; in the long run, we
-  // shouldn't generate the future, semifuture, and synchronous member functions
-  // for entry points that explicitly ask for coroutines.
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
   apache::thrift::detail::si::async_tm_prep(this, callback.get());
-  apache::thrift::RequestParams params{callback->getRequestContext(),
-    callback->getThreadManager(), callback->getEventBase()};
+  auto invocationType = __fbthrift_invocation_ping.load(std::memory_order_relaxed);
   try {
-    using Source = apache::thrift::concurrency::ThreadManager::Source;
-    auto scope = params.getRequestContext()->getRequestExecutionScope();
-    apache::thrift::detail::si::async_tm_coro_start(
-      co_ping(params),
-      params.getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL),
-      std::move(callback));
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+#if FOLLY_HAS_COROUTINES
+        __fbthrift_invocation_ping.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::CoroParam, std::memory_order_relaxed);
+        apache::thrift::RequestParams params{callback->getRequestContext(),
+          callback->getThreadManager(), callback->getEventBase()};
+        auto task = co_ping(params);
+        apache::thrift::detail::si::async_tm_coro(std::move(callback), std::move(task));
+        return;
+#else // FOLLY_HAS_COROUTINES
+        __fbthrift_invocation_ping.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+#endif // FOLLY_HAS_COROUTINES
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_ping();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_ping();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+#if FOLLY_HAS_COROUTINES
+      case apache::thrift::detail::si::InvocationType::CoroParam:
+      {
+        apache::thrift::RequestParams params{callback->getRequestContext(),
+          callback->getThreadManager(), callback->getEventBase()};
+        auto task = co_ping(params);
+        apache::thrift::detail::si::async_tm_coro(std::move(callback), std::move(task));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Coro:
+      {
+        auto task = co_ping();
+        apache::thrift::detail::si::async_tm_coro(std::move(callback), std::move(task));
+        return;
+      }
+#endif // FOLLY_HAS_COROUTINES
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        ping();
+        callback->done();
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
   } catch (...) {
     callback->exception(std::current_exception());
   }
-#else // FOLLY_HAS_COROUTINES
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_ping();
-  });
-#endif // FOLLY_HAS_COROUTINES
 }
 
 void MyServiceSvIf::getRandomData(::std::string& /*_return*/) {
@@ -75,20 +122,60 @@ void MyServiceSvIf::getRandomData(::std::string& /*_return*/) {
 }
 
 folly::SemiFuture<std::unique_ptr<::std::string>> MyServiceSvIf::semifuture_getRandomData() {
-  return apache::thrift::detail::si::semifuture_returning_uptr([&](::std::string& _return) { getRandomData(_return); });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_getRandomData.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  auto ret = std::make_unique<::std::string>();
+  getRandomData(*ret);
+  return folly::makeSemiFuture(std::move(ret));
 }
 
 folly::Future<std::unique_ptr<::std::string>> MyServiceSvIf::future_getRandomData() {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_getRandomData(), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_getRandomData.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_getRandomData(), getInternalKeepAlive());
 }
 
 void MyServiceSvIf::async_tm_getRandomData(std::unique_ptr<apache::thrift::HandlerCallback<std::unique_ptr<::std::string>>> callback) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_getRandomData();
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_getRandomData.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_getRandomData.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_getRandomData();
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_getRandomData();
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        ::std::string _return;
+        getRandomData(_return);
+        callback->result(_return);
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 bool MyServiceSvIf::hasDataById(::std::int64_t /*id*/) {
@@ -96,54 +183,95 @@ bool MyServiceSvIf::hasDataById(::std::int64_t /*id*/) {
 }
 
 folly::SemiFuture<bool> MyServiceSvIf::semifuture_hasDataById(::std::int64_t p_id) {
-  return apache::thrift::detail::si::semifuture([&] {
-    return hasDataById(p_id);
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_hasDataById.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  return hasDataById(p_id);
 }
 
 folly::Future<bool> MyServiceSvIf::future_hasDataById(::std::int64_t p_id) {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_hasDataById(p_id), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_hasDataById.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_hasDataById(p_id), getInternalKeepAlive());
 }
 
 #if FOLLY_HAS_COROUTINES
 folly::coro::Task<bool> MyServiceSvIf::co_hasDataById(::std::int64_t p_id) {
+  auto expected{apache::thrift::detail::si::InvocationType::Coro};
+  __fbthrift_invocation_hasDataById.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
   return folly::coro::toTask(future_hasDataById(p_id));
 }
 
 folly::coro::Task<bool> MyServiceSvIf::co_hasDataById(apache::thrift::RequestParams /* params */, ::std::int64_t p_id) {
+  auto expected{apache::thrift::detail::si::InvocationType::CoroParam};
+  __fbthrift_invocation_hasDataById.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Coro, std::memory_order_relaxed);
   return co_hasDataById(p_id);
 }
 #endif // FOLLY_HAS_COROUTINES
 
 void MyServiceSvIf::async_tm_hasDataById(std::unique_ptr<apache::thrift::HandlerCallback<bool>> callback, ::std::int64_t p_id) {
-#if FOLLY_HAS_COROUTINES
   // It's possible the coroutine versions will delegate to a future-based
   // version. If that happens, we need the RequestParams arguments to be
-  // available to the future through the thread-local backchannel, so we have to
-  // set them up now. This is just a short-term shim; in the long run, we
-  // shouldn't generate the future, semifuture, and synchronous member functions
-  // for entry points that explicitly ask for coroutines.
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
   apache::thrift::detail::si::async_tm_prep(this, callback.get());
-  apache::thrift::RequestParams params{callback->getRequestContext(),
-    callback->getThreadManager(), callback->getEventBase()};
+  auto invocationType = __fbthrift_invocation_hasDataById.load(std::memory_order_relaxed);
   try {
-    using Source = apache::thrift::concurrency::ThreadManager::Source;
-    auto scope = params.getRequestContext()->getRequestExecutionScope();
-    apache::thrift::detail::si::async_tm_coro_start(
-      co_hasDataById(params, p_id),
-      params.getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL),
-      std::move(callback));
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+#if FOLLY_HAS_COROUTINES
+        __fbthrift_invocation_hasDataById.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::CoroParam, std::memory_order_relaxed);
+        apache::thrift::RequestParams params{callback->getRequestContext(),
+          callback->getThreadManager(), callback->getEventBase()};
+        auto task = co_hasDataById(params, p_id);
+        apache::thrift::detail::si::async_tm_coro(std::move(callback), std::move(task));
+        return;
+#else // FOLLY_HAS_COROUTINES
+        __fbthrift_invocation_hasDataById.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+#endif // FOLLY_HAS_COROUTINES
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_hasDataById(p_id);
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_hasDataById(p_id);
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+#if FOLLY_HAS_COROUTINES
+      case apache::thrift::detail::si::InvocationType::CoroParam:
+      {
+        apache::thrift::RequestParams params{callback->getRequestContext(),
+          callback->getThreadManager(), callback->getEventBase()};
+        auto task = co_hasDataById(params, p_id);
+        apache::thrift::detail::si::async_tm_coro(std::move(callback), std::move(task));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Coro:
+      {
+        auto task = co_hasDataById(p_id);
+        apache::thrift::detail::si::async_tm_coro(std::move(callback), std::move(task));
+        return;
+      }
+#endif // FOLLY_HAS_COROUTINES
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        callback->result(hasDataById(p_id));
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
   } catch (...) {
     callback->exception(std::current_exception());
   }
-#else // FOLLY_HAS_COROUTINES
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_hasDataById(p_id);
-  });
-#endif // FOLLY_HAS_COROUTINES
 }
 
 void MyServiceSvIf::async_eb_getDataById(std::unique_ptr<apache::thrift::HandlerCallback<std::unique_ptr<::std::string>>> callback, ::std::int64_t /*id*/) {
@@ -155,22 +283,58 @@ void MyServiceSvIf::putDataById(::std::int64_t /*id*/, std::unique_ptr<::std::st
 }
 
 folly::SemiFuture<folly::Unit> MyServiceSvIf::semifuture_putDataById(::std::int64_t p_id, std::unique_ptr<::std::string> p_data) {
-  return apache::thrift::detail::si::semifuture([&] {
-    return putDataById(p_id, std::move(p_data));
-  });
+  auto expected{apache::thrift::detail::si::InvocationType::SemiFuture};
+  __fbthrift_invocation_putDataById.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::Sync, std::memory_order_relaxed);
+  putDataById(p_id, std::move(p_data));
+  return folly::makeSemiFuture();
 }
 
 folly::Future<folly::Unit> MyServiceSvIf::future_putDataById(::std::int64_t p_id, std::unique_ptr<::std::string> p_data) {
-  using Source = apache::thrift::concurrency::ThreadManager::Source;
-  auto scope = getRequestContext()->getRequestExecutionScope();
-  auto ka = getThreadManager()->getKeepAlive(std::move(scope), Source::INTERNAL);
-  return apache::thrift::detail::si::future(semifuture_putDataById(p_id, std::move(p_data)), std::move(ka));
+  auto expected{apache::thrift::detail::si::InvocationType::Future};
+  __fbthrift_invocation_putDataById.compare_exchange_strong(expected, apache::thrift::detail::si::InvocationType::SemiFuture, std::memory_order_relaxed);
+  return apache::thrift::detail::si::future(semifuture_putDataById(p_id, std::move(p_data)), getInternalKeepAlive());
 }
 
 void MyServiceSvIf::async_tm_putDataById(std::unique_ptr<apache::thrift::HandlerCallback<void>> callback, ::std::int64_t p_id, std::unique_ptr<::std::string> p_data) {
-  apache::thrift::detail::si::async_tm(this, std::move(callback), [&] {
-    return future_putDataById(p_id, std::move(p_data));
-  });
+  // It's possible the coroutine versions will delegate to a future-based
+  // version. If that happens, we need the RequestParams arguments to be
+  // available to the future through the thread-local backchannel, so we set that up
+  // for all cases.
+  apache::thrift::detail::si::async_tm_prep(this, callback.get());
+  auto invocationType = __fbthrift_invocation_putDataById.load(std::memory_order_relaxed);
+  try {
+    switch (invocationType) {
+      case apache::thrift::detail::si::InvocationType::AsyncTm:
+      {
+        __fbthrift_invocation_putDataById.compare_exchange_strong(invocationType, apache::thrift::detail::si::InvocationType::Future, std::memory_order_relaxed);
+        FOLLY_FALLTHROUGH;
+      }
+      case apache::thrift::detail::si::InvocationType::Future:
+      {
+        auto fut = future_putDataById(p_id, std::move(p_data));
+        apache::thrift::detail::si::async_tm_future(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::SemiFuture:
+      {
+        auto fut = semifuture_putDataById(p_id, std::move(p_data));
+        apache::thrift::detail::si::async_tm_semifuture(std::move(callback), std::move(fut));
+        return;
+      }
+      case apache::thrift::detail::si::InvocationType::Sync:
+      {
+        putDataById(p_id, std::move(p_data));
+        callback->done();
+        return;
+      }
+      default:
+      {
+        folly::assume_unreachable();
+      }
+    }
+  } catch (...) {
+    callback->exception(std::current_exception());
+  }
 }
 
 void MyServiceSvNull::ping() {
@@ -201,32 +365,20 @@ void MyServiceAsyncProcessor::processSerializedCompressedRequest(apache::thrift:
   apache::thrift::detail::ap::process(this, std::move(req), std::move(serializedRequest), protType, context, eb, tm);
 }
 
-std::shared_ptr<folly::RequestContext> MyServiceAsyncProcessor::getBaseContextForRequest() {
-  return iface_->getBaseContextForRequest();
+void MyServiceAsyncProcessor::processSerializedCompressedRequestWithMetadata(apache::thrift::ResponseChannelRequest::UniquePtr req, apache::thrift::SerializedCompressedRequest&& serializedRequest, const apache::thrift::AsyncProcessorFactory::MethodMetadata& methodMetadata, apache::thrift::protocol::PROTOCOL_TYPES protType, apache::thrift::Cpp2RequestContext* context, folly::EventBase* eb, apache::thrift::concurrency::ThreadManager* tm) {
+  apache::thrift::detail::ap::process(this, std::move(req), std::move(serializedRequest), methodMetadata, protType, context, eb, tm);
 }
 
-const MyServiceAsyncProcessor::ProcessMap& MyServiceAsyncProcessor::getBinaryProtocolProcessMap() {
-  return binaryProcessMap_;
+const MyServiceAsyncProcessor::ProcessMap& MyServiceAsyncProcessor::getOwnProcessMap() {
+  return kOwnProcessMap_;
 }
 
-const MyServiceAsyncProcessor::ProcessMap MyServiceAsyncProcessor::binaryProcessMap_ {
-  {"ping", &MyServiceAsyncProcessor::setUpAndProcess_ping<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"getRandomData", &MyServiceAsyncProcessor::setUpAndProcess_getRandomData<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"hasDataById", &MyServiceAsyncProcessor::setUpAndProcess_hasDataById<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"getDataById", &MyServiceAsyncProcessor::setUpAndProcess_getDataById<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-  {"putDataById", &MyServiceAsyncProcessor::setUpAndProcess_putDataById<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>},
-};
-
-const MyServiceAsyncProcessor::ProcessMap& MyServiceAsyncProcessor::getCompactProtocolProcessMap() {
-  return compactProcessMap_;
-}
-
-const MyServiceAsyncProcessor::ProcessMap MyServiceAsyncProcessor::compactProcessMap_ {
-  {"ping", &MyServiceAsyncProcessor::setUpAndProcess_ping<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"getRandomData", &MyServiceAsyncProcessor::setUpAndProcess_getRandomData<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"hasDataById", &MyServiceAsyncProcessor::setUpAndProcess_hasDataById<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"getDataById", &MyServiceAsyncProcessor::setUpAndProcess_getDataById<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
-  {"putDataById", &MyServiceAsyncProcessor::setUpAndProcess_putDataById<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>},
+const MyServiceAsyncProcessor::ProcessMap MyServiceAsyncProcessor::kOwnProcessMap_ {
+  {"ping", {&MyServiceAsyncProcessor::setUpAndProcess_ping<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &MyServiceAsyncProcessor::setUpAndProcess_ping<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"getRandomData", {&MyServiceAsyncProcessor::setUpAndProcess_getRandomData<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &MyServiceAsyncProcessor::setUpAndProcess_getRandomData<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"hasDataById", {&MyServiceAsyncProcessor::setUpAndProcess_hasDataById<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &MyServiceAsyncProcessor::setUpAndProcess_hasDataById<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"getDataById", {&MyServiceAsyncProcessor::setUpAndProcess_getDataById<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &MyServiceAsyncProcessor::setUpAndProcess_getDataById<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
+  {"putDataById", {&MyServiceAsyncProcessor::setUpAndProcess_putDataById<apache::thrift::CompactProtocolReader, apache::thrift::CompactProtocolWriter>, &MyServiceAsyncProcessor::setUpAndProcess_putDataById<apache::thrift::BinaryProtocolReader, apache::thrift::BinaryProtocolWriter>}},
 };
 
 } // cpp2

@@ -119,6 +119,13 @@ class MyUnion;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyDataItem final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -136,7 +143,8 @@ class MyDataItem final  {
 
  public:
 
-  MyDataItem() {}
+  MyDataItem() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyDataItem(apache::thrift::FragileConstructor);
@@ -150,24 +158,11 @@ class MyDataItem final  {
 
   MyDataItem& operator=(const MyDataItem&) = default;
   void __clear();
-  bool operator==(const MyDataItem& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyDataItem& __x, const MyDataItem& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyDataItem& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyDataItem& __x, const MyDataItem& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyDataItem& __x, const MyDataItem& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyDataItem& __x, const MyDataItem& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyDataItem&) const;
+  bool operator<(const MyDataItem&) const;
 
   template <class Protocol_>
   uint32_t read(Protocol_* iprot);
@@ -182,7 +177,7 @@ class MyDataItem final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyDataItem >;
+  friend class ::apache::thrift::Cpp2Ops<MyDataItem>;
   friend void swap(MyDataItem& a, MyDataItem& b);
 };
 
@@ -195,6 +190,13 @@ uint32_t MyDataItem::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -214,19 +216,19 @@ class MyStruct final  {
 
   MyStruct() :
       MyIntField(0),
-      myEnum( ::cpp2::MyEnum::MyValue1) {}
+      myEnum( ::cpp2::MyEnum::MyValue1) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::std::int64_t MyIntField__arg, ::std::string MyStringField__arg, ::cpp2::MyDataItem MyDataField__arg, ::cpp2::MyEnum myEnum__arg);
 
-  MyStruct(MyStruct&&) = default;
+  MyStruct(MyStruct&&) noexcept;
 
-  MyStruct(const MyStruct&) = default;
+  MyStruct(const MyStruct& src);
 
 
-  MyStruct& operator=(MyStruct&&) = default;
-
-  MyStruct& operator=(const MyStruct&) = default;
+  MyStruct& operator=(MyStruct&&) noexcept;
+  MyStruct& operator=(const MyStruct& src);
   void __clear();
  private:
   ::std::int64_t MyIntField;
@@ -237,7 +239,7 @@ class MyStruct final  {
  private:
   ::cpp2::MyEnum myEnum;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool MyIntField;
@@ -245,24 +247,11 @@ class MyStruct final  {
     bool MyDataField;
     bool myEnum;
   } __isset = {};
-  bool operator==(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStruct& __x, const MyStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStruct&) const;
+  bool operator<(const MyStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> MyIntField_ref() const& {
@@ -348,6 +337,7 @@ class MyStruct final  {
     return MyIntField;
   }
 
+  [[deprecated("Use `FOO.MyIntField_ref() = BAR;` instead of `FOO.set_MyIntField(BAR);`")]]
   ::std::int64_t& set_MyIntField(::std::int64_t MyIntField_) {
     MyIntField = MyIntField_;
     __isset.MyIntField = true;
@@ -363,6 +353,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_MyStringField_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.MyStringField_ref() = BAR;` instead of `FOO.set_MyStringField(BAR);`")]]
   ::std::string& set_MyStringField(T_MyStruct_MyStringField_struct_setter&& MyStringField_) {
     MyStringField = std::forward<T_MyStruct_MyStringField_struct_setter>(MyStringField_);
     __isset.MyStringField = true;
@@ -372,6 +363,7 @@ class MyStruct final  {
   ::cpp2::MyDataItem get_MyDataField() &&;
 
   template <typename T_MyStruct_MyDataField_struct_setter = ::cpp2::MyDataItem>
+  [[deprecated("Use `FOO.MyDataField_ref() = BAR;` instead of `FOO.set_MyDataField(BAR);`")]]
   ::cpp2::MyDataItem& set_MyDataField(T_MyStruct_MyDataField_struct_setter&& MyDataField_) {
     MyDataField = std::forward<T_MyStruct_MyDataField_struct_setter>(MyDataField_);
     __isset.MyDataField = true;
@@ -382,6 +374,7 @@ class MyStruct final  {
     return myEnum;
   }
 
+  [[deprecated("Use `FOO.myEnum_ref() = BAR;` instead of `FOO.set_myEnum(BAR);`")]]
   ::cpp2::MyEnum& set_myEnum(::cpp2::MyEnum myEnum_) {
     myEnum = myEnum_;
     __isset.myEnum = true;
@@ -401,7 +394,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 
@@ -414,6 +407,13 @@ uint32_t MyStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -440,7 +440,7 @@ class MyUnion final  {
   MyUnion()
       : type_(Type::__EMPTY__) {}
 
-  MyUnion(MyUnion&& rhs)
+  MyUnion(MyUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -497,7 +497,7 @@ class MyUnion final  {
     }
   }
 
-  MyUnion& operator=(MyUnion&& rhs) {
+  MyUnion& operator=(MyUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -568,24 +568,9 @@ class MyUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const MyUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyUnion& __x, const MyUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const MyUnion&) const;
+  bool operator<(const MyUnion&) const;
 
   ::cpp2::MyEnum& set_myEnum(::cpp2::MyEnum t = ::cpp2::MyEnum()) {
     __clear();
@@ -636,32 +621,38 @@ class MyUnion final  {
     return value_.myDataItem;
   }
 
-  ::cpp2::MyEnum const & get_myEnum() const {
-    assert(type_ == Type::myEnum);
+  ::cpp2::MyEnum const& get_myEnum() const {
+    if (type_ != Type::myEnum) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myEnum;
   }
 
-  ::cpp2::MyStruct const & get_myStruct() const {
-    assert(type_ == Type::myStruct);
+  ::cpp2::MyStruct const& get_myStruct() const {
+    if (type_ != Type::myStruct) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myStruct;
   }
 
-  ::cpp2::MyDataItem const & get_myDataItem() const {
-    assert(type_ == Type::myDataItem);
+  ::cpp2::MyDataItem const& get_myDataItem() const {
+    if (type_ != Type::myDataItem) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.myDataItem;
   }
 
-  ::cpp2::MyEnum & mutable_myEnum() {
+  ::cpp2::MyEnum& mutable_myEnum() {
     assert(type_ == Type::myEnum);
     return value_.myEnum;
   }
 
-  ::cpp2::MyStruct & mutable_myStruct() {
+  ::cpp2::MyStruct& mutable_myStruct() {
     assert(type_ == Type::myStruct);
     return value_.myStruct;
   }
 
-  ::cpp2::MyDataItem & mutable_myDataItem() {
+  ::cpp2::MyDataItem& mutable_myDataItem() {
     assert(type_ == Type::myDataItem);
     return value_.myDataItem;
   }
@@ -761,7 +752,7 @@ class MyUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyUnion >;
+  friend class ::apache::thrift::Cpp2Ops<MyUnion>;
   friend void swap(MyUnion& a, MyUnion& b);
 };
 

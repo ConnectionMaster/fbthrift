@@ -127,7 +127,7 @@ class t_concat_generator : public t_generator {
 
     // Qualify the name with the program name, if the type isn't from this
     // program.
-    const t_program* program = ttype->get_program();
+    const t_program* program = ttype->program();
     if (program != nullptr && program != program_) {
       full_name = program->name() + "." + full_name;
     }
@@ -167,49 +167,35 @@ class t_concat_generator : public t_generator {
   /**
    * Get current tmp variable counter value
    */
-  int get_tmp_counter() const {
-    return tmp_;
-  }
+  int get_tmp_counter() const { return tmp_; }
 
   /**
    * Set tmp variable counter value
    */
-  void set_tmp_counter(int tmp) {
-    tmp_ = tmp;
-  }
+  void set_tmp_counter(int tmp) { tmp_ = tmp; }
 
   /**
    * Get current indentation level.
    */
-  int get_indent() const {
-    return indent_;
-  }
+  int get_indent() const { return indent_; }
 
   /**
    * Indentation level modifiers
    */
 
-  void indent_up() {
-    ++indent_;
-  }
+  void indent_up() { ++indent_; }
 
-  void indent_down() {
-    --indent_;
-  }
+  void indent_down() { --indent_; }
 
   /**
    * Get number of spaces to use for each indentation level.
    */
-  virtual int get_indent_size() const {
-    return 2;
-  }
+  virtual int get_indent_size() const { return 2; }
 
   /**
    * Get line length.
    */
-  virtual int get_line_length() const {
-    return 80;
-  }
+  virtual int get_line_length() const { return 80; }
 
   /**
    * Indent by these many levels.
@@ -221,16 +207,12 @@ class t_concat_generator : public t_generator {
   /**
    * Indentation print function
    */
-  std::string indent() {
-    return indent(get_indent());
-  }
+  std::string indent() { return indent(get_indent()); }
 
   /**
    * Indentation utility wrapper
    */
-  std::ostream& indent(std::ostream& os) {
-    return os << indent();
-  }
+  std::ostream& indent(std::ostream& os) { return os << indent(); }
 
   /**
    * Capitalization helpers

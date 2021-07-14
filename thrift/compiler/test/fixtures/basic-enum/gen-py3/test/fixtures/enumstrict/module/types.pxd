@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -39,7 +39,7 @@ from thrift.py3.common cimport (
 )
 from folly.optional cimport cOptional as __cOptional
 
-cimport test.fixtures.enumstrict.module.types_fields as __fbthrift_types_fields
+cimport test.fixtures.enumstrict.module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -83,9 +83,6 @@ cdef extern from "src/gen-cpp2/module_metadata.h" namespace "apache::thrift::det
         @staticmethod
         void gen(__fbthrift_cThriftMetadata &metadata)
 cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::test::fixtures::enumstrict":
-    cdef cppclass cMyStruct__isset "::test::fixtures::enumstrict::MyStruct::__isset":
-        bint myEnum
-        bint myBigEnum
 
     cdef cppclass cMyStruct "::test::fixtures::enumstrict::MyStruct":
         cMyStruct() except +
@@ -100,14 +97,13 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::test
         __field_ref[cMyBigEnum] myBigEnum_ref()
         cMyEnum myEnum
         cMyBigEnum myBigEnum
-        cMyStruct__isset __isset
 
 
 
 
 cdef class MyStruct(thrift.py3.types.Struct):
     cdef shared_ptr[cMyStruct] _cpp_obj
-    cdef __fbthrift_types_fields.__MyStruct_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__MyStruct_FieldsSetter _fields_setter
     cdef object __fbthrift_cached_myEnum
     cdef object __fbthrift_cached_myBigEnum
 
@@ -115,6 +111,14 @@ cdef class MyStruct(thrift.py3.types.Struct):
     cdef create(shared_ptr[cMyStruct])
 
 
+cdef class Map__MyEnum_string(thrift.py3.types.Map):
+    cdef shared_ptr[cmap[cMyEnum,string]] _cpp_obj
+    @staticmethod
+    cdef create(shared_ptr[cmap[cMyEnum,string]])
+    @staticmethod
+    cdef shared_ptr[cmap[cMyEnum,string]] _make_instance(object items) except *
+
 
 cdef extern from "src/gen-cpp2/module_constants.h" namespace "::test::fixtures::enumstrict":
     cdef cMyEnum ckOne "::test::fixtures::enumstrict::module_constants::kOne"()
+    cdef cmap[cMyEnum,string] cenumNames "::test::fixtures::enumstrict::module_constants::enumNames"()

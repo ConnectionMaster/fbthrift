@@ -16,6 +16,8 @@
 
 %><%#struct:lazy_fields?%>
  private:
+  ::apache::thrift::ProtocolType __fbthrift_protocol_{};
+
   <%! Stores serialized data of each lazy field %>
   mutable struct __fbthrift_SerializedData {
 <%#struct:fields%><%#field:lazy?%>
@@ -30,15 +32,12 @@
 <%/field:lazy?%><%/struct:fields%>
   } __fbthrift_isDeserialized_;
 
-  mutable struct __fbthrift_DeserializationMutex {
-<%#struct:fields%><%#field:lazy?%>
-    std::mutex <%field:cpp_name%>;
-<%/field:lazy?%><%/struct:fields%>
-  } __fbthrift_deserializationMutex_;
+  mutable std::mutex __fbthrift_deserializationMutex_;
 
-<%#struct:fields%><%#field:lazy?%><%#field:type%>
-  const <% > types/ref_type%>& __fbthrift_read_field_<%field:cpp_name%>() const;
-  <% > types/ref_type%>& __fbthrift_read_field_<%field:cpp_name%>();
-<%/field:type%><%/field:lazy?%><%/struct:fields%>
+<%#struct:fields%><%#field:lazy?%>
+  const <%field:cpp_storage_type%>& __fbthrift_read_field_<%field:cpp_name%>() const;
+  <%field:cpp_storage_type%>& __fbthrift_read_field_<%field:cpp_name%>();
+  template<class ProtocolReader> void __fbthrift_read_field_<%field:cpp_name%>_impl() const;
+<%/field:lazy?%><%/struct:fields%>
 
 <%/struct:lazy_fields?%>

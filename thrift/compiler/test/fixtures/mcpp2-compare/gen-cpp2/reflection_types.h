@@ -39,6 +39,13 @@ class ReflectionStruct;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class ReflectionStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -57,7 +64,8 @@ class ReflectionStruct final  {
  public:
 
   ReflectionStruct() :
-      fieldA(5) {}
+      fieldA(5) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   ReflectionStruct(apache::thrift::FragileConstructor, ::std::int32_t fieldA__arg);
@@ -74,29 +82,16 @@ class ReflectionStruct final  {
  private:
   ::std::int32_t fieldA;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool fieldA;
   } __isset = {};
-  bool operator==(const ReflectionStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ReflectionStruct& __x, const ReflectionStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ReflectionStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ReflectionStruct& __x, const ReflectionStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ReflectionStruct& __x, const ReflectionStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ReflectionStruct& __x, const ReflectionStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ReflectionStruct&) const;
+  bool operator<(const ReflectionStruct&) const;
 
   template <typename..., typename T = ::std::int32_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> fieldA_ref() const& {
@@ -122,6 +117,7 @@ class ReflectionStruct final  {
     return fieldA;
   }
 
+  [[deprecated("Use `FOO.fieldA_ref() = BAR;` instead of `FOO.set_fieldA(BAR);`")]]
   ::std::int32_t& set_fieldA(::std::int32_t fieldA_) {
     fieldA = fieldA_;
     __isset.fieldA = true;
@@ -141,7 +137,7 @@ class ReflectionStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ReflectionStruct >;
+  friend class ::apache::thrift::Cpp2Ops<ReflectionStruct>;
   friend void swap(ReflectionStruct& a, ReflectionStruct& b);
 };
 

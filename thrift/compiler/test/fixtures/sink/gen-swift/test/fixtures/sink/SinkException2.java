@@ -22,7 +22,7 @@ import org.apache.thrift.meta_data.FieldValueMetaData;
 
 @SwiftGenerated
 @com.facebook.swift.codec.ThriftStruct("SinkException2")
-public final class SinkException2 extends java.lang.Exception {
+public final class SinkException2 extends java.lang.Exception implements com.facebook.thrift.payload.ThriftSerializable {
     private static final long serialVersionUID = 1L;
 
 
@@ -76,6 +76,10 @@ public final class SinkException2 extends java.lang.Exception {
     @com.facebook.swift.codec.ThriftField(value=1, name="reason", requiredness=Requiredness.NONE)
     public long getReason() { return reason; }
     
+    
+    public static com.facebook.thrift.payload.Reader<SinkException2> asReader() {
+      return SinkException2::read0;
+    }
     
     public static SinkException2 read0(TProtocol oprot) throws TException {
       TField __field;

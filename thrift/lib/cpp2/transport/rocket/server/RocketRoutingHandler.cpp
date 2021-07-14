@@ -54,14 +54,7 @@ REGISTER_SERVER_EXTENSION_DEFAULT(createRocketProfilingSetupFrameHandler)
 
 } // namespace
 
-RocketRoutingHandler::RocketRoutingHandler(ThriftServer& server)
-    : ingressMemoryLimitObserver_(
-          folly::observer::makeObserver([&server]() -> int64_t {
-            return **server.getIngressMemoryLimitObserver() /
-                server.getNumIOWorkerThreads();
-          })),
-      minPayloadSizeToEnforceIngressMemoryLimitObserver_(
-          server.getMinPayloadSizeToEnforceIngressMemoryLimitObserver()) {
+RocketRoutingHandler::RocketRoutingHandler(ThriftServer& server) {
   auto addSetupFramehandler = [&](auto&& handlerFactory) {
     if (auto handler = handlerFactory(server)) {
       setupFrameHandlers_.push_back(std::move(handler));
@@ -130,29 +123,27 @@ void RocketRoutingHandler::handleConnection(
     return;
   }
 
-  auto* const sockPtr = sock.get();
   auto* const server = worker->getServer();
-  auto memLimitParams =
-      rocket::RocketServerConnection::IngressMemoryLimitStateRef(
-          worker->getIngressMemoryUsageRef(),
-          ingressMemoryLimitObserver_,
-          minPayloadSizeToEnforceIngressMemoryLimitObserver_);
+
+  rocket::RocketServerConnection::Config cfg;
+  cfg.socketWriteTimeout = server->getSocketWriteTimeout();
+  cfg.streamStarvationTimeout = server->getStreamExpireTime();
+  cfg.writeBatchingInterval = server->getWriteBatchingInterval();
+  cfg.writeBatchingSize = server->getWriteBatchingSize();
+  cfg.egressBufferBackpressureThreshold =
+      server->getEgressBufferBackpressureThreshold();
+  cfg.egressBufferBackpressureRecoveryFactor =
+      server->getEgressBufferRecoveryFactor();
+
+  auto* const sockPtr = sock.get();
   auto* const connection = new rocket::RocketServerConnection(
       std::move(sock),
       std::make_unique<rocket::ThriftRocketServerHandler>(
           worker, *address, sockPtr, setupFrameHandlers_),
-      server->getStreamExpireTime(),
-      server->getWriteBatchingInterval(),
-      server->getWriteBatchingSize(),
-      std::move(memLimitParams));
+      worker->getIngressMemoryTracker(),
+      worker->getEgressMemoryTracker(),
+      cfg);
   onConnection(*connection);
-  // set negotiated compression algorithm on this connection
-  auto compression = static_cast<FizzPeeker*>(worker->getFizzPeeker())
-                         ->getNegotiatedParameters()
-                         .compression;
-  if (compression != CompressionAlgorithm::NONE) {
-    connection->setNegotiatedCompressionAlgorithm(compression);
-  }
   connectionManager->addConnection(connection);
 
   if (auto* observer = server->getObserver()) {

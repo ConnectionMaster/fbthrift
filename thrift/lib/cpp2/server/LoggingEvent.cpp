@@ -44,6 +44,11 @@ class DefaultLoggingEventRegistry : public LoggingEventRegistry {
     static auto* handler = new ApplicationEventHandler();
     return *handler;
   }
+  ServerTrackerHandler& getServerTrackerHandler(
+      std::string_view) const override {
+    static auto* handler = new ServerTrackerHandler();
+    return *handler;
+  }
 };
 
 THRIFT_PLUGGABLE_FUNC_REGISTER(
@@ -56,9 +61,7 @@ class Registry {
  public:
   Registry() : reg_(THRIFT_PLUGGABLE_FUNC(makeLoggingEventRegistry)()) {}
 
-  LoggingEventRegistry& getRegistry() const {
-    return *reg_.get();
-  }
+  LoggingEventRegistry& getRegistry() const { return *reg_.get(); }
 
  private:
   std::unique_ptr<LoggingEventRegistry> reg_;

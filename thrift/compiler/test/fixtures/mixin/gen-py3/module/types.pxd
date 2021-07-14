@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -39,7 +39,7 @@ from thrift.py3.common cimport (
 )
 from folly.optional cimport cOptional as __cOptional
 
-cimport module.types_fields as __fbthrift_types_fields
+cimport module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -57,8 +57,6 @@ cdef extern from "src/gen-cpp2/module_metadata.h" namespace "apache::thrift::det
         @staticmethod
         void gen(__fbthrift_cThriftMetadata &metadata)
 cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2":
-    cdef cppclass cMixin1__isset "::cpp2::Mixin1::__isset":
-        bint field1
 
     cdef cppclass cMixin1 "::cpp2::Mixin1":
         cMixin1() except +
@@ -71,11 +69,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         bint operator>=(cMixin1&)
         __field_ref[string] field1_ref()
         string field1
-        cMixin1__isset __isset
 
-    cdef cppclass cMixin2__isset "::cpp2::Mixin2::__isset":
-        bint m1
-        bint field2
 
     cdef cppclass cMixin2 "::cpp2::Mixin2":
         cMixin2() except +
@@ -91,10 +85,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         __field_ref[string] field1_ref()
         cMixin1 m1
         string field2
-        cMixin2__isset __isset
 
-    cdef cppclass cMixin3Base__isset "::cpp2::Mixin3Base::__isset":
-        bint field3
 
     cdef cppclass cMixin3Base "::cpp2::Mixin3Base":
         cMixin3Base() except +
@@ -107,12 +98,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         bint operator>=(cMixin3Base&)
         __field_ref[string] field3_ref()
         string field3
-        cMixin3Base__isset __isset
 
-    cdef cppclass cFoo__isset "::cpp2::Foo::__isset":
-        bint field4
-        bint m2
-        bint m3
 
     cdef cppclass cFoo "::cpp2::Foo":
         cFoo() except +
@@ -133,14 +119,13 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         string field4
         cMixin2 m2
         cMixin3Base m3
-        cFoo__isset __isset
 
 
 
 
 cdef class Mixin1(thrift.py3.types.Struct):
     cdef shared_ptr[cMixin1] _cpp_obj
-    cdef __fbthrift_types_fields.__Mixin1_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Mixin1_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cMixin1])
@@ -149,7 +134,7 @@ cdef class Mixin1(thrift.py3.types.Struct):
 
 cdef class Mixin2(thrift.py3.types.Struct):
     cdef shared_ptr[cMixin2] _cpp_obj
-    cdef __fbthrift_types_fields.__Mixin2_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Mixin2_FieldsSetter _fields_setter
     cdef Mixin1 __fbthrift_cached_m1
 
     @staticmethod
@@ -159,7 +144,7 @@ cdef class Mixin2(thrift.py3.types.Struct):
 
 cdef class Mixin3Base(thrift.py3.types.Struct):
     cdef shared_ptr[cMixin3Base] _cpp_obj
-    cdef __fbthrift_types_fields.__Mixin3Base_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Mixin3Base_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cMixin3Base])
@@ -168,7 +153,7 @@ cdef class Mixin3Base(thrift.py3.types.Struct):
 
 cdef class Foo(thrift.py3.types.Struct):
     cdef shared_ptr[cFoo] _cpp_obj
-    cdef __fbthrift_types_fields.__Foo_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Foo_FieldsSetter _fields_setter
     cdef Mixin2 __fbthrift_cached_m2
     cdef Mixin3Base __fbthrift_cached_m3
 

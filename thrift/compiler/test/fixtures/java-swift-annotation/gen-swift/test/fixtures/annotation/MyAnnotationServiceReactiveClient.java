@@ -7,7 +7,16 @@
 
 package test.fixtures.annotation;
 
+import static com.facebook.swift.service.SwiftConstants.STICKY_HASH_KEY;
+
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import org.apache.thrift.protocol.*;
-import com.facebook.swift.transport.client.ResponseWrapper;
+import org.apache.thrift.ClientPushMetadata;
+import org.apache.thrift.InteractionCreate;
+import org.apache.thrift.InteractionTerminate;
+import com.facebook.thrift.client.ResponseWrapper;
+import com.facebook.thrift.client.RpcOptions;
+
 // Generation of this class is disabled using (java.swift.disable_reactive)

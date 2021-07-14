@@ -21,6 +21,8 @@ struct Nat {
   2: optional Nat next (cpp2.ref = "true");
 }
 
+typedef Nat NatTypedef
+
 struct Map {
   1: map<i64, string> value;
 }
@@ -31,11 +33,14 @@ struct Country {
   10: double population;
 }
 
-@Nat {data = "struct"}
+@Nat{data = "struct"}
 struct City {
-  @Map {value = {0: "0", 1: "1"}}
+  @Map{value = {0: "0", 1: "1"}}
   1: string name;
-  @Nat {data = "2", next = Nat {data = "1", next = Nat {data = "0"}}}
+  @NatTypedef{
+    data = "2",
+    next = NatTypedef{data = "1", next = NatTypedef{data = "0"}},
+  }
   2: string country;
   3: double population;
 }

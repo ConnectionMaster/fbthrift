@@ -7,6 +7,7 @@
 
 package test.fixtures.basic;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class DbMixedStackArgumentsAsyncReactiveWrapper 
@@ -19,18 +20,18 @@ public class DbMixedStackArgumentsAsyncReactiveWrapper
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<byte[]> getDataByKey0(final String key) {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.getDataByKey0(key));
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.getDataByKey0(key));
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<byte[]> getDataByKey1(final String key) {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.getDataByKey1(key));
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.getDataByKey1(key));
     }
 
 }

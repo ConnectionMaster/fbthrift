@@ -60,6 +60,8 @@ class ThriftServerRequestResponse final : public ThriftRequestCore {
       RocketServerFrameContext&& context,
       int32_t version);
 
+  bool includeEnvelope() const override { return true; }
+
   void sendThriftResponse(
       ResponseRpcMetadata&&,
       std::unique_ptr<folly::IOBuf>,
@@ -69,13 +71,14 @@ class ThriftServerRequestResponse final : public ThriftRequestCore {
       ResponseRpcMetadata&& metadata,
       std::unique_ptr<folly::IOBuf> exbuf) noexcept override;
 
-  folly::EventBase* getEventBase() noexcept override {
-    return &evb_;
-  }
+  void sendThriftException(
+      ResponseRpcMetadata&& metadata,
+      std::unique_ptr<folly::IOBuf> data,
+      apache::thrift::MessageChannel::SendCallbackPtr) noexcept override;
 
-  bool isStream() const override {
-    return false;
-  }
+  folly::EventBase* getEventBase() noexcept override { return &evb_; }
+
+  bool isStream() const override { return false; }
 
   void closeConnection(folly::exception_wrapper ew) noexcept override;
 
@@ -103,6 +106,8 @@ class ThriftServerRequestFnf final : public ThriftRequestCore {
 
   ~ThriftServerRequestFnf() override;
 
+  bool includeEnvelope() const override { return true; }
+
   void sendThriftResponse(
       ResponseRpcMetadata&&,
       std::unique_ptr<folly::IOBuf>,
@@ -112,9 +117,12 @@ class ThriftServerRequestFnf final : public ThriftRequestCore {
       ResponseRpcMetadata&& metadata,
       std::unique_ptr<folly::IOBuf> exbuf) noexcept override;
 
-  folly::EventBase* getEventBase() noexcept override {
-    return &evb_;
-  }
+  void sendThriftException(
+      ResponseRpcMetadata&& metadata,
+      std::unique_ptr<folly::IOBuf> data,
+      apache::thrift::MessageChannel::SendCallbackPtr) noexcept override;
+
+  folly::EventBase* getEventBase() noexcept override { return &evb_; }
 
   void closeConnection(folly::exception_wrapper ew) noexcept override;
 
@@ -142,6 +150,8 @@ class ThriftServerRequestStream final : public ThriftRequestCore {
       RocketStreamClientCallback* clientCallback,
       std::shared_ptr<AsyncProcessor> cpp2Processor);
 
+  bool includeEnvelope() const override { return true; }
+
   void sendThriftResponse(
       ResponseRpcMetadata&&,
       std::unique_ptr<folly::IOBuf>,
@@ -153,6 +163,11 @@ class ThriftServerRequestStream final : public ThriftRequestCore {
       ResponseRpcMetadata&& metadata,
       std::unique_ptr<folly::IOBuf> exbuf) noexcept override;
 
+  void sendThriftException(
+      ResponseRpcMetadata&& metadata,
+      std::unique_ptr<folly::IOBuf> data,
+      apache::thrift::MessageChannel::SendCallbackPtr) noexcept override;
+
   bool sendStreamThriftResponse(
       ResponseRpcMetadata&&,
       std::unique_ptr<folly::IOBuf>,
@@ -163,13 +178,9 @@ class ThriftServerRequestStream final : public ThriftRequestCore {
       std::unique_ptr<folly::IOBuf>,
       ::apache::thrift::detail::ServerStreamFactory&&) noexcept override;
 
-  folly::EventBase* getEventBase() noexcept override {
-    return &evb_;
-  }
+  folly::EventBase* getEventBase() noexcept override { return &evb_; }
 
-  bool isStream() const override {
-    return true;
-  }
+  bool isStream() const override { return true; }
 
   void closeConnection(folly::exception_wrapper ew) noexcept override;
 
@@ -200,9 +211,16 @@ class ThriftServerRequestSink final : public ThriftRequestCore {
       RocketSinkClientCallback* clientCallback,
       std::shared_ptr<AsyncProcessor> cpp2Processor);
 
+  bool includeEnvelope() const override { return true; }
+
   void sendThriftResponse(
       ResponseRpcMetadata&&,
       std::unique_ptr<folly::IOBuf>,
+      apache::thrift::MessageChannel::SendCallbackPtr) noexcept override;
+
+  void sendThriftException(
+      ResponseRpcMetadata&& metadata,
+      std::unique_ptr<folly::IOBuf> data,
       apache::thrift::MessageChannel::SendCallbackPtr) noexcept override;
 
   void sendSerializedError(
@@ -214,19 +232,18 @@ class ThriftServerRequestSink final : public ThriftRequestCore {
       ResponseRpcMetadata&&,
       std::unique_ptr<folly::IOBuf>,
       apache::thrift::detail::SinkConsumerImpl&&) noexcept override;
+
+  bool sendSinkThriftResponse(
+      ResponseRpcMetadata&&,
+      std::unique_ptr<folly::IOBuf>,
+      SinkServerCallbackPtr) noexcept override;
 #endif
 
-  folly::EventBase* getEventBase() noexcept override {
-    return &evb_;
-  }
+  folly::EventBase* getEventBase() noexcept override { return &evb_; }
 
-  bool isSink() const override {
-    return true;
-  }
+  bool isSink() const override { return true; }
 
-  bool isReplyChecksumNeeded() const override {
-    return true;
-  }
+  bool isReplyChecksumNeeded() const override { return true; }
 
   void closeConnection(folly::exception_wrapper ew) noexcept override;
 

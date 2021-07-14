@@ -22,7 +22,7 @@ import org.apache.thrift.meta_data.FieldValueMetaData;
 
 @SwiftGenerated
 @com.facebook.swift.codec.ThriftStruct("Fiery")
-public final class Fiery extends java.lang.RuntimeException {
+public final class Fiery extends java.lang.RuntimeException implements com.facebook.thrift.payload.ThriftSerializable {
     private static final long serialVersionUID = 1L;
 
 
@@ -76,6 +76,10 @@ public final class Fiery extends java.lang.RuntimeException {
     @com.facebook.swift.codec.ThriftField(value=1, name="message", requiredness=Requiredness.REQUIRED)
     public String getMessage() { return message; }
     
+    
+    public static com.facebook.thrift.payload.Reader<Fiery> asReader() {
+      return Fiery::read0;
+    }
     
     public static Fiery read0(TProtocol oprot) throws TException {
       TField __field;

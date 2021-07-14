@@ -22,7 +22,7 @@ import org.apache.thrift.meta_data.FieldValueMetaData;
 
 @SwiftGenerated
 @com.facebook.swift.codec.ThriftStruct("complexException")
-public final class ComplexException extends java.lang.Exception {
+public final class ComplexException extends java.lang.Exception implements com.facebook.thrift.payload.ThriftSerializable {
     private static final long serialVersionUID = 1L;
 
 
@@ -176,6 +176,10 @@ public final class ComplexException extends java.lang.Exception {
     @com.facebook.swift.codec.ThriftField(value=6, name="lsMap", requiredness=Requiredness.NONE)
     public it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap<String> getLsMap() { return lsMap; }
     
+    
+    public static com.facebook.thrift.payload.Reader<ComplexException> asReader() {
+      return ComplexException::read0;
+    }
     
     public static ComplexException read0(TProtocol oprot) throws TException {
       TField __field;

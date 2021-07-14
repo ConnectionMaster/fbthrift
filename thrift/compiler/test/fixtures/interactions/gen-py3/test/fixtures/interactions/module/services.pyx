@@ -6,6 +6,7 @@
 #
 
 cimport cython
+from typing import AsyncIterator
 from cpython.version cimport PY_VERSION_HEX
 from libc.stdint cimport (
     int8_t as cint8_t,
@@ -21,6 +22,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap
 from libcpp.utility cimport move as cmove
+from libcpp.pair cimport pair
 from cython.operator cimport dereference as deref
 from cpython.ref cimport PyObject
 from thrift.py3.exceptions cimport (
@@ -47,11 +49,13 @@ if PY_VERSION_HEX >= 0x030702F0:  # 3.7.2 Final
 
 cimport folly.futures
 from folly.executor cimport get_executor
-cimport folly.iobuf as __iobuf
-import folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
+import folly.iobuf as _fbthrift_iobuf
 from folly.iobuf cimport move as move_iobuf
 from folly.memory cimport to_shared_ptr as __to_shared_ptr
 
+from thrift.py3.std_libcpp cimport optional
+from thrift.py3.stream cimport cServerStream, cServerStreamPublisher, cResponseAndServerStream, createResponseAndServerStream, createAsyncIteratorFromPyIterator, pythonFuncToCppFunc, ServerStream, ServerPublisher
 cimport test.fixtures.interactions.module.types as _test_fixtures_interactions_module_types
 import test.fixtures.interactions.module.types as _test_fixtures_interactions_module_types
 
@@ -64,8 +68,63 @@ import traceback
 import types as _py_types
 
 from test.fixtures.interactions.module.services_wrapper cimport cMyServiceInterface
+cdef class ServerPublisher_cbool(ServerPublisher):
+    cdef unique_ptr[cServerStreamPublisher[cbool]] cPublisher
+
+    def complete(ServerPublisher self):
+        cmove(deref(self.cPublisher)).complete()
+
+    # Calling this send instead of the wrapped method name of next because next is
+    # a python keyword and makes the linter complain
+    def send(ServerPublisher self, pbool item):
+        deref(self.cPublisher).next(<cbool?>item)
+
+    @staticmethod
+    cdef create(cServerStreamPublisher[cbool] cPublisher):
+        cdef ServerPublisher_cbool inst = ServerPublisher_cbool.__new__(ServerPublisher_cbool)
+        inst.cPublisher = make_unique[cServerStreamPublisher[cbool]](cmove(cPublisher))
+        return inst
+
+cdef class ServerStream_cbool(ServerStream):
+    cdef unique_ptr[cServerStream[cbool]] cStream
+
+    @staticmethod
+    cdef create(cServerStream[cbool] cStream):
+        cdef ServerStream_cbool inst = ServerStream_cbool.__new__(ServerStream_cbool)
+        inst.cStream = make_unique[cServerStream[cbool]](cmove(cStream))
+        return inst
 
 
+
+@cython.auto_pickle(False)
+cdef class Promise_:
+    cdef cFollyPromise[] cPromise
+
+    @staticmethod
+    cdef create(cFollyPromise[] cPromise):
+        cdef Promise_ inst = Promise_.__new__(Promise_)
+        inst.cPromise = cmove(cPromise)
+        return inst
+
+@cython.auto_pickle(False)
+cdef class Promise_cServerStream__cbool:
+    cdef cFollyPromise[cServerStream[cbool]] cPromise
+
+    @staticmethod
+    cdef create(cFollyPromise[cServerStream[cbool]] cPromise):
+        cdef Promise_cServerStream__cbool inst = Promise_cServerStream__cbool.__new__(Promise_cServerStream__cbool)
+        inst.cPromise = cmove(cPromise)
+        return inst
+
+@cython.auto_pickle(False)
+cdef class Promise_cint32_t:
+    cdef cFollyPromise[cint32_t] cPromise
+
+    @staticmethod
+    cdef create(cFollyPromise[cint32_t] cPromise):
+        cdef Promise_cint32_t inst = Promise_cint32_t.__new__(Promise_cint32_t)
+        inst.cPromise = cmove(cPromise)
+        return inst
 
 @cython.auto_pickle(False)
 cdef class Promise_cFollyUnit:
@@ -74,6 +133,16 @@ cdef class Promise_cFollyUnit:
     @staticmethod
     cdef create(cFollyPromise[cFollyUnit] cPromise):
         cdef Promise_cFollyUnit inst = Promise_cFollyUnit.__new__(Promise_cFollyUnit)
+        inst.cPromise = cmove(cPromise)
+        return inst
+
+@cython.auto_pickle(False)
+cdef class Promise_cbool_Stream:
+    cdef cFollyPromise[optional[cbool]] cPromise
+
+    @staticmethod
+    cdef create(cFollyPromise[optional[cbool]] cPromise):
+        cdef Promise_cbool_Stream inst = Promise_cbool_Stream.__new__(Promise_cbool_Stream)
         inst.cPromise = cmove(cPromise)
         return inst
 

@@ -10,7 +10,7 @@ package test.fixtures.sink;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.codec.ThriftField.Requiredness;
 import com.facebook.swift.service.*;
-import com.facebook.swift.transport.client.*;
+import com.facebook.thrift.client.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.util.*;
@@ -26,9 +26,7 @@ public interface SinkService extends java.io.Closeable {
     @java.lang.Override void close();
 
     @com.facebook.swift.service.ThriftService("SinkService")
-    interface Reactive extends Closeable {
-        @java.lang.Override void close();
-
+    interface Reactive extends reactor.core.Disposable {
         reactor.core.publisher.Mono<test.fixtures.sink.FinalResponse> method( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads);
 
         default reactor.core.publisher.Mono<test.fixtures.sink.FinalResponse> method( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads, RpcOptions rpcOptions) {
@@ -39,13 +37,13 @@ public interface SinkService extends java.io.Closeable {
             throw new UnsupportedOperationException();
         }
 
-        reactor.core.publisher.Flux<com.facebook.swift.transport.model.StreamResponse<test.fixtures.sink.InitialResponse,test.fixtures.sink.FinalResponse>> methodAndReponse( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads);
+        reactor.core.publisher.Flux<com.facebook.thrift.model.StreamResponse<test.fixtures.sink.InitialResponse,test.fixtures.sink.FinalResponse>> methodAndReponse( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads);
 
-        default reactor.core.publisher.Flux<com.facebook.swift.transport.model.StreamResponse<test.fixtures.sink.InitialResponse,test.fixtures.sink.FinalResponse>> methodAndReponse( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads, RpcOptions rpcOptions) {
+        default reactor.core.publisher.Flux<com.facebook.thrift.model.StreamResponse<test.fixtures.sink.InitialResponse,test.fixtures.sink.FinalResponse>> methodAndReponse( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads, RpcOptions rpcOptions) {
             throw new UnsupportedOperationException();
         }
 
-        default reactor.core.publisher.Flux<ResponseWrapper<com.facebook.swift.transport.model.StreamResponse<test.fixtures.sink.InitialResponse,test.fixtures.sink.FinalResponse>>> methodAndReponseWrapper( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads, RpcOptions rpcOptions) {
+        default reactor.core.publisher.Flux<ResponseWrapper<com.facebook.thrift.model.StreamResponse<test.fixtures.sink.InitialResponse,test.fixtures.sink.FinalResponse>>> methodAndReponseWrapper( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads, RpcOptions rpcOptions) {
             throw new UnsupportedOperationException();
         }
 

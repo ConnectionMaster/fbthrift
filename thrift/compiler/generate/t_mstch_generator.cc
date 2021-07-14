@@ -23,9 +23,10 @@
 #include <stdexcept>
 #include <string>
 
-#include <thrift/compiler/mustache/mstch.h>
+#include <thrift/compiler/detail/mustache/mstch.h>
 
 #include <thrift/compiler/common.h>
+#include <thrift/compiler/filesystem.h>
 #include <thrift/compiler/generate/t_generator.h>
 #include <thrift/compiler/generate/templates.h>
 
@@ -40,8 +41,7 @@ namespace compiler {
 namespace {
 
 fs::path from_components(
-    fs::path::const_iterator begin,
-    fs::path::const_iterator end) {
+    fs::path::const_iterator begin, fs::path::const_iterator end) {
   fs::path tmp;
   while (begin != end) {
     tmp /= *begin++;
@@ -220,7 +220,7 @@ mstch::map t_mstch_generator::dump(const t_enum_value& val) {
 }
 
 mstch::map t_mstch_generator::dump(const t_service& service) {
-  t_service* extends = service.get_extends();
+  const t_service* extends = service.get_extends();
   mstch::map result{
       {"name", service.get_name()},
       {"annotations", dump_elems(service.annotations())},
@@ -238,7 +238,7 @@ mstch::map t_mstch_generator::dump(const t_service& service) {
 mstch::map t_mstch_generator::dump(const t_function& function) {
   mstch::map result{
       {"name", function.get_name()},
-      {"oneway?", function.is_oneway()},
+      {"oneway?", function.qualifier() == t_function_qualifier::one_way},
       {"return_type", dump(*function.get_returntype())},
       {"exceptions", dump_elems(function.get_xceptions()->fields())},
       {"exceptions?", function.get_xceptions()->has_fields()},
@@ -351,7 +351,7 @@ mstch::map t_mstch_generator::dump(const annotation& pair) {
 mstch::map t_mstch_generator::dump(const t_typedef& typdef) {
   mstch::map result{
       {"type", dump(*typdef.get_type())},
-      {"symbolic", typdef.get_symbolic()},
+      {"name", typdef.name()},
   };
 
   mstch::map extension = extend_typedef(typdef);
@@ -464,11 +464,16 @@ const std::string& t_mstch_generator::get_template(
 }
 
 void t_mstch_generator::write_output(
-    const boost::filesystem::path& path,
-    const std::string& data) {
-  auto abs_path = boost::filesystem::path{get_out_dir()} / path;
+    const boost::filesystem::path& path, const std::string& data) {
+  auto base_path = boost::filesystem::path{get_out_dir()};
+  auto abs_path = make_abs_path(base_path, path);
   boost::filesystem::create_directories(abs_path.parent_path());
   std::ofstream ofs{abs_path.string()};
+  if (!ofs) {
+    std::ostringstream err;
+    err << "Couldn't open \"" << abs_path.string() << "\" for writing.";
+    throw std::runtime_error{err.str()};
+  }
   ofs << data;
   if (!is_last_char(data, '\n')) {
     // Terminate with newline.
@@ -490,8 +495,7 @@ std::string t_mstch_generator::get_option(const std::string& option) {
 }
 
 mstch::map t_mstch_generator::prepend_prefix(
-    const std::string& prefix,
-    mstch::map map) {
+    const std::string& prefix, mstch::map map) {
   mstch::map res;
   for (auto& pair : map) {
     res.emplace(prefix + ":" + pair.first, std::move(pair.second));
@@ -500,8 +504,7 @@ mstch::map t_mstch_generator::prepend_prefix(
 }
 
 std::string t_mstch_generator::render(
-    const std::string& template_name,
-    const mstch::node& context) {
+    const std::string& template_name, const mstch::node& context) {
   return mstch::render(
       get_template(template_name), context, get_template_map());
 }

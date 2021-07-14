@@ -130,6 +130,13 @@ class SecretStruct;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStructNestedAnnotation final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -147,46 +154,33 @@ class MyStructNestedAnnotation final  {
 
  public:
 
-  MyStructNestedAnnotation() {}
+  MyStructNestedAnnotation() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStructNestedAnnotation(apache::thrift::FragileConstructor, ::std::string name__arg);
 
-  MyStructNestedAnnotation(MyStructNestedAnnotation&&) = default;
+  MyStructNestedAnnotation(MyStructNestedAnnotation&&) noexcept;
 
-  MyStructNestedAnnotation(const MyStructNestedAnnotation&) = default;
+  MyStructNestedAnnotation(const MyStructNestedAnnotation& src);
 
 
-  MyStructNestedAnnotation& operator=(MyStructNestedAnnotation&&) = default;
-
-  MyStructNestedAnnotation& operator=(const MyStructNestedAnnotation&) = default;
+  MyStructNestedAnnotation& operator=(MyStructNestedAnnotation&&) noexcept;
+  MyStructNestedAnnotation& operator=(const MyStructNestedAnnotation& src);
   void __clear();
  private:
   ::std::string name;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool name;
   } __isset = {};
-  bool operator==(const MyStructNestedAnnotation& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStructNestedAnnotation& __x, const MyStructNestedAnnotation& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStructNestedAnnotation& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStructNestedAnnotation& __x, const MyStructNestedAnnotation& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStructNestedAnnotation& __x, const MyStructNestedAnnotation& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStructNestedAnnotation& __x, const MyStructNestedAnnotation& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStructNestedAnnotation&) const;
+  bool operator<(const MyStructNestedAnnotation&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> name_ref() const& {
@@ -217,6 +211,7 @@ class MyStructNestedAnnotation final  {
   }
 
   template <typename T_MyStructNestedAnnotation_name_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.name_ref() = BAR;` instead of `FOO.set_name(BAR);`")]]
   ::std::string& set_name(T_MyStructNestedAnnotation_name_struct_setter&& name_) {
     name = std::forward<T_MyStructNestedAnnotation_name_struct_setter>(name_);
     __isset.name = true;
@@ -236,7 +231,7 @@ class MyStructNestedAnnotation final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStructNestedAnnotation >;
+  friend class ::apache::thrift::Cpp2Ops<MyStructNestedAnnotation>;
   friend void swap(MyStructNestedAnnotation& a, MyStructNestedAnnotation& b);
 };
 
@@ -249,6 +244,13 @@ uint32_t MyStructNestedAnnotation::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -278,14 +280,13 @@ class MyStruct final  {
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::std::int64_t majorVer__arg, ::std::string package__arg, ::std::string annotation_with_quote__arg, ::std::string class___arg, ::std::string annotation_with_trailing_comma__arg, ::std::string empty_annotations__arg);
 
-  MyStruct(MyStruct&&) = default;
+  MyStruct(MyStruct&&) noexcept;
 
-  MyStruct(const MyStruct&) = default;
+  MyStruct(const MyStruct& src);
 
 
-  MyStruct& operator=(MyStruct&&) = default;
-
-  MyStruct& operator=(const MyStruct&) = default;
+  MyStruct& operator=(MyStruct&&) noexcept;
+  MyStruct& operator=(const MyStruct& src);
   void __clear();
 
   ~MyStruct();
@@ -303,7 +304,7 @@ class MyStruct final  {
  private:
   ::std::string empty_annotations;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool majorVer;
@@ -313,24 +314,11 @@ class MyStruct final  {
     bool annotation_with_trailing_comma;
     bool empty_annotations;
   } __isset = {};
-  bool operator==(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStruct& __x, const MyStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStruct&) const;
+  bool operator<(const MyStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> majorVer_ref() const& {
@@ -456,6 +444,7 @@ class MyStruct final  {
     return majorVer;
   }
 
+  [[deprecated("Use `FOO.majorVer_ref() = BAR;` instead of `FOO.set_majorVer(BAR);`")]]
   ::std::int64_t& set_majorVer(::std::int64_t majorVer_) {
     majorVer = majorVer_;
     __isset.majorVer = true;
@@ -471,6 +460,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_package_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.package_ref() = BAR;` instead of `FOO.set_package(BAR);`")]]
   ::std::string& set_package(T_MyStruct_package_struct_setter&& package_) {
     package = std::forward<T_MyStruct_package_struct_setter>(package_);
     __isset.package = true;
@@ -486,6 +476,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_annotation_with_quote_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.annotation_with_quote_ref() = BAR;` instead of `FOO.set_annotation_with_quote(BAR);`")]]
   ::std::string& set_annotation_with_quote(T_MyStruct_annotation_with_quote_struct_setter&& annotation_with_quote_) {
     annotation_with_quote = std::forward<T_MyStruct_annotation_with_quote_struct_setter>(annotation_with_quote_);
     __isset.annotation_with_quote = true;
@@ -501,6 +492,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_class__struct_setter = ::std::string>
+  [[deprecated("Use `FOO.class__ref() = BAR;` instead of `FOO.set_class_(BAR);`")]]
   ::std::string& set_class_(T_MyStruct_class__struct_setter&& class__) {
     class_ = std::forward<T_MyStruct_class__struct_setter>(class__);
     __isset.class_ = true;
@@ -516,6 +508,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_annotation_with_trailing_comma_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.annotation_with_trailing_comma_ref() = BAR;` instead of `FOO.set_annotation_with_trailing_comma(BAR);`")]]
   ::std::string& set_annotation_with_trailing_comma(T_MyStruct_annotation_with_trailing_comma_struct_setter&& annotation_with_trailing_comma_) {
     annotation_with_trailing_comma = std::forward<T_MyStruct_annotation_with_trailing_comma_struct_setter>(annotation_with_trailing_comma_);
     __isset.annotation_with_trailing_comma = true;
@@ -531,6 +524,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_empty_annotations_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.empty_annotations_ref() = BAR;` instead of `FOO.set_empty_annotations(BAR);`")]]
   ::std::string& set_empty_annotations(T_MyStruct_empty_annotations_struct_setter&& empty_annotations_) {
     empty_annotations = std::forward<T_MyStruct_empty_annotations_struct_setter>(empty_annotations_);
     __isset.empty_annotations = true;
@@ -550,7 +544,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 
@@ -563,6 +557,13 @@ uint32_t MyStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class SecretStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -581,49 +582,36 @@ class SecretStruct final  {
  public:
 
   SecretStruct() :
-      id(0) {}
+      id(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   SecretStruct(apache::thrift::FragileConstructor, ::std::int64_t id__arg, ::std::string password__arg);
 
-  SecretStruct(SecretStruct&&) = default;
+  SecretStruct(SecretStruct&&) noexcept;
 
-  SecretStruct(const SecretStruct&) = default;
+  SecretStruct(const SecretStruct& src);
 
 
-  SecretStruct& operator=(SecretStruct&&) = default;
-
-  SecretStruct& operator=(const SecretStruct&) = default;
+  SecretStruct& operator=(SecretStruct&&) noexcept;
+  SecretStruct& operator=(const SecretStruct& src);
   void __clear();
  private:
   ::std::int64_t id;
  private:
   ::std::string password;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool id;
     bool password;
   } __isset = {};
-  bool operator==(const SecretStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const SecretStruct& __x, const SecretStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const SecretStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const SecretStruct& __x, const SecretStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const SecretStruct& __x, const SecretStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const SecretStruct& __x, const SecretStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const SecretStruct&) const;
+  bool operator<(const SecretStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> id_ref() const& {
@@ -669,6 +657,7 @@ class SecretStruct final  {
     return id;
   }
 
+  [[deprecated("Use `FOO.id_ref() = BAR;` instead of `FOO.set_id(BAR);`")]]
   ::std::int64_t& set_id(::std::int64_t id_) {
     id = id_;
     __isset.id = true;
@@ -684,6 +673,7 @@ class SecretStruct final  {
   }
 
   template <typename T_SecretStruct_password_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.password_ref() = BAR;` instead of `FOO.set_password(BAR);`")]]
   ::std::string& set_password(T_SecretStruct_password_struct_setter&& password_) {
     password = std::forward<T_SecretStruct_password_struct_setter>(password_);
     __isset.password = true;
@@ -703,7 +693,7 @@ class SecretStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< SecretStruct >;
+  friend class ::apache::thrift::Cpp2Ops<SecretStruct>;
   friend void swap(SecretStruct& a, SecretStruct& b);
 };
 

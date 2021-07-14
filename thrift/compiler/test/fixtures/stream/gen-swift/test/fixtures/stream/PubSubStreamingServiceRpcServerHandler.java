@@ -11,9 +11,9 @@ import java.util.*;
 import org.apache.thrift.protocol.*;
 
 public class PubSubStreamingServiceRpcServerHandler 
-  implements com.facebook.swift.transport.server.RpcServerHandler {
+  implements com.facebook.thrift.server.RpcServerHandler {
 
-  private final java.util.Map<String, com.facebook.swift.transport.server.RpcServerHandler> _methodMap;
+  private final java.util.Map<String, com.facebook.thrift.server.RpcServerHandler> _methodMap;
 
   private final PubSubStreamingService.Reactive _delegate;
 
@@ -21,9 +21,8 @@ public class PubSubStreamingServiceRpcServerHandler
   private final java.util.List<com.facebook.swift.service.ThriftEventHandler> _eventHandlers;
 
   public PubSubStreamingServiceRpcServerHandler(PubSubStreamingService _delegate,
-                                    java.util.List<com.facebook.swift.service.ThriftEventHandler> _eventHandlers,
-                                    reactor.core.scheduler.Scheduler _scheduler) {
-    this(new PubSubStreamingServiceBlockingReactiveWrapper(_delegate, _scheduler), _eventHandlers);
+                                    java.util.List<com.facebook.swift.service.ThriftEventHandler> _eventHandlers) {
+    this(new PubSubStreamingServiceBlockingReactiveWrapper(_delegate), _eventHandlers);
   }
 
   public PubSubStreamingServiceRpcServerHandler(PubSubStreamingService.Async _delegate,
@@ -42,10 +41,10 @@ public class PubSubStreamingServiceRpcServerHandler
 
 
   @Override
-  public reactor.core.publisher.Mono<com.facebook.swift.transport.payload.ServerResponsePayload> singleRequestSingleResponse(com.facebook.swift.transport.payload.ServerRequestPayload _payload) {
+  public reactor.core.publisher.Mono<com.facebook.thrift.payload.ServerResponsePayload> singleRequestSingleResponse(com.facebook.thrift.payload.ServerRequestPayload _payload) {
     final String _name = _payload.getRequestRpcMetadata().getName();
 
-    reactor.core.publisher.Mono<com.facebook.swift.transport.payload.ServerResponsePayload> _result;
+    reactor.core.publisher.Mono<com.facebook.thrift.payload.ServerResponsePayload> _result;
     try {
       switch (_name) {
         default: {
@@ -59,7 +58,7 @@ public class PubSubStreamingServiceRpcServerHandler
     return _result;
   }
 
-  public java.util.Map<String, com.facebook.swift.transport.server.RpcServerHandler> getMethodMap() {
+  public java.util.Map<String, com.facebook.thrift.server.RpcServerHandler> getMethodMap() {
       return _methodMap;
   }
 

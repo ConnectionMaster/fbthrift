@@ -176,6 +176,13 @@ typedef ::std::int64_t annotated_inline_i64;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class structured_annotation_inline final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -195,49 +202,36 @@ class structured_annotation_inline final  {
 
   structured_annotation_inline() :
       count(0),
-      name(apache::thrift::StringTraits< std::string>::fromStringLiteral("abacaba")) {}
+      name(apache::thrift::StringTraits<std::string>::fromStringLiteral("abacaba")) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   structured_annotation_inline(apache::thrift::FragileConstructor, ::std::int64_t count__arg, ::std::string name__arg);
 
-  structured_annotation_inline(structured_annotation_inline&&) = default;
+  structured_annotation_inline(structured_annotation_inline&&) noexcept;
 
-  structured_annotation_inline(const structured_annotation_inline&) = default;
+  structured_annotation_inline(const structured_annotation_inline& src);
 
 
-  structured_annotation_inline& operator=(structured_annotation_inline&&) = default;
-
-  structured_annotation_inline& operator=(const structured_annotation_inline&) = default;
+  structured_annotation_inline& operator=(structured_annotation_inline&&) noexcept;
+  structured_annotation_inline& operator=(const structured_annotation_inline& src);
   void __clear();
  private:
   ::std::int64_t count;
  private:
   ::std::string name;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool count;
     bool name;
   } __isset = {};
-  bool operator==(const structured_annotation_inline& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const structured_annotation_inline& __x, const structured_annotation_inline& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const structured_annotation_inline& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const structured_annotation_inline& __x, const structured_annotation_inline& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const structured_annotation_inline& __x, const structured_annotation_inline& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const structured_annotation_inline& __x, const structured_annotation_inline& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const structured_annotation_inline&) const;
+  bool operator<(const structured_annotation_inline&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> count_ref() const& {
@@ -283,6 +277,7 @@ class structured_annotation_inline final  {
     return count;
   }
 
+  [[deprecated("Use `FOO.count_ref() = BAR;` instead of `FOO.set_count(BAR);`")]]
   ::std::int64_t& set_count(::std::int64_t count_) {
     count = count_;
     __isset.count = true;
@@ -298,6 +293,7 @@ class structured_annotation_inline final  {
   }
 
   template <typename T_structured_annotation_inline_name_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.name_ref() = BAR;` instead of `FOO.set_name(BAR);`")]]
   ::std::string& set_name(T_structured_annotation_inline_name_struct_setter&& name_) {
     name = std::forward<T_structured_annotation_inline_name_struct_setter>(name_);
     __isset.name = true;
@@ -317,7 +313,7 @@ class structured_annotation_inline final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< structured_annotation_inline >;
+  friend class ::apache::thrift::Cpp2Ops<structured_annotation_inline>;
   friend void swap(structured_annotation_inline& a, structured_annotation_inline& b);
 };
 
@@ -330,6 +326,13 @@ uint32_t structured_annotation_inline::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class structured_annotation_with_default final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -348,46 +351,33 @@ class structured_annotation_with_default final  {
  public:
 
   structured_annotation_with_default() :
-      name(apache::thrift::StringTraits< std::string>::fromStringLiteral("abacabadabacaba")) {}
+      name(apache::thrift::StringTraits<std::string>::fromStringLiteral("abacabadabacaba")) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   structured_annotation_with_default(apache::thrift::FragileConstructor, ::std::string name__arg);
 
-  structured_annotation_with_default(structured_annotation_with_default&&) = default;
+  structured_annotation_with_default(structured_annotation_with_default&&) noexcept;
 
-  structured_annotation_with_default(const structured_annotation_with_default&) = default;
+  structured_annotation_with_default(const structured_annotation_with_default& src);
 
 
-  structured_annotation_with_default& operator=(structured_annotation_with_default&&) = default;
-
-  structured_annotation_with_default& operator=(const structured_annotation_with_default&) = default;
+  structured_annotation_with_default& operator=(structured_annotation_with_default&&) noexcept;
+  structured_annotation_with_default& operator=(const structured_annotation_with_default& src);
   void __clear();
  private:
   ::std::string name;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool name;
   } __isset = {};
-  bool operator==(const structured_annotation_with_default& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const structured_annotation_with_default& __x, const structured_annotation_with_default& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const structured_annotation_with_default& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const structured_annotation_with_default& __x, const structured_annotation_with_default& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const structured_annotation_with_default& __x, const structured_annotation_with_default& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const structured_annotation_with_default& __x, const structured_annotation_with_default& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const structured_annotation_with_default&) const;
+  bool operator<(const structured_annotation_with_default&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> name_ref() const& {
@@ -418,6 +408,7 @@ class structured_annotation_with_default final  {
   }
 
   template <typename T_structured_annotation_with_default_name_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.name_ref() = BAR;` instead of `FOO.set_name(BAR);`")]]
   ::std::string& set_name(T_structured_annotation_with_default_name_struct_setter&& name_) {
     name = std::forward<T_structured_annotation_with_default_name_struct_setter>(name_);
     __isset.name = true;
@@ -437,7 +428,7 @@ class structured_annotation_with_default final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< structured_annotation_with_default >;
+  friend class ::apache::thrift::Cpp2Ops<structured_annotation_with_default>;
   friend void swap(structured_annotation_with_default& a, structured_annotation_with_default& b);
 };
 
@@ -450,6 +441,13 @@ uint32_t structured_annotation_with_default::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class structured_annotation_forward final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -468,7 +466,8 @@ class structured_annotation_forward final  {
  public:
 
   structured_annotation_forward() :
-      count(0) {}
+      count(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   structured_annotation_forward(apache::thrift::FragileConstructor, ::std::int64_t count__arg);
@@ -485,29 +484,16 @@ class structured_annotation_forward final  {
  private:
   ::std::int64_t count;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool count;
   } __isset = {};
-  bool operator==(const structured_annotation_forward& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const structured_annotation_forward& __x, const structured_annotation_forward& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const structured_annotation_forward& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const structured_annotation_forward& __x, const structured_annotation_forward& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const structured_annotation_forward& __x, const structured_annotation_forward& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const structured_annotation_forward& __x, const structured_annotation_forward& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const structured_annotation_forward&) const;
+  bool operator<(const structured_annotation_forward&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> count_ref() const& {
@@ -533,6 +519,7 @@ class structured_annotation_forward final  {
     return count;
   }
 
+  [[deprecated("Use `FOO.count_ref() = BAR;` instead of `FOO.set_count(BAR);`")]]
   ::std::int64_t& set_count(::std::int64_t count_) {
     count = count_;
     __isset.count = true;
@@ -552,7 +539,7 @@ class structured_annotation_forward final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< structured_annotation_forward >;
+  friend class ::apache::thrift::Cpp2Ops<structured_annotation_forward>;
   friend void swap(structured_annotation_forward& a, structured_annotation_forward& b);
 };
 
@@ -565,6 +552,13 @@ uint32_t structured_annotation_forward::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class structured_annotation_recursive final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -582,19 +576,19 @@ class structured_annotation_recursive final  {
 
  public:
 
-  structured_annotation_recursive() {}
+  structured_annotation_recursive() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   structured_annotation_recursive(apache::thrift::FragileConstructor, ::std::string name__arg, ::cpp2::structured_annotation_recursive recurse__arg, ::cpp2::structured_annotation_forward forward__arg);
 
-  structured_annotation_recursive(structured_annotation_recursive&&) = default;
+  structured_annotation_recursive(structured_annotation_recursive&&) noexcept;
 
-  structured_annotation_recursive(const structured_annotation_recursive&) = default;
+  structured_annotation_recursive(const structured_annotation_recursive& src);
 
 
-  structured_annotation_recursive& operator=(structured_annotation_recursive&&) = default;
-
-  structured_annotation_recursive& operator=(const structured_annotation_recursive&) = default;
+  structured_annotation_recursive& operator=(structured_annotation_recursive&&) noexcept;
+  structured_annotation_recursive& operator=(const structured_annotation_recursive& src);
   void __clear();
  private:
   ::std::string name;
@@ -603,31 +597,18 @@ class structured_annotation_recursive final  {
  private:
   ::cpp2::structured_annotation_forward forward;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool name;
     bool recurse;
     bool forward;
   } __isset = {};
-  bool operator==(const structured_annotation_recursive& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const structured_annotation_recursive& __x, const structured_annotation_recursive& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const structured_annotation_recursive& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const structured_annotation_recursive& __x, const structured_annotation_recursive& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const structured_annotation_recursive& __x, const structured_annotation_recursive& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const structured_annotation_recursive& __x, const structured_annotation_recursive& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const structured_annotation_recursive&) const;
+  bool operator<(const structured_annotation_recursive&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> name_ref() const& {
@@ -698,6 +679,7 @@ class structured_annotation_recursive final  {
   }
 
   template <typename T_structured_annotation_recursive_name_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.name_ref() = BAR;` instead of `FOO.set_name(BAR);`")]]
   ::std::string& set_name(T_structured_annotation_recursive_name_struct_setter&& name_) {
     name = std::forward<T_structured_annotation_recursive_name_struct_setter>(name_);
     __isset.name = true;
@@ -707,6 +689,7 @@ class structured_annotation_recursive final  {
   ::cpp2::structured_annotation_recursive get_recurse() &&;
 
   template <typename T_structured_annotation_recursive_recurse_struct_setter = ::cpp2::structured_annotation_recursive>
+  [[deprecated("Use `FOO.recurse_ref() = BAR;` instead of `FOO.set_recurse(BAR);`")]]
   ::cpp2::structured_annotation_recursive& set_recurse(T_structured_annotation_recursive_recurse_struct_setter&& recurse_) {
     recurse = std::forward<T_structured_annotation_recursive_recurse_struct_setter>(recurse_);
     __isset.recurse = true;
@@ -716,6 +699,7 @@ class structured_annotation_recursive final  {
   ::cpp2::structured_annotation_forward get_forward() &&;
 
   template <typename T_structured_annotation_recursive_forward_struct_setter = ::cpp2::structured_annotation_forward>
+  [[deprecated("Use `FOO.forward_ref() = BAR;` instead of `FOO.set_forward(BAR);`")]]
   ::cpp2::structured_annotation_forward& set_forward(T_structured_annotation_recursive_forward_struct_setter&& forward_) {
     forward = std::forward<T_structured_annotation_recursive_forward_struct_setter>(forward_);
     __isset.forward = true;
@@ -735,7 +719,7 @@ class structured_annotation_recursive final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< structured_annotation_recursive >;
+  friend class ::apache::thrift::Cpp2Ops<structured_annotation_recursive>;
   friend void swap(structured_annotation_recursive& a, structured_annotation_recursive& b);
 };
 
@@ -748,6 +732,13 @@ uint32_t structured_annotation_recursive::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class structured_annotation_nested final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -765,49 +756,36 @@ class structured_annotation_nested final  {
 
  public:
 
-  structured_annotation_nested() {}
+  structured_annotation_nested() {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   structured_annotation_nested(apache::thrift::FragileConstructor, ::std::string name__arg, ::cpp2::structured_annotation_with_default nest__arg);
 
-  structured_annotation_nested(structured_annotation_nested&&) = default;
+  structured_annotation_nested(structured_annotation_nested&&) noexcept;
 
-  structured_annotation_nested(const structured_annotation_nested&) = default;
+  structured_annotation_nested(const structured_annotation_nested& src);
 
 
-  structured_annotation_nested& operator=(structured_annotation_nested&&) = default;
-
-  structured_annotation_nested& operator=(const structured_annotation_nested&) = default;
+  structured_annotation_nested& operator=(structured_annotation_nested&&) noexcept;
+  structured_annotation_nested& operator=(const structured_annotation_nested& src);
   void __clear();
  private:
   ::std::string name;
  private:
   ::cpp2::structured_annotation_with_default nest;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool name;
     bool nest;
   } __isset = {};
-  bool operator==(const structured_annotation_nested& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const structured_annotation_nested& __x, const structured_annotation_nested& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const structured_annotation_nested& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const structured_annotation_nested& __x, const structured_annotation_nested& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const structured_annotation_nested& __x, const structured_annotation_nested& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const structured_annotation_nested& __x, const structured_annotation_nested& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const structured_annotation_nested&) const;
+  bool operator<(const structured_annotation_nested&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> name_ref() const& {
@@ -858,6 +836,7 @@ class structured_annotation_nested final  {
   }
 
   template <typename T_structured_annotation_nested_name_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.name_ref() = BAR;` instead of `FOO.set_name(BAR);`")]]
   ::std::string& set_name(T_structured_annotation_nested_name_struct_setter&& name_) {
     name = std::forward<T_structured_annotation_nested_name_struct_setter>(name_);
     __isset.name = true;
@@ -867,6 +846,7 @@ class structured_annotation_nested final  {
   ::cpp2::structured_annotation_with_default get_nest() &&;
 
   template <typename T_structured_annotation_nested_nest_struct_setter = ::cpp2::structured_annotation_with_default>
+  [[deprecated("Use `FOO.nest_ref() = BAR;` instead of `FOO.set_nest(BAR);`")]]
   ::cpp2::structured_annotation_with_default& set_nest(T_structured_annotation_nested_nest_struct_setter&& nest_) {
     nest = std::forward<T_structured_annotation_nested_nest_struct_setter>(nest_);
     __isset.nest = true;
@@ -886,7 +866,7 @@ class structured_annotation_nested final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< structured_annotation_nested >;
+  friend class ::apache::thrift::Cpp2Ops<structured_annotation_nested>;
   friend void swap(structured_annotation_nested& a, structured_annotation_nested& b);
 };
 
@@ -899,6 +879,13 @@ uint32_t structured_annotation_nested::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyStruct final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -918,19 +905,19 @@ class MyStruct final  {
 
   MyStruct() :
       annotated_field(0),
-      annotated_nested(0) {}
+      annotated_nested(0) {
+  }
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyStruct(apache::thrift::FragileConstructor, ::std::int64_t annotated_field__arg, ::cpp2::annotated_inline_string annotated_type__arg, ::std::string annotated_recursive__arg, ::std::int64_t annotated_nested__arg);
 
-  MyStruct(MyStruct&&) = default;
+  MyStruct(MyStruct&&) noexcept;
 
-  MyStruct(const MyStruct&) = default;
+  MyStruct(const MyStruct& src);
 
 
-  MyStruct& operator=(MyStruct&&) = default;
-
-  MyStruct& operator=(const MyStruct&) = default;
+  MyStruct& operator=(MyStruct&&) noexcept;
+  MyStruct& operator=(const MyStruct& src);
   void __clear();
  private:
   ::std::int64_t annotated_field;
@@ -941,7 +928,7 @@ class MyStruct final  {
  private:
   ::std::int64_t annotated_nested;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool annotated_field;
@@ -949,24 +936,11 @@ class MyStruct final  {
     bool annotated_recursive;
     bool annotated_nested;
   } __isset = {};
-  bool operator==(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyStruct& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyStruct& __x, const MyStruct& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyStruct& __x, const MyStruct& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyStruct&) const;
+  bool operator<(const MyStruct&) const;
 
   template <typename..., typename T = ::std::int64_t>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> annotated_field_ref() const& {
@@ -1052,6 +1026,7 @@ class MyStruct final  {
     return annotated_field;
   }
 
+  [[deprecated("Use `FOO.annotated_field_ref() = BAR;` instead of `FOO.set_annotated_field(BAR);`")]]
   ::std::int64_t& set_annotated_field(::std::int64_t annotated_field_) {
     annotated_field = annotated_field_;
     __isset.annotated_field = true;
@@ -1067,6 +1042,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_annotated_type_struct_setter = ::cpp2::annotated_inline_string>
+  [[deprecated("Use `FOO.annotated_type_ref() = BAR;` instead of `FOO.set_annotated_type(BAR);`")]]
   ::cpp2::annotated_inline_string& set_annotated_type(T_MyStruct_annotated_type_struct_setter&& annotated_type_) {
     annotated_type = std::forward<T_MyStruct_annotated_type_struct_setter>(annotated_type_);
     __isset.annotated_type = true;
@@ -1082,6 +1058,7 @@ class MyStruct final  {
   }
 
   template <typename T_MyStruct_annotated_recursive_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.annotated_recursive_ref() = BAR;` instead of `FOO.set_annotated_recursive(BAR);`")]]
   ::std::string& set_annotated_recursive(T_MyStruct_annotated_recursive_struct_setter&& annotated_recursive_) {
     annotated_recursive = std::forward<T_MyStruct_annotated_recursive_struct_setter>(annotated_recursive_);
     __isset.annotated_recursive = true;
@@ -1092,6 +1069,7 @@ class MyStruct final  {
     return annotated_nested;
   }
 
+  [[deprecated("Use `FOO.annotated_nested_ref() = BAR;` instead of `FOO.set_annotated_nested(BAR);`")]]
   ::std::int64_t& set_annotated_nested(::std::int64_t annotated_nested_) {
     annotated_nested = annotated_nested_;
     __isset.annotated_nested = true;
@@ -1111,7 +1089,7 @@ class MyStruct final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyStruct >;
+  friend class ::apache::thrift::Cpp2Ops<MyStruct>;
   friend void swap(MyStruct& a, MyStruct& b);
 };
 
@@ -1124,7 +1102,14 @@ uint32_t MyStruct::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class MyException final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT MyException final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -1132,6 +1117,12 @@ class MyException final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = MyException;
@@ -1141,46 +1132,36 @@ class MyException final : public apache::thrift::TException {
 
  public:
 
-  MyException() {}
+  MyException();
+
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   MyException(apache::thrift::FragileConstructor, ::std::string context__arg);
 
-  MyException(MyException&&) = default;
+  MyException(MyException&&) noexcept;
 
-  MyException(const MyException&) = default;
+  MyException(const MyException& src);
 
 
-  MyException& operator=(MyException&&) = default;
-
-  MyException& operator=(const MyException&) = default;
+  MyException& operator=(MyException&&) noexcept;
+  MyException& operator=(const MyException& src);
   void __clear();
+
+  ~MyException() override;
+
  private:
   ::std::string context;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool context;
   } __isset = {};
-  bool operator==(const MyException& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyException& __x, const MyException& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyException& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyException& __x, const MyException& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyException& __x, const MyException& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyException& __x, const MyException& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const MyException&) const;
+  bool operator<(const MyException&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> context_ref() const& {
@@ -1211,6 +1192,7 @@ class MyException final : public apache::thrift::TException {
   }
 
   template <typename T_MyException_context_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.context_ref() = BAR;` instead of `FOO.set_context(BAR);`")]]
   ::std::string& set_context(T_MyException_context_struct_setter&& context_) {
     context = std::forward<T_MyException_context_struct_setter>(context_);
     __isset.context = true;
@@ -1234,7 +1216,7 @@ class MyException final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyException >;
+  friend class ::apache::thrift::Cpp2Ops<MyException>;
   friend void swap(MyException& a, MyException& b);
 };
 
@@ -1247,6 +1229,13 @@ uint32_t MyException::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class MyUnion final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -1272,7 +1261,7 @@ class MyUnion final  {
   MyUnion()
       : type_(Type::__EMPTY__) {}
 
-  MyUnion(MyUnion&& rhs)
+  MyUnion(MyUnion&& rhs) noexcept
       : type_(Type::__EMPTY__) {
     if (this == &rhs) { return; }
     if (rhs.type_ == Type::__EMPTY__) { return; }
@@ -1319,7 +1308,7 @@ class MyUnion final  {
     }
   }
 
-  MyUnion& operator=(MyUnion&& rhs) {
+  MyUnion& operator=(MyUnion&& rhs) noexcept {
     if (this == &rhs) { return *this; }
     __clear();
     if (rhs.type_ == Type::__EMPTY__) { return *this; }
@@ -1379,24 +1368,9 @@ class MyUnion final  {
     storage_type() {}
     ~storage_type() {}
   } ;
-  bool operator==(const MyUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const MyUnion& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const MyUnion& __x, const MyUnion& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const MyUnion& __x, const MyUnion& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const MyUnion&) const;
+  bool operator<(const MyUnion&) const;
 
   ::cpp2::annotated_inline_string& set_first(::cpp2::annotated_inline_string const &t) {
     __clear();
@@ -1426,22 +1400,26 @@ class MyUnion final  {
     return value_.second;
   }
 
-  ::cpp2::annotated_inline_string const & get_first() const {
-    assert(type_ == Type::first);
+  ::cpp2::annotated_inline_string const& get_first() const {
+    if (type_ != Type::first) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.first;
   }
 
-  ::cpp2::annotated_inline_i64 const & get_second() const {
-    assert(type_ == Type::second);
+  ::cpp2::annotated_inline_i64 const& get_second() const {
+    if (type_ != Type::second) {
+      ::apache::thrift::detail::throw_on_bad_field_access();
+    }
     return value_.second;
   }
 
-  ::cpp2::annotated_inline_string & mutable_first() {
+  ::cpp2::annotated_inline_string& mutable_first() {
     assert(type_ == Type::first);
     return value_.first;
   }
 
-  ::cpp2::annotated_inline_i64 & mutable_second() {
+  ::cpp2::annotated_inline_i64& mutable_second() {
     assert(type_ == Type::second);
     return value_.second;
   }
@@ -1517,7 +1495,7 @@ class MyUnion final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< MyUnion >;
+  friend class ::apache::thrift::Cpp2Ops<MyUnion>;
   friend void swap(MyUnion& a, MyUnion& b);
 };
 

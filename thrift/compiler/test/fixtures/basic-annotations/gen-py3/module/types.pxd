@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -39,7 +39,7 @@ from thrift.py3.common cimport (
 )
 from folly.optional cimport cOptional as __cOptional
 
-cimport module.types_fields as __fbthrift_types_fields
+cimport module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -69,8 +69,6 @@ cdef extern from "src/gen-cpp2/module_metadata.h" namespace "apache::thrift::det
         @staticmethod
         void gen(__fbthrift_cThriftMetadata &metadata)
 cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2":
-    cdef cppclass cMyStructNestedAnnotation__isset "::cpp2::MyStructNestedAnnotation::__isset":
-        bint name
 
     cdef cppclass cMyStructNestedAnnotation "::cpp2::MyStructNestedAnnotation":
         cMyStructNestedAnnotation() except +
@@ -83,15 +81,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         bint operator>=(cMyStructNestedAnnotation&)
         __field_ref[string] name_ref()
         string name
-        cMyStructNestedAnnotation__isset __isset
 
-    cdef cppclass cMyStruct__isset "::cpp2::MyStruct::__isset":
-        bint major "majorVer"
-        bint package
-        bint annotation_with_quote
-        bint class_
-        bint annotation_with_trailing_comma
-        bint empty_annotations
 
     cdef cppclass cMyStruct "::cpp2::MyStruct":
         cMyStruct() except +
@@ -114,11 +104,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         string class_
         string annotation_with_trailing_comma
         string empty_annotations
-        cMyStruct__isset __isset
 
-    cdef cppclass cSecretStruct__isset "::cpp2::SecretStruct::__isset":
-        bint id
-        bint password
 
     cdef cppclass cSecretStruct "::cpp2::SecretStruct":
         cSecretStruct() except +
@@ -133,14 +119,13 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         __field_ref[string] password_ref()
         cint64_t id
         string password
-        cSecretStruct__isset __isset
 
 
 
 
 cdef class MyStructNestedAnnotation(thrift.py3.types.Struct):
     cdef shared_ptr[cMyStructNestedAnnotation] _cpp_obj
-    cdef __fbthrift_types_fields.__MyStructNestedAnnotation_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__MyStructNestedAnnotation_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cMyStructNestedAnnotation])
@@ -149,7 +134,7 @@ cdef class MyStructNestedAnnotation(thrift.py3.types.Struct):
 
 cdef class MyStruct(thrift.py3.types.Struct):
     cdef shared_ptr[cMyStruct] _cpp_obj
-    cdef __fbthrift_types_fields.__MyStruct_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__MyStruct_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cMyStruct])
@@ -158,7 +143,7 @@ cdef class MyStruct(thrift.py3.types.Struct):
 
 cdef class SecretStruct(thrift.py3.types.Struct):
     cdef shared_ptr[cSecretStruct] _cpp_obj
-    cdef __fbthrift_types_fields.__SecretStruct_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__SecretStruct_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cSecretStruct])

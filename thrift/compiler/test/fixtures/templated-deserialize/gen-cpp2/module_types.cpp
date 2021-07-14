@@ -68,6 +68,7 @@ void TccStructTraits<::cpp2::SmallStruct>::translateFieldName(
 
 namespace cpp2 {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 SmallStruct::SmallStruct(apache::thrift::FragileConstructor, bool small_A__arg, ::std::int32_t small_B__arg) :
     small_A(std::move(small_A__arg)),
@@ -76,10 +77,11 @@ SmallStruct::SmallStruct(apache::thrift::FragileConstructor, bool small_A__arg, 
   __isset.small_B = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void SmallStruct::__clear() {
   // clear all fields
-  small_A = 0;
-  small_B = 0;
+  this->small_A = 0;
+  this->small_B = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -226,11 +228,14 @@ THRIFT_IGNORE_ISSET_USE_WARNING_END
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset.fieldQ = srcObj.__isset.fieldQ;
 THRIFT_IGNORE_ISSET_USE_WARNING_END
-  if (srcObj.fieldR) fieldR.reset(new ::std::map<::std::string, bool>(*srcObj.fieldR));
-  if (srcObj.fieldS) fieldS.reset(new ::cpp2::SmallStruct(*srcObj.fieldS));
+  fieldR = ::apache::thrift::detail::st::copy_field<
+        ::apache::thrift::type_class::map<::apache::thrift::type_class::string, ::apache::thrift::type_class::integral>>(srcObj.fieldR);
+  fieldS = ::apache::thrift::detail::st::copy_field<
+        ::apache::thrift::type_class::structure>(srcObj.fieldS);
   fieldT = srcObj.fieldT;
   fieldU = srcObj.fieldU;
-  if (srcObj.fieldX) fieldX.reset(new ::cpp2::SmallStruct(*srcObj.fieldX));
+  fieldX = ::apache::thrift::detail::st::copy_field<
+        ::apache::thrift::type_class::structure>(srcObj.fieldX);
 }
 
 containerStruct& containerStruct::operator=(const containerStruct& src) {
@@ -246,13 +251,13 @@ containerStruct::containerStruct() :
   2,
   3,
   4}),
-      fieldE(apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring")),
+      fieldE(apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring")),
       fieldI(true),
-      fieldJ(std::initializer_list<std::pair<const ::std::string, ::std::vector<::std::int32_t>>>{{apache::thrift::StringTraits< std::string>::fromStringLiteral("subfieldA"), std::initializer_list<::std::int32_t>{1,
+      fieldJ(std::initializer_list<std::pair<const ::std::string, ::std::vector<::std::int32_t>>>{{apache::thrift::StringTraits<std::string>::fromStringLiteral("subfieldA"), std::initializer_list<::std::int32_t>{1,
   4,
   8,
   12}},
-  {apache::thrift::StringTraits< std::string>::fromStringLiteral("subfieldB"), std::initializer_list<::std::int32_t>{2,
+  {apache::thrift::StringTraits<std::string>::fromStringLiteral("subfieldB"), std::initializer_list<::std::int32_t>{2,
   5,
   9,
   13}}}),
@@ -261,14 +266,69 @@ containerStruct::containerStruct() :
       fieldS(std::make_unique<::cpp2::SmallStruct>()),
       fieldT(std::make_shared<::cpp2::SmallStruct>()),
       fieldU(std::make_shared<::cpp2::SmallStruct>()),
-      fieldX(std::make_unique<::cpp2::SmallStruct>()) {}
+      fieldX(std::make_unique<::cpp2::SmallStruct>()) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 containerStruct::~containerStruct() {}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
-containerStruct::containerStruct(apache::thrift::FragileConstructor, bool fieldA__arg, ::std::map<::std::string, bool> fieldB__arg, ::std::set<::std::int32_t> fieldC__arg, ::std::string fieldD__arg, ::std::string fieldE__arg, ::std::vector<::std::vector<::std::vector<::std::int32_t>>> fieldF__arg, ::std::map<::std::string, ::std::map<::std::string, ::std::map<::std::string, ::std::int32_t>>> fieldG__arg, ::std::vector<::std::set<::std::int32_t>> fieldH__arg, bool fieldI__arg, ::std::map<::std::string, ::std::vector<::std::int32_t>> fieldJ__arg, ::std::vector<::std::vector<::std::vector<::std::vector<::std::int32_t>>>> fieldK__arg, ::std::set<::std::set<::std::set<bool>>> fieldL__arg, ::std::map<::std::set<::std::vector<::std::int32_t>>, ::std::map<::std::vector<::std::set<::std::string>>, ::std::string>> fieldM__arg, ::std::vector<::cpp2::IndirectionA> fieldN__arg, ::std::vector<::cpp2::IndirectionB> fieldO__arg, ::std::vector<::cpp2::IndirectionC> fieldP__arg, ::cpp2::MyEnumA fieldQ__arg, std::unique_ptr<::std::map<::std::string, bool>> fieldR__arg, std::unique_ptr<::cpp2::SmallStruct> fieldS__arg, std::shared_ptr<::cpp2::SmallStruct> fieldT__arg, std::shared_ptr<const ::cpp2::SmallStruct> fieldU__arg, std::unique_ptr<::cpp2::SmallStruct> fieldX__arg) :
+containerStruct::containerStruct(containerStruct&& other) noexcept  :
+    fieldA(std::move(other.fieldA)),
+    fieldB(std::move(other.fieldB)),
+    fieldC(std::move(other.fieldC)),
+    fieldD(std::move(other.fieldD)),
+    fieldE(std::move(other.fieldE)),
+    fieldF(std::move(other.fieldF)),
+    fieldG(std::move(other.fieldG)),
+    fieldH(std::move(other.fieldH)),
+    fieldI(std::move(other.fieldI)),
+    fieldJ(std::move(other.fieldJ)),
+    fieldK(std::move(other.fieldK)),
+    fieldL(std::move(other.fieldL)),
+    fieldM(std::move(other.fieldM)),
+    fieldN(std::move(other.fieldN)),
+    fieldO(std::move(other.fieldO)),
+    fieldP(std::move(other.fieldP)),
+    fieldQ(std::move(other.fieldQ)),
+    fieldR(std::move(other.fieldR)),
+    fieldS(std::move(other.fieldS)),
+    fieldT(std::move(other.fieldT)),
+    fieldU(std::move(other.fieldU)),
+    fieldX(std::move(other.fieldX)),
+    __isset(other.__isset) {}
+containerStruct& containerStruct::operator=(FOLLY_MAYBE_UNUSED containerStruct&& other) noexcept {
+    this->fieldA = std::move(other.fieldA);
+    this->fieldB = std::move(other.fieldB);
+    this->fieldC = std::move(other.fieldC);
+    this->fieldD = std::move(other.fieldD);
+    this->fieldE = std::move(other.fieldE);
+    this->fieldF = std::move(other.fieldF);
+    this->fieldG = std::move(other.fieldG);
+    this->fieldH = std::move(other.fieldH);
+    this->fieldI = std::move(other.fieldI);
+    this->fieldJ = std::move(other.fieldJ);
+    this->fieldK = std::move(other.fieldK);
+    this->fieldL = std::move(other.fieldL);
+    this->fieldM = std::move(other.fieldM);
+    this->fieldN = std::move(other.fieldN);
+    this->fieldO = std::move(other.fieldO);
+    this->fieldP = std::move(other.fieldP);
+    this->fieldQ = std::move(other.fieldQ);
+    this->fieldR = std::move(other.fieldR);
+    this->fieldS = std::move(other.fieldS);
+    this->fieldT = std::move(other.fieldT);
+    this->fieldU = std::move(other.fieldU);
+    this->fieldX = std::move(other.fieldX);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+containerStruct::containerStruct(apache::thrift::FragileConstructor, bool fieldA__arg, ::std::map<::std::string, bool> fieldB__arg, ::std::set<::std::int32_t> fieldC__arg, ::std::string fieldD__arg, ::std::string fieldE__arg, ::std::vector<::std::vector<::std::vector<::std::int32_t>>> fieldF__arg, ::std::map<::std::string, ::std::map<::std::string, ::std::map<::std::string, ::std::int32_t>>> fieldG__arg, ::std::vector<::std::set<::std::int32_t>> fieldH__arg, bool fieldI__arg, ::std::map<::std::string, ::std::vector<::std::int32_t>> fieldJ__arg, ::std::vector<::std::vector<::std::vector<::std::vector<::std::int32_t>>>> fieldK__arg, ::std::set<::std::set<::std::set<bool>>> fieldL__arg, ::std::map<::std::set<::std::vector<::std::int32_t>>, ::std::map<::std::vector<::std::set<::std::string>>, ::std::string>> fieldM__arg, ::std::vector<::cpp2::IndirectionA> fieldN__arg, ::std::vector<::cpp2::IndirectionB> fieldO__arg, ::std::vector<::cpp2::IndirectionC> fieldP__arg, ::cpp2::MyEnumA fieldQ__arg, ::std::unique_ptr<::std::map<::std::string, bool>> fieldR__arg, ::std::unique_ptr<::cpp2::SmallStruct> fieldS__arg, ::std::shared_ptr<::cpp2::SmallStruct> fieldT__arg, ::std::shared_ptr<const ::cpp2::SmallStruct> fieldU__arg, ::std::unique_ptr<::cpp2::SmallStruct> fieldX__arg) :
     fieldA(std::move(fieldA__arg)),
     fieldB(std::move(fieldB__arg)),
     fieldC(std::move(fieldC__arg)),
@@ -310,30 +370,31 @@ containerStruct::containerStruct(apache::thrift::FragileConstructor, bool fieldA
   __isset.fieldQ = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void containerStruct::__clear() {
   // clear all fields
-  fieldA = 0;
-  fieldB.clear();
-  fieldC.clear();
-  fieldD = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  fieldE = apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring");
-  fieldF.clear();
-  fieldG.clear();
-  fieldH.clear();
-  fieldI = true;
-  fieldJ.clear();
-  fieldK.clear();
-  fieldL.clear();
-  fieldM.clear();
-  fieldN.clear();
-  fieldO.clear();
-  fieldP.clear();
-  fieldQ = static_cast< ::cpp2::MyEnumA>(0);
-  fieldR = ::apache::thrift::detail::make_mutable_smart_ptr(folly::tag_t<std::unique_ptr<::std::map<::std::string, bool>>>());
-  if (fieldS) fieldS->__clear();
-  if (fieldT) fieldT->__clear();
-  if (fieldU) fieldU.reset(new typename decltype(fieldU)::element_type());
-  if (fieldX) fieldX->__clear();
+  this->fieldA = 0;
+  this->fieldB.clear();
+  this->fieldC.clear();
+  this->fieldD = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->fieldE = apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring");
+  this->fieldF.clear();
+  this->fieldG.clear();
+  this->fieldH.clear();
+  this->fieldI = true;
+  this->fieldJ.clear();
+  this->fieldK.clear();
+  this->fieldL.clear();
+  this->fieldM.clear();
+  this->fieldN.clear();
+  this->fieldO.clear();
+  this->fieldP.clear();
+  this->fieldQ = static_cast< ::cpp2::MyEnumA>(0);
+  this->fieldR = ::apache::thrift::detail::make_mutable_smart_ptr<::std::unique_ptr<::std::map<::std::string, bool>>>();
+  if (this->fieldS) this->fieldS->__clear();
+  if (this->fieldT) this->fieldT->__clear();
+  if (this->fieldU) this->fieldU.reset(new typename decltype(this->fieldU)::element_type());
+  if (this->fieldX) this->fieldX->__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END

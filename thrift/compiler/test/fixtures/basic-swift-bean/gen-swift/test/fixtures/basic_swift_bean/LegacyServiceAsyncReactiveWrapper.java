@@ -7,6 +7,7 @@
 
 package test.fixtures.basic_swift_bean;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class LegacyServiceAsyncReactiveWrapper 
@@ -19,13 +20,13 @@ public class LegacyServiceAsyncReactiveWrapper
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
     @java.lang.Override
     public reactor.core.publisher.Mono<Map<String, List<Integer>>> getPoints(final Set<String> key, final long legacyStuff) {
-        return com.facebook.swift.transport.util.FutureUtil.toMono(_delegate.getPoints(key, legacyStuff));
+        return com.facebook.thrift.util.FutureUtil.toMono(_delegate.getPoints(key, legacyStuff));
     }
 
 }

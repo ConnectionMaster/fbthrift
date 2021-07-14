@@ -27,6 +27,7 @@
 #include <folly/SocketAddress.h>
 #include <folly/io/async/AsyncSocket.h>
 #include <folly/io/async/AsyncTransport.h>
+#include <folly/io/async/ssl/OpenSSLTransportCertificate.h>
 #include <thrift/lib/cpp/concurrency/ThreadManager.h>
 #include <thrift/lib/cpp/server/TConnectionContext.h>
 #include <thrift/lib/cpp/server/TServerObserver.h>
@@ -93,7 +94,9 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
       transport->getLocalAddress(&localAddress_);
       auto cert = transport->getPeerCertificate();
       if (cert) {
-        peerCert_ = cert->getX509();
+        auto osslCert =
+            dynamic_cast<const folly::OpenSSLTransportCertificate*>(cert);
+        peerCert_ = osslCert ? osslCert->getX509() : nullptr;
       }
       securityProtocol_ = transport->getSecurityProtocol();
 
@@ -111,6 +114,10 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
     }
   }
 
+  ~Cpp2ConnContext() override { DCHECK(tiles_.empty()); }
+  Cpp2ConnContext(Cpp2ConnContext&&) = default;
+  Cpp2ConnContext& operator=(Cpp2ConnContext&&) = default;
+
   void reset() {
     peerAddress_.reset();
     localAddress_.reset();
@@ -121,9 +128,7 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
     return &peerAddress_;
   }
 
-  const folly::SocketAddress* getLocalAddress() const {
-    return &localAddress_;
-  }
+  const folly::SocketAddress* getLocalAddress() const { return &localAddress_; }
 
   void setLocalAddress(const folly::SocketAddress& localAddress) {
     localAddress_ = localAddress;
@@ -133,9 +138,7 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
     header_ = header;
   }
 
-  folly::EventBaseManager* getEventBaseManager() override {
-    return manager_;
-  }
+  folly::EventBaseManager* getEventBaseManager() override { return manager_; }
 
   std::string getPeerCommonName() const {
     if (peerCert_) {
@@ -146,9 +149,7 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
     return std::string();
   }
 
-  virtual std::shared_ptr<X509> getPeerCertificate() const {
-    return peerCert_;
-  }
+  virtual std::shared_ptr<X509> getPeerCertificate() const { return peerCert_; }
 
   template <typename Client>
   std::shared_ptr<Client> getDuplexClient() {
@@ -165,20 +166,14 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
     return securityProtocol_;
   }
 
-  virtual void* getPeerIdentities() const {
-    return peerIdentities_.get();
-  }
+  virtual void* getPeerIdentities() const { return peerIdentities_.get(); }
 
-  const folly::AsyncTransport* getTransport() const {
-    return transport_;
-  }
+  const folly::AsyncTransport* getTransport() const { return transport_; }
 
   /**
    * Get the user data field.
    */
-  void* getUserData() const override {
-    return userData_.get();
-  }
+  void* getUserData() const override { return userData_.get(); }
 
   /**
    * Set the user data field.
@@ -243,13 +238,9 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
    * registered to run immediately in this thread.  If any of these callbacks
    * throw this will cause program termination.
    */
-  void connectionClosed() {
-    cancellationSource_.requestCancellation();
-  }
+  void connectionClosed() { cancellationSource_.requestCancellation(); }
 
-  const Cpp2Worker* getWorker() const {
-    return worker_;
-  }
+  const Cpp2Worker* getWorker() const { return worker_; }
 
   std::optional<TransportType> getTransportType() const {
     return transportType_;
@@ -262,46 +253,44 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
     return ClientMetadataRef{*clientMetadata_};
   }
 
-  InterfaceKind getInterfaceKind() const {
-    return interfaceKind_;
-  }
+  InterfaceKind getInterfaceKind() const { return interfaceKind_; }
 
  private:
   /**
    * Adds interaction to interaction map
-   * Returns false if id is in use
+   * Returns false and destroys tile if id is in use
    */
-  bool addTile(int64_t id, std::unique_ptr<Tile> tile) {
+  bool addTile(int64_t id, TilePtr tile) {
     return tiles_.try_emplace(id, std::move(tile)).second;
-  }
-  /**
-   * Updates interaction in map
-   * Returns old value
-   */
-  std::unique_ptr<Tile> resetTile(int64_t id, std::unique_ptr<Tile> tile) {
-    DCHECK(tiles_.count(id));
-    return std::exchange(tiles_[id], std::move(tile));
   }
   /**
    * Removes interaction from map
    * Returns old value
    */
-  std::unique_ptr<Tile> removeTile(int64_t id) {
+  TilePtr removeTile(int64_t id) {
     auto it = tiles_.find(id);
     if (it == tiles_.end()) {
-      return nullptr;
+      return {};
     }
     auto ret = std::move(it->second);
     tiles_.erase(it);
     return ret;
   }
   /**
+   * Replaces interaction if id is present in map.
+   * Destroys passed-in tile otherwise.
+   */
+  void tryReplaceTile(int64_t id, TilePtr tile) {
+    auto it = tiles_.find(id);
+    if (it != tiles_.end()) {
+      it->second = std::move(tile);
+    }
+  }
+  /**
    * Gets tile from map
    * Throws std::out_of_range if not found
    */
-  Tile& getTile(int64_t id) {
-    return *tiles_.at(id);
-  }
+  Tile& getTile(int64_t id) { return *tiles_.at(id); }
   friend class GeneratedAsyncProcessor;
   friend class Tile;
   friend class TilePromise;
@@ -319,9 +308,7 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
     }
   }
 
-  void setClientMetadata(const ClientMetadata& md) {
-    clientMetadata_ = md;
-  }
+  void setClientMetadata(const ClientMetadata& md) { clientMetadata_ = md; }
 
   friend class Cpp2Connection;
   friend class rocket::ThriftRocketServerHandler;
@@ -387,9 +374,7 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
         : pid_{pid}, uid_{uid}, gid_{gid} {}
 #endif
 
-    bool hasCredentials() const {
-      return pid_ >= 0;
-    }
+    bool hasCredentials() const { return pid_ >= 0; }
 
     StatusOrPid pid_ = Validity::NotInitialized;
 #ifndef _WIN32
@@ -411,7 +396,7 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
   PeerCred peerCred_;
   // A CancellationSource that will be signaled when the connection is closed.
   folly::CancellationSource cancellationSource_;
-  folly::F14FastMap<int64_t, std::unique_ptr<Tile>> tiles_;
+  folly::F14FastMap<int64_t, TilePtr> tiles_;
   const Cpp2Worker* worker_;
   InterfaceKind interfaceKind_{InterfaceKind::USER};
   std::optional<TransportType> transportType_;
@@ -421,10 +406,10 @@ class Cpp2ConnContext : public apache::thrift::server::TConnectionContext {
 class Cpp2ClientRequestContext
     : public apache::thrift::server::TConnectionContext {
  public:
-  Cpp2ClientRequestContext() = default;
-  void setRequestHeader(transport::THeader* header) {
-    header_ = header;
-  }
+  explicit Cpp2ClientRequestContext(transport::THeader* header)
+      : TConnectionContext(header) {}
+
+  void setRequestHeader(transport::THeader* header) { header_ = header; }
 };
 
 // Request-specific context
@@ -432,12 +417,13 @@ class Cpp2RequestContext : public apache::thrift::server::TConnectionContext {
  public:
   explicit Cpp2RequestContext(
       Cpp2ConnContext* ctx,
-      apache::thrift::transport::THeader* header = nullptr)
-      : TConnectionContext(header), ctx_(ctx) {}
+      apache::thrift::transport::THeader* header = nullptr,
+      std::string methodName = std::string{})
+      : TConnectionContext(header),
+        ctx_(ctx),
+        methodName_(std::move(methodName)) {}
 
-  void setConnectionContext(Cpp2ConnContext* ctx) {
-    ctx_ = ctx;
-  }
+  void setConnectionContext(Cpp2ConnContext* ctx) { ctx_ = ctx; }
 
   // Forward all connection-specific information
   const folly::SocketAddress* getPeerAddress() const override {
@@ -448,9 +434,7 @@ class Cpp2RequestContext : public apache::thrift::server::TConnectionContext {
     return ctx_->getLocalAddress();
   }
 
-  void reset() {
-    ctx_->reset();
-  }
+  void reset() { ctx_->reset(); }
 
   concurrency::PRIORITY getCallPriority() const {
     return header_->getCallPriority();
@@ -473,9 +457,7 @@ class Cpp2RequestContext : public apache::thrift::server::TConnectionContext {
     return ctx_->getEventBaseManager();
   }
 
-  void* getUserData() const override {
-    return ctx_->getUserData();
-  }
+  void* getUserData() const override { return ctx_->getUserData(); }
 
   void* setUserData(folly::erased_unique_ptr data) override {
     return ctx_->setUserData(std::move(data));
@@ -483,23 +465,18 @@ class Cpp2RequestContext : public apache::thrift::server::TConnectionContext {
   using TConnectionContext::setUserData;
 
   // This data is set on a per request basis.
-  void* getRequestData() const {
-    return requestData_.get();
-  }
+  void* getRequestData() const { return requestData_.get(); }
 
   // Returns the old request data context so the caller can clean up
   folly::erased_unique_ptr setRequestData(
-      void* data,
-      void (*destructor)(void*) = no_op_destructor) {
+      void* data, void (*destructor)(void*) = no_op_destructor) {
     return std::exchange(requestData_, {data, destructor});
   }
   folly::erased_unique_ptr setRequestData(folly::erased_unique_ptr data) {
     return std::exchange(requestData_, std::move(data));
   }
 
-  virtual Cpp2ConnContext* getConnectionContext() const {
-    return ctx_;
-  }
+  virtual Cpp2ConnContext* getConnectionContext() const { return ctx_; }
 
   std::chrono::milliseconds getRequestTimeout() const {
     return requestTimeout_;
@@ -509,33 +486,17 @@ class Cpp2RequestContext : public apache::thrift::server::TConnectionContext {
     requestTimeout_ = requestTimeout;
   }
 
-  void setMethodName(std::string methodName) {
-    methodName_ = std::move(methodName);
-  }
+  const std::string& getMethodName() const { return methodName_; }
 
-  const std::string& getMethodName() const {
-    return methodName_;
-  }
+  std::string releaseMethodName() { return std::move(methodName_); }
 
-  std::string releaseMethodName() {
-    return std::move(methodName_);
-  }
+  void setProtoSeqId(int32_t protoSeqId) { protoSeqId_ = protoSeqId; }
 
-  void setProtoSeqId(int32_t protoSeqId) {
-    protoSeqId_ = protoSeqId;
-  }
+  int32_t getProtoSeqId() { return protoSeqId_; }
 
-  int32_t getProtoSeqId() {
-    return protoSeqId_;
-  }
+  void setInteractionId(int64_t id) { interactionId_ = id; }
 
-  void setInteractionId(int64_t id) {
-    interactionId_ = id;
-  }
-
-  int64_t getInteractionId() {
-    return interactionId_;
-  }
+  int64_t getInteractionId() { return interactionId_; }
 
   void setInteractionCreate(InteractionCreate interactionCreate) {
     interactionCreate_ = std::move(interactionCreate);
@@ -549,12 +510,22 @@ class Cpp2RequestContext : public apache::thrift::server::TConnectionContext {
     return timestamps_;
   }
 
-  void setTile(Tile& tile) {
-    tile_ = &tile;
+  // This lets us avoid having different signatures in the processor map.
+  // Should remove if we decide to split out interaction methods.
+  void setTile(TilePtr&& tile) {
+    DCHECK(tile);
+    tile_ = std::move(tile);
   }
+  TilePtr releaseTile() { return std::move(tile_); }
 
-  Tile* getTile() {
-    return tile_;
+  const std::string* clientId() const {
+    if (auto header = getHeader(); header && header->clientId()) {
+      return &*header->clientId();
+    }
+    if (auto headers = getHeadersPtr()) {
+      return folly::get_ptr(*headers, transport::THeader::kClientId);
+    }
+    return nullptr;
   }
 
  protected:
@@ -568,7 +539,7 @@ class Cpp2RequestContext : public apache::thrift::server::TConnectionContext {
   int32_t protoSeqId_{0};
   int64_t interactionId_{0};
   folly::Optional<InteractionCreate> interactionCreate_;
-  Tile* tile_{nullptr};
+  TilePtr tile_;
   concurrency::ThreadManager::ExecutionScope executionScope_{
       concurrency::PRIORITY::NORMAL};
 };

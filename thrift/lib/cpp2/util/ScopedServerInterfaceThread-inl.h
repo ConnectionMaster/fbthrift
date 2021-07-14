@@ -33,68 +33,68 @@ class FaultInjectionChannel : public RequestChannel {
 
   void sendRequestResponse(
       const RpcOptions& rpcOptions,
-      ManagedStringView&& methodName,
+      MethodMetadata&& methodMetadata,
       SerializedRequest&& req,
       std::shared_ptr<transport::THeader> header,
       RequestClientCallback::Ptr clientCallback) override {
-    if (auto ex = injectFault_(methodName.view())) {
+    if (auto ex = injectFault_(methodMetadata.name_view())) {
       clientCallback.release()->onResponseError(std::move(ex));
       return;
     }
     client_->sendRequestResponse(
         rpcOptions,
-        std::move(methodName),
+        std::move(methodMetadata),
         std::move(req),
         std::move(header),
         std::move(clientCallback));
   }
   void sendRequestNoResponse(
       const RpcOptions& rpcOptions,
-      ManagedStringView&& methodName,
+      MethodMetadata&& methodMetadata,
       SerializedRequest&& req,
       std::shared_ptr<transport::THeader> header,
       RequestClientCallback::Ptr clientCallback) override {
-    if (auto ex = injectFault_(methodName.view())) {
+    if (auto ex = injectFault_(methodMetadata.name_view())) {
       clientCallback.release()->onResponseError(std::move(ex));
       return;
     }
     client_->sendRequestNoResponse(
         rpcOptions,
-        std::move(methodName),
+        std::move(methodMetadata),
         std::move(req),
         std::move(header),
         std::move(clientCallback));
   }
   void sendRequestStream(
       const RpcOptions& rpcOptions,
-      ManagedStringView&& methodName,
+      MethodMetadata&& methodMetadata,
       SerializedRequest&& req,
       std::shared_ptr<transport::THeader> header,
       StreamClientCallback* clientCallback) override {
-    if (auto ex = injectFault_(methodName.view())) {
+    if (auto ex = injectFault_(methodMetadata.name_view())) {
       clientCallback->onFirstResponseError(std::move(ex));
       return;
     }
     client_->sendRequestStream(
         rpcOptions,
-        std::move(methodName),
+        std::move(methodMetadata),
         std::move(req),
         std::move(header),
         clientCallback);
   }
   void sendRequestSink(
       const RpcOptions& rpcOptions,
-      ManagedStringView&& methodName,
+      MethodMetadata&& methodMetadata,
       SerializedRequest&& req,
       std::shared_ptr<transport::THeader> header,
       SinkClientCallback* clientCallback) override {
-    if (auto ex = injectFault_(methodName.view())) {
+    if (auto ex = injectFault_(methodMetadata.name_view())) {
       clientCallback->onFirstResponseError(std::move(ex));
       return;
     }
     client_->sendRequestSink(
         rpcOptions,
-        std::move(methodName),
+        std::move(methodMetadata),
         std::move(req),
         std::move(header),
         clientCallback);
@@ -108,21 +108,21 @@ class FaultInjectionChannel : public RequestChannel {
     return client_->getEventBase();
   }
 
-  uint16_t getProtocolId() override {
-    return client_->getProtocolId();
-  }
+  uint16_t getProtocolId() override { return client_->getProtocolId(); }
 
  private:
   RequestChannel::Ptr client_;
   ScopedServerInterfaceThread::FaultInjectionFunc injectFault_;
 };
+
+void validateServiceName(AsyncProcessorFactory& apf, const char* serviceName);
 } // namespace detail
 
 template <class AsyncClientT>
 std::unique_ptr<AsyncClientT> ScopedServerInterfaceThread::newStickyClient(
     folly::Executor* callbackExecutor,
     ScopedServerInterfaceThread::MakeChannelFunc makeChannel) const {
-  auto io = folly::getIOExecutor();
+  auto io = folly::getUnsafeMutableGlobalIOExecutor();
   auto sp = std::shared_ptr<folly::EventBase>(io, io->getEventBase());
   return std::make_unique<AsyncClientT>(
       newChannel(callbackExecutor, std::move(makeChannel), std::move(sp)));
@@ -151,11 +151,12 @@ ScopedServerInterfaceThread::newClientWithFaultInjection(
 template <class AsyncClientT>
 std::unique_ptr<AsyncClientT> makeTestClient(
     std::shared_ptr<AsyncProcessorFactory> apf,
-    folly::Executor* callbackExecutor,
     ScopedServerInterfaceThread::FaultInjectionFunc injectFault) {
-  return std::make_unique<AsyncClientT>(
+  auto client = std::make_unique<AsyncClientT>(
       ScopedServerInterfaceThread::makeTestClientChannel(
-          std::move(apf), callbackExecutor, std::move(injectFault)));
+          apf, std::move(injectFault)));
+  apache::thrift::detail::validateServiceName(*apf, client->getServiceName());
+  return client;
 }
 
 } // namespace thrift

@@ -18,7 +18,6 @@
 
 #include <atomic>
 #include <functional>
-#include <mutex>
 #include <type_traits>
 
 #include <folly/Optional.h>
@@ -114,9 +113,7 @@ struct ServerAttributeObservable {
   explicit ServerAttributeObservable(folly::observer::Observer<T> defaultValue)
       : default_(std::move(defaultValue)) {}
 
-  T get() const {
-    return **getObserver();
-  }
+  T get() const { return **getObserver(); }
 
   const folly::observer::Observer<T>& getObserver() const {
     return mergedObserver_.try_emplace_with([&] {
@@ -178,9 +175,7 @@ struct ServerAttributeAtomic
   using apache::thrift::detail::ServerAttributeObservable<T>::unset;
   using apache::thrift::detail::ServerAttributeObservable<T>::getObserver;
 
-  T get() const {
-    return *getAtomicObserver();
-  }
+  T get() const { return *getAtomicObserver(); }
 
   const folly::observer::AtomicObserver<T>& getAtomicObserver() const {
     return atomicObserver_.try_emplace(getObserver());
@@ -200,9 +195,7 @@ struct ServerAttributeThreadLocal
   using apache::thrift::detail::ServerAttributeObservable<T>::unset;
   using apache::thrift::detail::ServerAttributeObservable<T>::getObserver;
 
-  const T& get() const {
-    return **getTLObserver();
-  }
+  const T& get() const { return **getTLObserver(); }
 
   const folly::observer::TLObserver<T>& getTLObserver() const {
     return tlObserver_.try_emplace(getObserver());
@@ -226,9 +219,7 @@ struct ServerAttributeStatic {
     updateMergedValue();
   }
 
-  const T& get() const {
-    return merged_.get();
-  }
+  const T& get() const { return merged_.get(); }
 
  protected:
   void updateMergedValue() {

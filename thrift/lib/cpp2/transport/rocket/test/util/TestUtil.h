@@ -79,12 +79,8 @@ class TestSetup : public testing::Test {
       folly::Function<void()> onDetachable = nullptr,
       folly::Function<void(TAsyncSocketIntercepted&)> socketSetup = nullptr);
 
-  void setNumIOThreads(int num) {
-    numIOThreads_ = num;
-  }
-  void setNumWorkerThreads(int num) {
-    numWorkerThreads_ = num;
-  }
+  void setNumIOThreads(int num) { numIOThreads_ = num; }
+  void setNumWorkerThreads(int num) { numWorkerThreads_ = num; }
   void setQueueTimeout(std::chrono::milliseconds timeout) {
     queueTimeout_ = timeout;
   }
@@ -182,10 +178,10 @@ class SlowWritingSocket : public folly::AsyncSocket {
  private:
   struct BufferedWrite {
     BufferedWrite(
-        std::unique_ptr<folly::IOBuf> _iobuf,
+        std::unique_ptr<folly::IOBuf> _fbthrift_iobuf,
         WriteCallback* _callback,
         size_t _bytesWritten)
-        : iobuf(std::move(_iobuf)),
+        : iobuf(std::move(_fbthrift_iobuf)),
           callback(_callback),
           bytesWritten(_bytesWritten) {}
 

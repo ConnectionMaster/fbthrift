@@ -7,21 +7,20 @@
 
 package test.fixtures.sink;
 
+import com.facebook.thrift.client.*;
 import java.util.*;
 
 public class SinkServiceBlockingReactiveWrapper 
     implements SinkService.Reactive {
     private final SinkService _delegate;
-    private final reactor.core.scheduler.Scheduler _scheduler;
 
-    public SinkServiceBlockingReactiveWrapper(SinkService _delegate, reactor.core.scheduler.Scheduler _scheduler) {
+    public SinkServiceBlockingReactiveWrapper(SinkService _delegate) {
         
         this._delegate = _delegate;
-        this._scheduler = _scheduler;
     }
 
     @java.lang.Override
-    public void close() {
+    public void dispose() {
         _delegate.close();
     }
 
@@ -31,7 +30,7 @@ public class SinkServiceBlockingReactiveWrapper
     }
 
     @java.lang.Override
-    public reactor.core.publisher.Flux<com.facebook.swift.transport.model.StreamResponse<test.fixtures.sink.InitialResponse,test.fixtures.sink.FinalResponse>> methodAndReponse( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads) {
+    public reactor.core.publisher.Flux<com.facebook.thrift.model.StreamResponse<test.fixtures.sink.InitialResponse,test.fixtures.sink.FinalResponse>> methodAndReponse( org.reactivestreams.Publisher<test.fixtures.sink.SinkPayload> payloads) {
         throw new UnsupportedOperationException();
     }
 

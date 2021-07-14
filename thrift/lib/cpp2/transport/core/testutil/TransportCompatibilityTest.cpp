@@ -43,6 +43,7 @@
 #include <thrift/lib/cpp2/transport/rocket/server/RocketServerConnection.h>
 #include <thrift/lib/cpp2/transport/rocket/server/ThriftRocketServerHandler.h>
 #include <thrift/lib/cpp2/transport/util/ConnectionManager.h>
+#include <thrift/lib/thrift/gen-cpp2/RpcMetadata_types.h>
 
 DECLARE_bool(use_ssl);
 DECLARE_string(transport);
@@ -203,22 +204,21 @@ template <typename Service>
 void SampleServer<Service>::connectToServer(
     std::string transport,
     folly::Function<void(
-        std::shared_ptr<RequestChannel>,
-        std::shared_ptr<ClientConnectionIf>)> callMe) {
+        std::shared_ptr<RequestChannel>, std::shared_ptr<ClientConnectionIf>)>
+        callMe) {
   ASSERT_GT(port_, 0) << "Check if the server has started already";
   if (transport == "header") {
-    std::shared_ptr<HeaderClientChannel> channel;
+    std::shared_ptr<ClientChannel> channel;
     evbThread_.getEventBase()->runInEventBaseThreadAndWait([&]() {
       channel = HeaderClientChannel::newChannel(
           folly::AsyncSocket::UniquePtr(new TAsyncSocketIntercepted(
               evbThread_.getEventBase(), FLAGS_host, port_)));
-      channel->setProtocolId(apache::thrift::protocol::T_COMPACT_PROTOCOL);
     });
     auto channelPtr = channel.get();
-    std::shared_ptr<HeaderClientChannel> destroyInEvbChannel(
+    std::shared_ptr<ClientChannel> destroyInEvbChannel(
         channelPtr,
         [channel = std::move(channel),
-         eventBase = evbThread_.getEventBase()](HeaderClientChannel*) mutable {
+         eventBase = evbThread_.getEventBase()](ClientChannel*) mutable {
           eventBase->runImmediatelyOrRunInEventBaseThreadAndWait(
               [channel_ = std::move(channel)] {});
         });
@@ -269,9 +269,7 @@ void SampleServer<Service>::connectToServer(
 }
 
 void TransportCompatibilityTest::callSleep(
-    TestServiceAsyncClient* client,
-    int32_t timeoutMs,
-    int32_t sleepMs) {
+    TestServiceAsyncClient* client, int32_t timeoutMs, int32_t sleepMs) {
   auto cb = std::make_unique<MockCallback>(false, timeoutMs < sleepMs);
   RpcOptions opts;
   opts.setTimeout(std::chrono::milliseconds(timeoutMs));
@@ -680,13 +678,7 @@ void TransportCompatibilityTest::TestRequestResponse_IsOverloaded() {
     } catch (TApplicationException& ex) {
       EXPECT_EQ(TApplicationException::LOADSHEDDING, ex.getType());
       EXPECT_EQ(0, server_->observer_->taskKilled_);
-      if (!upgradeToRocket_) {
-        EXPECT_EQ(1, server_->observer_->serverOverloaded_);
-      } else {
-        // for transport upgrade, upgrade request and original request both hit
-        // the server
-        EXPECT_EQ(2, server_->observer_->serverOverloaded_);
-      }
+      EXPECT_EQ(1, server_->observer_->serverOverloaded_);
     }
   });
 }
@@ -792,7 +784,7 @@ void TransportCompatibilityTest::TestRequestResponse_Checksumming() {
       REQUESTS = 1,
       RESPONSES = 2,
     };
-    EXPECT_CALL(*handler_.get(), echo_(_)).Times(2);
+    EXPECT_CALL(*handler_.get(), echo_(_)).Times(4);
 
     auto setCorruption = [&](CorruptionType corruptionType) {
       auto channel = static_cast<ClientChannel*>(client->getChannel());
@@ -800,9 +792,19 @@ void TransportCompatibilityTest::TestRequestResponse_Checksumming() {
         auto p = std::make_shared<TAsyncSocketIntercepted::Params>();
         p->corruptLastWriteByte_ = corruptionType == CorruptionType::REQUESTS;
         p->corruptLastReadByte_ = corruptionType == CorruptionType::RESPONSES;
-        p->corruptLastReadByteMinSize_ = 1 << 10;
         dynamic_cast<TAsyncSocketIntercepted*>(channel->getTransport())
             ->setParams(p);
+      });
+    };
+
+    auto setCompression = [&](bool compression) {
+      auto channel = static_cast<ClientChannel*>(client->getChannel());
+      channel->getEventBase()->runInEventBaseThreadAndWait([&]() {
+        CompressionConfig compressionConfig;
+        if (compression) {
+          compressionConfig.codecConfig_ref().ensure().set_zstdConfig();
+        }
+        channel->setDesiredCompressionConfig(compressionConfig);
       });
     };
 
@@ -810,27 +812,41 @@ void TransportCompatibilityTest::TestRequestResponse_Checksumming() {
          {CorruptionType::NONE,
           CorruptionType::REQUESTS,
           CorruptionType::RESPONSES}) {
-      static const int kSize = 32 << 10;
-      std::string asString(kSize, 'a');
-      std::unique_ptr<folly::IOBuf> payload =
-          folly::IOBuf::copyBuffer(asString);
-      setCorruption(testType);
+      for (auto compression : {false, true}) {
+        static const int kSize = 32 << 10;
+        std::string asString(kSize, 'a');
+        std::unique_ptr<folly::IOBuf> payload =
+            folly::IOBuf::copyBuffer(asString);
+        setCorruption(testType);
+        setCompression(compression);
 
-      auto future =
-          client->future_echo(RpcOptions().setEnableChecksum(true), *payload);
+        server_->observer_->taskKilled_ = 0;
+        auto future =
+            client->future_echo(RpcOptions().setEnableChecksum(true), *payload);
 
-      if (testType == CorruptionType::NONE) {
-        EXPECT_EQ(asString, std::move(future).get());
-      } else {
-        bool didThrow = false;
-        try {
-          auto res = std::move(future).get();
-        } catch (TApplicationException& ex) {
-          EXPECT_EQ(TApplicationException::CHECKSUM_MISMATCH, ex.getType());
-          didThrow = true;
-          EXPECT_EQ(1, server_->observer_->taskKilled_);
+        if (testType == CorruptionType::NONE) {
+          EXPECT_EQ(asString, std::move(future).get());
+        } else {
+          bool didThrow = false;
+          try {
+            auto res = std::move(future).get();
+          } catch (TApplicationException& ex) {
+            EXPECT_EQ(
+                compression
+                    ? ((testType == CorruptionType::RESPONSES)
+                           ? TApplicationException::INVALID_TRANSFORM
+                           : TApplicationException::UNSUPPORTED_CLIENT_TYPE)
+                    : TApplicationException::CHECKSUM_MISMATCH,
+                ex.getType());
+            didThrow = true;
+          }
+          EXPECT_TRUE(didThrow)
+              << "Expected an exception with corruption type: " << (int)testType
+              << ", compression: " << compression;
         }
-        EXPECT_TRUE(didThrow);
+        EXPECT_EQ(
+            testType == CorruptionType::REQUESTS ? 1 : 0,
+            server_->observer_->taskKilled_);
       }
     }
     setCorruption(CorruptionType::NONE);
@@ -1014,7 +1030,6 @@ void TransportCompatibilityTest::TestBadPayload() {
       metadata.clientTimeoutMs_ref() = 10000;
       metadata.kind_ref() = RpcKind::SINGLE_REQUEST_SINGLE_RESPONSE;
       metadata.name_ref() = "name";
-      metadata.seqId_ref() = 0;
       metadata.protocol_ref() = ProtocolId::BINARY;
 
       // Put a bad payload!
@@ -1029,9 +1044,7 @@ void TransportCompatibilityTest::TestBadPayload() {
           return apache::thrift::RequestClientCallback::Ptr(instance.get());
         }
 
-        void onRequestSent() noexcept override {
-          ADD_FAILURE();
-        }
+        void onRequestSent() noexcept override { ADD_FAILURE(); }
         void onResponse(
             apache::thrift::ClientReceiveState&&) noexcept override {
           ADD_FAILURE();
@@ -1147,9 +1160,7 @@ class CloseCallbackTest : public CloseCallback {
     EXPECT_FALSE(closed_);
     closed_ = true;
   }
-  bool isClosed() {
-    return closed_;
-  }
+  bool isClosed() { return closed_; }
 
  private:
   bool closed_{false};
@@ -1203,23 +1214,26 @@ void TransportCompatibilityTest::TestCustomAsyncProcessor() {
         apache::thrift::ResponseChannelRequest::UniquePtr req)
         : req_(std::move(req)) {}
 
-    bool isActive() const override {
-      return req_->isActive();
-    }
+    bool isActive() const override { return req_->isActive(); }
 
-    bool isOneway() const override {
-      return req_->isOneway();
-    }
+    bool isOneway() const override { return req_->isOneway(); }
+
+    bool includeEnvelope() const override { return req_->includeEnvelope(); }
 
     void sendReply(
-        std::unique_ptr<folly::IOBuf>&& buf,
+        ResponsePayload&& response,
         MessageChannel::SendCallback* cb,
         folly::Optional<uint32_t> crc32) override {
-      req_->sendReply(std::move(buf), new TestSendCallback(cb), crc32);
+      req_->sendReply(std::move(response), new TestSendCallback(cb), crc32);
     }
 
-    void sendErrorWrapped(folly::exception_wrapper ex, std::string exCode)
-        override {
+    void sendException(
+        ResponsePayload&& response, MessageChannel::SendCallback* cb) override {
+      req_->sendException(std::move(response), cb);
+    }
+
+    void sendErrorWrapped(
+        folly::exception_wrapper ex, std::string exCode) override {
       req_->sendErrorWrapped(std::move(ex), std::move(exCode));
     }
 
@@ -1269,6 +1283,10 @@ void TransportCompatibilityTest::TestCustomAsyncProcessor() {
     std::unique_ptr<apache::thrift::AsyncProcessor> getProcessor() override {
       return std::make_unique<TestAsyncProcessor>(
           underlyingFac_->getProcessor());
+    }
+
+    std::vector<apache::thrift::ServiceHandler*> getServiceHandlers() override {
+      return underlyingFac_->getServiceHandlers();
     }
 
    private:

@@ -100,6 +100,13 @@ class containerStruct2;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace extra { namespace svc {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
 class containerStruct2 final  {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
@@ -123,14 +130,13 @@ class containerStruct2 final  {
   [[deprecated("This constructor is deprecated")]]
   containerStruct2(apache::thrift::FragileConstructor, bool fieldA__arg, bool req_fieldA__arg, bool opt_fieldA__arg, ::std::map<::std::string, bool> fieldB__arg, ::std::map<::std::string, bool> req_fieldB__arg, ::std::map<::std::string, bool> opt_fieldB__arg, ::std::set<::std::int32_t> fieldC__arg, ::std::set<::std::int32_t> req_fieldC__arg, ::std::set<::std::int32_t> opt_fieldC__arg, ::std::string fieldD__arg, ::std::string fieldE__arg, ::std::string req_fieldE__arg, ::std::string opt_fieldE__arg);
 
-  containerStruct2(containerStruct2&&) = default;
+  containerStruct2(containerStruct2&&) noexcept;
 
-  containerStruct2(const containerStruct2&) = default;
+  containerStruct2(const containerStruct2& src);
 
 
-  containerStruct2& operator=(containerStruct2&&) = default;
-
-  containerStruct2& operator=(const containerStruct2&) = default;
+  containerStruct2& operator=(containerStruct2&&) noexcept;
+  containerStruct2& operator=(const containerStruct2& src);
   void __clear();
 
   ~containerStruct2();
@@ -162,7 +168,7 @@ class containerStruct2 final  {
  private:
   ::std::string opt_fieldE;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool fieldA;
@@ -175,24 +181,11 @@ class containerStruct2 final  {
     bool fieldE;
     bool opt_fieldE;
   } __isset = {};
-  bool operator==(const containerStruct2& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const containerStruct2& __x, const containerStruct2& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const containerStruct2& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const containerStruct2& __x, const containerStruct2& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const containerStruct2& __x, const containerStruct2& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const containerStruct2& __x, const containerStruct2& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const containerStruct2&) const;
+  bool operator<(const containerStruct2&) const;
 
   template <typename..., typename T = bool>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> fieldA_ref() const& {
@@ -458,6 +451,7 @@ class containerStruct2 final  {
     return fieldA;
   }
 
+  [[deprecated("Use `FOO.fieldA_ref() = BAR;` instead of `FOO.set_fieldA(BAR);`")]]
   bool& set_fieldA(bool fieldA_) {
     fieldA = fieldA_;
     __isset.fieldA = true;
@@ -468,6 +462,7 @@ class containerStruct2 final  {
     return req_fieldA;
   }
 
+  [[deprecated("Use `FOO.req_fieldA_ref() = BAR;` instead of `FOO.set_req_fieldA(BAR);`")]]
   bool& set_req_fieldA(bool req_fieldA_) {
     req_fieldA = req_fieldA_;
     return req_fieldA;
@@ -482,6 +477,7 @@ class containerStruct2 final  {
   }
   bool* get_opt_fieldA() && = delete;
 
+  [[deprecated("Use `FOO.opt_fieldA_ref() = BAR;` instead of `FOO.set_opt_fieldA(BAR);`")]]
   bool& set_opt_fieldA(bool opt_fieldA_) {
     opt_fieldA = opt_fieldA_;
     __isset.opt_fieldA = true;
@@ -491,6 +487,7 @@ class containerStruct2 final  {
   ::std::map<::std::string, bool> get_fieldB() &&;
 
   template <typename T_containerStruct2_fieldB_struct_setter = ::std::map<::std::string, bool>>
+  [[deprecated("Use `FOO.fieldB_ref() = BAR;` instead of `FOO.set_fieldB(BAR);`")]]
   ::std::map<::std::string, bool>& set_fieldB(T_containerStruct2_fieldB_struct_setter&& fieldB_) {
     fieldB = std::forward<T_containerStruct2_fieldB_struct_setter>(fieldB_);
     __isset.fieldB = true;
@@ -500,6 +497,7 @@ class containerStruct2 final  {
   ::std::map<::std::string, bool> get_req_fieldB() &&;
 
   template <typename T_containerStruct2_req_fieldB_struct_setter = ::std::map<::std::string, bool>>
+  [[deprecated("Use `FOO.req_fieldB_ref() = BAR;` instead of `FOO.set_req_fieldB(BAR);`")]]
   ::std::map<::std::string, bool>& set_req_fieldB(T_containerStruct2_req_fieldB_struct_setter&& req_fieldB_) {
     req_fieldB = std::forward<T_containerStruct2_req_fieldB_struct_setter>(req_fieldB_);
     return req_fieldB;
@@ -509,6 +507,7 @@ class containerStruct2 final  {
   ::std::map<::std::string, bool>* get_opt_fieldB() && = delete;
 
   template <typename T_containerStruct2_opt_fieldB_struct_setter = ::std::map<::std::string, bool>>
+  [[deprecated("Use `FOO.opt_fieldB_ref() = BAR;` instead of `FOO.set_opt_fieldB(BAR);`")]]
   ::std::map<::std::string, bool>& set_opt_fieldB(T_containerStruct2_opt_fieldB_struct_setter&& opt_fieldB_) {
     opt_fieldB = std::forward<T_containerStruct2_opt_fieldB_struct_setter>(opt_fieldB_);
     __isset.opt_fieldB = true;
@@ -518,6 +517,7 @@ class containerStruct2 final  {
   ::std::set<::std::int32_t> get_fieldC() &&;
 
   template <typename T_containerStruct2_fieldC_struct_setter = ::std::set<::std::int32_t>>
+  [[deprecated("Use `FOO.fieldC_ref() = BAR;` instead of `FOO.set_fieldC(BAR);`")]]
   ::std::set<::std::int32_t>& set_fieldC(T_containerStruct2_fieldC_struct_setter&& fieldC_) {
     fieldC = std::forward<T_containerStruct2_fieldC_struct_setter>(fieldC_);
     __isset.fieldC = true;
@@ -527,6 +527,7 @@ class containerStruct2 final  {
   ::std::set<::std::int32_t> get_req_fieldC() &&;
 
   template <typename T_containerStruct2_req_fieldC_struct_setter = ::std::set<::std::int32_t>>
+  [[deprecated("Use `FOO.req_fieldC_ref() = BAR;` instead of `FOO.set_req_fieldC(BAR);`")]]
   ::std::set<::std::int32_t>& set_req_fieldC(T_containerStruct2_req_fieldC_struct_setter&& req_fieldC_) {
     req_fieldC = std::forward<T_containerStruct2_req_fieldC_struct_setter>(req_fieldC_);
     return req_fieldC;
@@ -536,6 +537,7 @@ class containerStruct2 final  {
   ::std::set<::std::int32_t>* get_opt_fieldC() && = delete;
 
   template <typename T_containerStruct2_opt_fieldC_struct_setter = ::std::set<::std::int32_t>>
+  [[deprecated("Use `FOO.opt_fieldC_ref() = BAR;` instead of `FOO.set_opt_fieldC(BAR);`")]]
   ::std::set<::std::int32_t>& set_opt_fieldC(T_containerStruct2_opt_fieldC_struct_setter&& opt_fieldC_) {
     opt_fieldC = std::forward<T_containerStruct2_opt_fieldC_struct_setter>(opt_fieldC_);
     __isset.opt_fieldC = true;
@@ -551,6 +553,7 @@ class containerStruct2 final  {
   }
 
   template <typename T_containerStruct2_fieldD_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.fieldD_ref() = BAR;` instead of `FOO.set_fieldD(BAR);`")]]
   ::std::string& set_fieldD(T_containerStruct2_fieldD_struct_setter&& fieldD_) {
     fieldD = std::forward<T_containerStruct2_fieldD_struct_setter>(fieldD_);
     __isset.fieldD = true;
@@ -566,6 +569,7 @@ class containerStruct2 final  {
   }
 
   template <typename T_containerStruct2_fieldE_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.fieldE_ref() = BAR;` instead of `FOO.set_fieldE(BAR);`")]]
   ::std::string& set_fieldE(T_containerStruct2_fieldE_struct_setter&& fieldE_) {
     fieldE = std::forward<T_containerStruct2_fieldE_struct_setter>(fieldE_);
     __isset.fieldE = true;
@@ -581,6 +585,7 @@ class containerStruct2 final  {
   }
 
   template <typename T_containerStruct2_req_fieldE_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.req_fieldE_ref() = BAR;` instead of `FOO.set_req_fieldE(BAR);`")]]
   ::std::string& set_req_fieldE(T_containerStruct2_req_fieldE_struct_setter&& req_fieldE_) {
     req_fieldE = std::forward<T_containerStruct2_req_fieldE_struct_setter>(req_fieldE_);
     return req_fieldE;
@@ -596,6 +601,7 @@ class containerStruct2 final  {
   ::std::string* get_opt_fieldE() && = delete;
 
   template <typename T_containerStruct2_opt_fieldE_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.opt_fieldE_ref() = BAR;` instead of `FOO.set_opt_fieldE(BAR);`")]]
   ::std::string& set_opt_fieldE(T_containerStruct2_opt_fieldE_struct_setter&& opt_fieldE_) {
     opt_fieldE = std::forward<T_containerStruct2_opt_fieldE_struct_setter>(opt_fieldE_);
     __isset.opt_fieldE = true;
@@ -615,7 +621,7 @@ class containerStruct2 final  {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< containerStruct2 >;
+  friend class ::apache::thrift::Cpp2Ops<containerStruct2>;
   friend void swap(containerStruct2& a, containerStruct2& b);
 };
 

@@ -21,7 +21,7 @@ from libcpp.vector cimport vector
 from libcpp.set cimport set as cset
 from libcpp.map cimport map as cmap, pair as cpair
 from thrift.py3.exceptions cimport cTException
-cimport folly.iobuf as __iobuf
+cimport folly.iobuf as _fbthrift_iobuf
 cimport thrift.py3.exceptions
 cimport thrift.py3.types
 from thrift.py3.types cimport (
@@ -39,7 +39,7 @@ from thrift.py3.common cimport (
 )
 from folly.optional cimport cOptional as __cOptional
 
-cimport module.types_fields as __fbthrift_types_fields
+cimport module.types_fields as _fbthrift_types_fields
 
 cdef extern from "src/gen-py3/module/types.h":
   pass
@@ -83,11 +83,6 @@ cdef extern from "src/gen-cpp2/module_metadata.h" namespace "apache::thrift::det
         @staticmethod
         void gen(__fbthrift_cThriftMetadata &metadata)
 cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2":
-    cdef cppclass cInternship__isset "::cpp2::Internship::__isset":
-        bint weeks
-        bint title
-        bint employer
-        bint compensation
 
     cdef cppclass cInternship "::cpp2::Internship":
         cInternship() except +
@@ -106,11 +101,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         string title
         cCompany employer
         double compensation
-        cInternship__isset __isset
 
-    cdef cppclass cRange__isset "::cpp2::Range::__isset":
-        bint min
-        bint max
 
     cdef cppclass cRange "::cpp2::Range":
         cRange() except +
@@ -125,11 +116,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         __required_field_ref[cint32_t] max_ref()
         cint32_t min
         cint32_t max
-        cRange__isset __isset
 
-    cdef cppclass cstruct1__isset "::cpp2::struct1::__isset":
-        bint a
-        bint b
 
     cdef cppclass cstruct1 "::cpp2::struct1":
         cstruct1() except +
@@ -144,13 +131,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         __field_ref[string] b_ref()
         cint32_t a
         string b
-        cstruct1__isset __isset
 
-    cdef cppclass cstruct2__isset "::cpp2::struct2::__isset":
-        bint a
-        bint b
-        bint c
-        bint d
 
     cdef cppclass cstruct2 "::cpp2::struct2":
         cstruct2() except +
@@ -169,12 +150,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         string b
         cstruct1 c
         vector[cint32_t] d
-        cstruct2__isset __isset
 
-    cdef cppclass cstruct3__isset "::cpp2::struct3::__isset":
-        bint a
-        bint b
-        bint c
 
     cdef cppclass cstruct3 "::cpp2::struct3":
         cstruct3() except +
@@ -191,12 +167,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         string a
         cint32_t b
         cstruct2 c
-        cstruct3__isset __isset
 
-    cdef cppclass cstruct4__isset "::cpp2::struct4::__isset":
-        bint a
-        bint b
-        bint c
 
     cdef cppclass cstruct4 "::cpp2::struct4":
         cstruct4() except +
@@ -213,7 +184,6 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
         cint32_t a
         double b
         cint8_t c
-        cstruct4__isset __isset
 
     cdef enum cunion1__type "::cpp2::union1::Type":
         cunion1__type___EMPTY__ "::cpp2::union1::Type::__EMPTY__",
@@ -266,7 +236,7 @@ cdef extern from "src/gen-cpp2/module_types_custom_protocol.h" namespace "::cpp2
 
 cdef class Internship(thrift.py3.types.Struct):
     cdef shared_ptr[cInternship] _cpp_obj
-    cdef __fbthrift_types_fields.__Internship_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Internship_FieldsSetter _fields_setter
     cdef object __fbthrift_cached_employer
 
     @staticmethod
@@ -276,7 +246,7 @@ cdef class Internship(thrift.py3.types.Struct):
 
 cdef class Range(thrift.py3.types.Struct):
     cdef shared_ptr[cRange] _cpp_obj
-    cdef __fbthrift_types_fields.__Range_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__Range_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cRange])
@@ -285,7 +255,7 @@ cdef class Range(thrift.py3.types.Struct):
 
 cdef class struct1(thrift.py3.types.Struct):
     cdef shared_ptr[cstruct1] _cpp_obj
-    cdef __fbthrift_types_fields.__struct1_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__struct1_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cstruct1])
@@ -294,7 +264,7 @@ cdef class struct1(thrift.py3.types.Struct):
 
 cdef class struct2(thrift.py3.types.Struct):
     cdef shared_ptr[cstruct2] _cpp_obj
-    cdef __fbthrift_types_fields.__struct2_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__struct2_FieldsSetter _fields_setter
     cdef struct1 __fbthrift_cached_c
     cdef List__i32 __fbthrift_cached_d
 
@@ -305,7 +275,7 @@ cdef class struct2(thrift.py3.types.Struct):
 
 cdef class struct3(thrift.py3.types.Struct):
     cdef shared_ptr[cstruct3] _cpp_obj
-    cdef __fbthrift_types_fields.__struct3_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__struct3_FieldsSetter _fields_setter
     cdef struct2 __fbthrift_cached_c
 
     @staticmethod
@@ -315,7 +285,7 @@ cdef class struct3(thrift.py3.types.Struct):
 
 cdef class struct4(thrift.py3.types.Struct):
     cdef shared_ptr[cstruct4] _cpp_obj
-    cdef __fbthrift_types_fields.__struct4_FieldsSetter _fields_setter
+    cdef _fbthrift_types_fields.__struct4_FieldsSetter _fields_setter
 
     @staticmethod
     cdef create(shared_ptr[cstruct4])

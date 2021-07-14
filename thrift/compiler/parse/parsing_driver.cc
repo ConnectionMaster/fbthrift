@@ -17,6 +17,8 @@
 #include <thrift/compiler/parse/parsing_driver.h>
 
 #include <cstdarg>
+#include <limits>
+#include <memory>
 
 #include <boost/filesystem.hpp>
 
@@ -41,13 +43,15 @@ class parsing_terminator : public std::runtime_error {
 
 } // namespace
 
-parsing_driver::parsing_driver(std::string path, parsing_params parse_params)
+parsing_driver::parsing_driver(
+    diagnostic_context& ctx, std::string path, parsing_params parse_params)
     : params(std::move(parse_params)),
       doctext(boost::none),
       doctext_lineno(0),
-      mode(parsing_mode::INCLUDES) {
+      mode(parsing_mode::INCLUDES),
+      ctx_(ctx) {
   auto root_program = std::make_unique<t_program>(path);
-  program = root_program.get();
+  ctx_.start_program(program = root_program.get());
   program_bundle = std::make_unique<t_program_bundle>(std::move(root_program));
 
   scope_cache = program->scope();
@@ -60,17 +64,19 @@ parsing_driver::parsing_driver(std::string path, parsing_params parse_params)
  */
 parsing_driver::~parsing_driver() = default;
 
-std::unique_ptr<t_program_bundle> parsing_driver::parse(
-    std::vector<diagnostic_message>& messages) {
+std::unique_ptr<t_program_bundle> parsing_driver::parse() {
   std::unique_ptr<t_program_bundle> result{};
-
   try {
     scanner = std::make_unique<yy_scanner>();
   } catch (std::system_error const&) {
     return result;
   }
 
-  parser_ = std::make_unique<yy::parser>(*this, scanner->get_scanner());
+  YYSTYPE yylval{};
+  YYLTYPE yylloc{};
+
+  parser_ = std::make_unique<yy::parser>(
+      *this, scanner->get_scanner(), &yylval, &yylloc);
 
   try {
     parse_file();
@@ -79,16 +85,12 @@ std::unique_ptr<t_program_bundle> parsing_driver::parse(
     // No need to do anything here. The purpose of the exception is simply to
     // end the parsing process by unwinding to here.
   }
-
-  std::swap(messages, diagnostic_messages_);
-  diagnostic_messages_.clear();
-
   return result;
 }
 
 void parsing_driver::parse_file() {
   // Get scope file path
-  std::string path = program->path();
+  const std::string& path = program->path();
 
   // Skip on already parsed files
   if (already_parsed_paths_.count(path)) {
@@ -105,14 +107,14 @@ void parsing_driver::parse_file() {
   }
 
   // Create new scope and scan for includes
-  verbose("Scanning %s for includes\n", path.c_str());
+  verbose([&](auto& o) { o << "Scanning " << path << " for includes\n"; });
   mode = parsing_mode::INCLUDES;
   try {
     if (parser_->parse() != 0) {
       failure("Parser error during include pass.");
     }
   } catch (const std::string& x) {
-    failure(x.c_str());
+    failure(x);
   }
 
   // Recursively parse all the include programs
@@ -127,17 +129,18 @@ void parsing_driver::parse_file() {
 
     // Fail on circular dependencies
     if (circular_deps_.count(included_program->path())) {
-      failure(
-          "Circular dependency found: file `%s` is already parsed.",
-          included_program->path().c_str());
+      failure([&](auto& o) {
+        o << "Circular dependency found: file `" << included_program->path()
+          << "` is already parsed.";
+      });
     }
 
     // This must be after the previous circular include check, since the emitted
     // error message above is supposed to reference the parent file name.
-    program = included_program;
-    params.allow_neg_enum_vals = true;
     params.allow_neg_field_keys = true;
+    ctx_.start_program(program = included_program);
     parse_file();
+    ctx_.end_program(program);
 
     size_t num_removed = circular_deps_.erase(path);
     (void)num_removed;
@@ -155,18 +158,19 @@ void parsing_driver::parse_file() {
   }
 
   mode = parsing_mode::PROGRAM;
-  verbose("Parsing %s for types\n", path.c_str());
+  verbose([&](auto& o) { o << "Parsing " << path << " for types\n"; });
   try {
     if (parser_->parse() != 0) {
       failure("Parser error during types pass.");
     }
   } catch (const std::string& x) {
-    failure(x.c_str());
+    failure(x);
   }
 
   for (auto td : program->placeholder_typedefs()) {
-    if (!td->resolve_placeholder()) {
-      failure("Type `%s` not defined.", td->get_symbolic().c_str());
+    if (!td->resolve()) {
+      failure(
+          [&](auto& o) { o << "Type `" << td->name() << "` not defined."; });
     }
   }
 }
@@ -195,7 +199,9 @@ std::string parsing_driver::include_file(const std::string& filename) {
       auto abspath = boost::filesystem::canonical(path);
       return abspath.string();
     } catch (const boost::filesystem::filesystem_error& e) {
-      failure("Could not find file: %s. Error: %s", filename.c_str(), e.what());
+      failure([&](auto& o) {
+        o << "Could not find file: " << filename << ". Error: " << e.what();
+      });
     }
   } else { // relative path, start searching
     // new search path with current dir global
@@ -212,182 +218,13 @@ std::string parsing_driver::include_file(const std::string& filename) {
       if (boost::filesystem::exists(sfilename)) {
         return sfilename;
       } else {
-        debug("Could not find: %s.", sfilename.c_str());
+        debug([&](auto& o) { o << "Could not find: " << filename << "."; });
       }
     }
 
     // File was not found
-    failure("Could not find include file %s", filename.c_str());
+    failure([&](auto& o) { o << "Could not find include file " << filename; });
   }
-}
-
-void parsing_driver::validate_const_rec(
-    std::string name,
-    const t_type* type,
-    t_const_value* value) {
-  if (type->is_void()) {
-    throw std::string("type error: cannot declare a void const: " + name);
-  }
-
-  auto as_struct = dynamic_cast<const t_struct*>(type);
-  assert((as_struct != nullptr) == type->is_struct());
-  if (type->is_base_type()) {
-    t_base_type::t_base tbase = ((t_base_type*)type)->get_base();
-    switch (tbase) {
-      case t_base_type::TYPE_STRING:
-      case t_base_type::TYPE_BINARY:
-        if (value->get_type() != t_const_value::CV_STRING) {
-          throw std::string(
-              "type error: const `" + name + "` was declared as string.");
-        }
-        break;
-      case t_base_type::TYPE_BOOL:
-        if (value->get_type() != t_const_value::CV_BOOL &&
-            value->get_type() != t_const_value::CV_INTEGER) {
-          throw std::string(
-              "type error: const `" + name + "` was declared as bool.");
-        }
-        break;
-      case t_base_type::TYPE_BYTE:
-        if (value->get_type() != t_const_value::CV_INTEGER) {
-          throw std::string(
-              "type error: const `" + name + "` was declared as byte.");
-        }
-        break;
-      case t_base_type::TYPE_I16:
-        if (value->get_type() != t_const_value::CV_INTEGER) {
-          throw std::string(
-              "type error: const `" + name + "` was declared as i16.");
-        }
-        break;
-      case t_base_type::TYPE_I32:
-        if (value->get_type() != t_const_value::CV_INTEGER) {
-          throw std::string(
-              "type error: const `" + name + "` was declared as i32.");
-        }
-        break;
-      case t_base_type::TYPE_I64:
-        if (value->get_type() != t_const_value::CV_INTEGER) {
-          throw std::string(
-              "type error: const `" + name + "` was declared as i64.");
-        }
-        break;
-      case t_base_type::TYPE_DOUBLE:
-      case t_base_type::TYPE_FLOAT:
-        if (value->get_type() != t_const_value::CV_INTEGER &&
-            value->get_type() != t_const_value::CV_DOUBLE) {
-          throw std::string(
-              "type error: const `" + name + "` was declared as double.");
-        }
-        break;
-      default:
-        throw std::string(
-            "compiler error: no const of base type " +
-            t_base_type::t_base_name(tbase) + name);
-    }
-  } else if (type->is_enum()) {
-    if (value->get_type() != t_const_value::CV_INTEGER) {
-      throw std::string(
-          "type error: const `" + name + "` was declared as enum.");
-    }
-    const auto as_enum = dynamic_cast<const t_enum*>(type);
-    assert(as_enum != nullptr);
-    const auto enum_val = as_enum->find_value(value->get_integer());
-    if (enum_val == nullptr) {
-      warning(
-          0,
-          "type error: const `%s` was declared as enum `%s` with a value"
-          " not of that enum.",
-          name.c_str(),
-          type->get_name().c_str());
-    }
-  } else if (as_struct && as_struct->is_union()) {
-    if (value->get_type() != t_const_value::CV_MAP) {
-      throw std::string(
-          "type error: const `" + name + "` was declared as union.");
-    }
-    auto const& map = value->get_map();
-    if (map.size() > 1) {
-      throw std::string(
-          "type error: const `" + name +
-          "` is a union and can't "
-          "have more than one field set.");
-    }
-    if (!map.empty()) {
-      if (map.front().first->get_type() != t_const_value::CV_STRING) {
-        throw std::string(
-            "type error: const `" + name +
-            "` is a union and member "
-            "names must be a string.");
-      }
-      auto const& member_name = map.front().first->get_string();
-      auto const* member = as_struct->get_field_by_name(member_name);
-      if (!member) {
-        throw std::string(
-            "type error: no member named `" + member_name +
-            "` for "
-            "union const `" +
-            name + "`.");
-      }
-    }
-  } else if (type->is_struct() || type->is_xception()) {
-    if (value->get_type() != t_const_value::CV_MAP) {
-      throw std::string(
-          "type error: const `" + name + "` was declared as " +
-          "struct/exception.");
-    }
-    const auto as_struct = static_cast<const t_struct*>(type);
-    for (const auto& entry : value->get_map()) {
-      if (entry.first->get_type() != t_const_value::CV_STRING) {
-        throw std::string(
-            "type error: `" + name + "` struct key must be string.");
-      }
-      const t_type* field_type = nullptr;
-      if (const auto* field =
-              as_struct->get_field_by_name(entry.first->get_string())) {
-        field_type = field->get_type();
-      }
-      if (field_type == nullptr) {
-        throw std::string(
-            "type error: `" + type->get_name() + "` has no field `" +
-            entry.first->get_string() + "`.");
-      }
-
-      validate_const_rec(
-          name + "." + entry.first->get_string(), field_type, entry.second);
-    }
-  } else if (type->is_map()) {
-    const t_type* k_type = ((t_map*)type)->get_key_type();
-    const t_type* v_type = ((t_map*)type)->get_val_type();
-    const std::vector<std::pair<t_const_value*, t_const_value*>>& val =
-        value->get_map();
-    std::vector<std::pair<t_const_value*, t_const_value*>>::const_iterator
-        v_iter;
-    for (v_iter = val.begin(); v_iter != val.end(); ++v_iter) {
-      validate_const_rec(name + "<key>", k_type, v_iter->first);
-      validate_const_rec(name + "<val>", v_type, v_iter->second);
-    }
-  } else if (type->is_list() || type->is_set()) {
-    const t_type* e_type;
-    if (type->is_list()) {
-      e_type = ((t_list*)type)->get_elem_type();
-    } else {
-      e_type = ((t_set*)type)->get_elem_type();
-    }
-    const std::vector<t_const_value*>& val = value->get_list();
-    std::vector<t_const_value*>::const_iterator v_iter;
-    for (v_iter = val.begin(); v_iter != val.end(); ++v_iter) {
-      validate_const_rec(name + "<elem>", e_type, *v_iter);
-    }
-  }
-}
-
-void parsing_driver::validate_const_type(t_const* c) {
-  validate_const_rec(c->get_name(), c->get_type(), c->get_value());
-}
-
-void parsing_driver::validate_field_value(t_field* field, t_const_value* cv) {
-  validate_const_rec(field->get_name(), field->get_type(), cv);
 }
 
 void parsing_driver::validate_not_ambiguous_enum(const std::string& name) {
@@ -400,19 +237,20 @@ void parsing_driver::validate_not_ambiguous_enum(const std::string& name) {
     if (!possible_enums.empty()) {
       msg += (" Possible options: " + possible_enums);
     }
-    warning(1, msg.c_str());
+    warning(msg);
   }
 }
 void parsing_driver::clear_doctext() {
   if (doctext) {
-    warning(2, "Uncaptured doctext at on line %d.", doctext_lineno);
+    warning_strict([&](auto& o) {
+      o << "Uncaptured doctext at on line " << doctext_lineno << ".";
+    });
   }
 
   doctext = boost::none;
 }
 
-boost::optional<std::string> parsing_driver::clean_up_doctext(
-    std::string docstring) {
+t_doc parsing_driver::clean_up_doctext(std::string docstring) {
   // Convert to C++ string, and remove Windows's carriage returns.
   docstring.erase(
       remove(docstring.begin(), docstring.end(), '\r'), docstring.end());
@@ -446,24 +284,34 @@ boost::optional<std::string> parsing_driver::clean_up_doctext(
   lines.front().erase(0, pos);
 
   // If every nonblank line after the first has the same number of spaces/tabs,
-  // then a star, remove them.
-  bool have_prefix = true;
-  bool found_prefix = false;
+  // then a comment prefix, remove them.
+  enum Prefix {
+    None = 0,
+    Star = 1, // length of '*'
+    Slashes = 3, // length of '///'
+  };
+  Prefix found_prefix = None;
   std::string::size_type prefix_len = 0;
   std::vector<std::string>::iterator l_iter;
+
+  // Start searching for prefixes from second line, since lexer already removed
+  // initial prefix/suffix.
   for (l_iter = lines.begin() + 1; l_iter != lines.end(); ++l_iter) {
     if (l_iter->empty()) {
       continue;
     }
 
     pos = l_iter->find_first_not_of(" \t");
-    if (!found_prefix) {
+    if (found_prefix == None) {
       if (pos != std::string::npos) {
         if (l_iter->at(pos) == '*') {
-          found_prefix = true;
+          found_prefix = Star;
+          prefix_len = pos;
+        } else if (l_iter->compare(pos, 3, "///") == 0) {
+          found_prefix = Slashes;
           prefix_len = pos;
         } else {
-          have_prefix = false;
+          found_prefix = None;
           break;
         }
       } else {
@@ -471,22 +319,24 @@ boost::optional<std::string> parsing_driver::clean_up_doctext(
         l_iter->clear();
       }
     } else if (
-        l_iter->size() > pos && l_iter->at(pos) == '*' && pos == prefix_len) {
-      // Business as usual.
+        l_iter->size() > pos && pos == prefix_len &&
+        ((found_prefix == Star && l_iter->at(pos) == '*') ||
+         (found_prefix == Slashes && l_iter->compare(pos, 3, "///") == 0))) {
+      // Business as usual
     } else if (pos == std::string::npos) {
       // Whitespace-only line.  Let's truncate it for them.
       l_iter->clear();
     } else {
       // The pattern has been broken.
-      have_prefix = false;
+      found_prefix = None;
       break;
     }
   }
 
   // If our prefix survived, delete it from every line.
-  if (have_prefix) {
-    // Get the star too.
-    prefix_len++;
+  if (found_prefix != None) {
+    // Get the prefix too.
+    prefix_len += found_prefix;
     for (l_iter = lines.begin() + 1; l_iter != lines.end(); ++l_iter) {
       l_iter->erase(0, prefix_len);
     }
@@ -505,7 +355,7 @@ boost::optional<std::string> parsing_driver::clean_up_doctext(
     }
   }
 
-  // If our prefix survived, delete it from every line.
+  // If our whitespace prefix survived, delete it from every line.
   if (prefix_len != std::string::npos) {
     for (l_iter = lines.begin() + 1; l_iter != lines.end(); ++l_iter) {
       l_iter->erase(0, prefix_len);
@@ -540,28 +390,53 @@ bool parsing_driver::require_experimental_feature(const char* feature) {
   assert(feature != std::string("all"));
   if (params.allow_experimental_features.count("all") ||
       params.allow_experimental_features.count(feature)) {
-    warning(2, "'%s' is an experimental feature.", feature);
+    warning_strict([&](auto& o) {
+      o << "'" << feature << "' is an experimental feature.";
+    });
     return true;
   }
-  failure("'%s' is an experimental feature.", feature);
+  failure(
+      [&](auto& o) { o << "'" << feature << "' is an experimental feature."; });
   return false;
 }
 
 void parsing_driver::set_annotations(
-    t_annotated* node,
-    std::unique_ptr<t_annotations> annotations,
-    std::unique_ptr<t_struct_annotations> struct_annotations) {
+    t_node* node, std::unique_ptr<t_annotations> annotations) {
   if (annotations != nullptr) {
     node->reset_annotations(annotations->strings, annotations->last_lineno);
   }
-  if (struct_annotations != nullptr) {
-    for (auto& an : *struct_annotations) {
-      node->add_structured_annotation(std::move(an));
+}
+
+void parsing_driver::set_attributes(
+    t_named* node,
+    std::unique_ptr<t_def_attrs> attrs,
+    std::unique_ptr<t_annotations> annotations) {
+  if (attrs != nullptr) {
+    if (attrs->doc) {
+      node->set_doc(std::move(*attrs->doc));
+    }
+    if (attrs->struct_annotations != nullptr) {
+      for (auto& an : *attrs->struct_annotations) {
+        node->add_structured_annotation(std::move(an));
+      }
     }
   }
+  set_annotations(node, std::move(annotations));
 }
 
 void parsing_driver::start_node(LineType lineType) {
+  switch (lineType) {
+    case LineType::Function:
+    case LineType::Struct:
+    case LineType::Union:
+    case LineType::Exception:
+      // Should always be true because structs/functions can't be nested.
+      assert(next_field_id_ == 0);
+      next_field_id_ = -1;
+      break;
+    default:
+      break;
+  }
   lineno_stack_.emplace(lineType, scanner->get_lineno());
 }
 
@@ -575,123 +450,141 @@ int parsing_driver::pop_node(LineType lineType) {
 }
 
 void parsing_driver::finish_node(
-    t_annotated* node,
+    t_node* node,
     LineType lineType,
-    std::unique_ptr<t_annotations> annotations,
-    std::unique_ptr<t_struct_annotations> struct_annotations) {
+    std::unique_ptr<t_annotations> annotations) {
   node->set_lineno(pop_node(lineType));
-  set_annotations(node, std::move(annotations), std::move(struct_annotations));
-}
-void parsing_driver::finish_node(
-    t_named* node,
-    LineType lineType,
-    std::string name,
-    std::unique_ptr<t_annotations> annotations,
-    std::unique_ptr<t_struct_annotations> struct_annotations) {
-  node->set_name(std::move(name));
-  finish_node(
-      node, lineType, std::move(annotations), std::move(struct_annotations));
+  set_annotations(node, std::move(annotations));
 }
 
 void parsing_driver::finish_node(
-    t_struct* node,
+    t_named* node,
     LineType lineType,
-    std::string name,
+    std::unique_ptr<t_def_attrs> attrs,
+    std::unique_ptr<t_annotations> annotations) {
+  node->set_lineno(pop_node(lineType));
+  set_attributes(node, std::move(attrs), std::move(annotations));
+  switch (lineType) {
+    case LineType::Function:
+    case LineType::Struct:
+    case LineType::Union:
+    case LineType::Exception:
+      // Should always be true because structs/functions can't be nested.
+      assert(next_field_id_ < 0);
+      next_field_id_ = 0;
+      break;
+    default:
+      break;
+  }
+}
+
+void parsing_driver::finish_node(
+    t_structured* node,
+    LineType lineType,
+    std::unique_ptr<t_def_attrs> attrs,
     std::unique_ptr<t_field_list> fields,
-    std::unique_ptr<t_annotations> annotations,
-    std::unique_ptr<t_struct_annotations> struct_annotations) {
+    std::unique_ptr<t_annotations> annotations) {
   append_fields(*node, std::move(*fields));
-  finish_node(
-      node,
-      lineType,
-      std::move(name),
-      std::move(annotations),
-      std::move(struct_annotations));
+  finish_node(node, lineType, std::move(attrs), std::move(annotations));
+}
+
+void parsing_driver::finish_node(
+    t_interface* node,
+    LineType lineType,
+    std::unique_ptr<t_def_attrs> attrs,
+    std::unique_ptr<t_function_list> functions,
+    std::unique_ptr<t_annotations> annotations) {
+  if (functions != nullptr) {
+    node->set_functions(std::move(*functions));
+  }
+  finish_node(node, lineType, std::move(attrs), std::move(annotations));
 }
 
 std::unique_ptr<t_const> parsing_driver::new_struct_annotation(
     std::unique_ptr<t_const_value> const_struct) {
-  auto* ttype = const_struct->get_ttype();
-  auto result =
-      std::make_unique<t_const>(program, ttype, "", std::move(const_struct));
+  auto ttype = const_struct->ttype().value(); // Copy the t_type_ref.
+  auto result = std::make_unique<t_const>(
+      program, std::move(ttype), "", std::move(const_struct));
   result->set_lineno(scanner->get_lineno());
-  if (mode == parsing_mode::PROGRAM) {
-    validate_const_type(result.get());
-  }
   return result;
 }
 
-std::unique_ptr<t_struct> parsing_driver::new_throws(
+std::unique_ptr<t_throws> parsing_driver::new_throws(
     std::unique_ptr<t_field_list> exceptions) {
-  auto result = std::make_unique<t_struct>(program);
-  if (exceptions != nullptr) {
-    append_fields(*result, std::move(*exceptions));
-  }
+  assert(exceptions != nullptr);
+  auto result = std::make_unique<t_throws>();
+  append_fields(*result, std::move(*exceptions));
   return result;
 }
 
-void parsing_driver::append_fields(t_struct& tstruct, t_field_list&& fields) {
+void parsing_driver::append_fields(
+    t_structured& tstruct, t_field_list&& fields) {
   for (auto& field : fields) {
     if (!tstruct.try_append_field(std::move(field))) {
-      failure(
-          "Field identifier %d for \"%s\" has already been used",
-          field->get_key(),
-          field->get_name().c_str());
+      failure([&](auto& o) {
+        o << "Field identifier " << field->get_key() << " for \""
+          << field->get_name() << "\" has already been used";
+      });
       break;
     }
   }
 }
 
-std::unique_ptr<t_type_ref> parsing_driver::new_type_ref(
-    const t_type* type,
-    std::unique_ptr<t_annotations> annotations) {
-  if (annotations != nullptr) {
-    // Make a copy of the node to hold the annotations.
-    // TODO(afuller): Remove the need for copying the underlying type by making
-    // t_type_ref annotatable directly.
-    if (const auto* tbase_type = dynamic_cast<const t_base_type*>(type)) {
-      // base types can be copy constructed.
-      type = add_unnamed_type(
-          std::make_unique<t_base_type>(*tbase_type), std::move(annotations));
-    } else {
-      // Containers always use a new type, so should never show up here.
-      assert(!type->is_container());
-      // For all other types, we can just create a dummy typedef node with
-      // the same name.
-      // NOTE(afuller): This is not a safe assumption as it breaks all
-      // dynamic casts and t_type::is_* calls.
-      type = add_unnamed_typedef(
-          std::make_unique<t_typedef>(
-              const_cast<t_program*>(type->get_program()),
-              type,
-              type->get_name(),
-              scope_cache),
-          std::move(annotations));
-    }
+t_type_ref parsing_driver::new_type_ref(
+    const t_type& type, std::unique_ptr<t_annotations> annotations) {
+  if (annotations == nullptr) {
+    return type;
   }
-  return std::make_unique<t_type_ref>(type);
+
+  // Make a copy of the node to hold the annotations.
+  // TODO(afuller): Remove the need for copying the underlying type by making
+  // t_type_ref annotatable directly.
+  if (const auto* tbase_type = dynamic_cast<const t_base_type*>(&type)) {
+    // base types can be copy constructed.
+    auto node = std::make_unique<t_base_type>(*tbase_type);
+    set_annotations(node.get(), std::move(annotations));
+    t_type_ref result(*node);
+    if (mode == parsing_mode::INCLUDES) {
+      delete_at_the_end(node.release());
+    } else {
+      program->add_unnamed_type(std::move(node));
+    }
+    return result;
+  }
+
+  // Containers always use a new type, so should never show up here.
+  assert(!type.is_container());
+  // For all other types, we can just create a dummy typedef node with
+  // the same name.
+  // NOTE(afuller): This is not a safe assumption as it breaks all
+  // dynamic casts and t_type::is_* calls.
+  return *add_unnamed_typedef(
+      std::make_unique<t_typedef>(
+          const_cast<t_program*>(type.program()), type.get_name(), type),
+      std::move(annotations));
 }
 
-std::unique_ptr<t_type_ref> parsing_driver::new_type_ref(
-    std::unique_ptr<t_type> node,
+t_type_ref parsing_driver::new_type_ref(
+    std::unique_ptr<t_templated_type> node,
     std::unique_ptr<t_annotations> annotations) {
+  assert(node != nullptr);
   const t_type* type = node.get();
-  set_annotations(node.get(), std::move(annotations), nullptr);
+  set_annotations(node.get(), std::move(annotations));
   if (mode == parsing_mode::INCLUDES) {
     delete_at_the_end(node.release());
   } else {
-    program->add_unnamed_type(std::move(node));
+    program->add_type_instantiation(std::move(node));
   }
-  return std::make_unique<t_type_ref>(type);
+  return *type;
 }
 
-std::unique_ptr<t_type_ref> parsing_driver::new_type_ref(
+t_type_ref parsing_driver::new_type_ref(
     std::string name,
     std::unique_ptr<t_annotations> annotations,
     bool is_const) {
   if (mode == parsing_mode::INCLUDES) {
     // Ignore identifier-based type references in include mode
-    return std::make_unique<t_type_ref>();
+    return {};
   }
 
   // Try to resolve the type
@@ -703,10 +596,10 @@ std::unique_ptr<t_type_ref> parsing_driver::new_type_ref(
     // TODO(afuller): Remove this special case for const, which requires a
     // specific declaration order.
     if (is_const) {
-      failure(
-          "The type '%s' is not defined yet. Types must be "
-          "defined before the usage in constant values.",
-          name.c_str());
+      failure([&](auto& o) {
+        o << "The type '" << name << "' is not defined yet. Types must be "
+          << "defined before the usage in constant values.";
+      });
     }
     // TODO(afuller): Why are interactions special? They should just be another
     // declared type.
@@ -718,7 +611,7 @@ std::unique_ptr<t_type_ref> parsing_driver::new_type_ref(
 
   if (type != nullptr) {
     // We found the type!
-    return new_type_ref(type, std::move(annotations));
+    return new_type_ref(*type, std::move(annotations));
   }
 
   /*
@@ -730,120 +623,141 @@ std::unique_ptr<t_type_ref> parsing_driver::new_type_ref(
   // is safe to create a dummy typedef to use as a proxy for the original type.
   // However, this actually breaks dynamic casts and t_type::is_* calls.
   // TODO(afuller): Resolve *all* types in a second pass.
-  return std::make_unique<t_type_ref>(add_placeholder_typedef(
-      std::make_unique<t_typedef>(program, std::move(name), scope_cache),
+  return t_type_ref(*add_placeholder_typedef(
+      std::make_unique<t_placeholder_typedef>(
+          program, std::move(name), scope_cache),
       std::move(annotations)));
-}
-
-const t_type* parsing_driver::add_unnamed_type(
-    std::unique_ptr<t_type> node,
-    std::unique_ptr<t_annotations> annotations) {
-  const t_type* result(node.get());
-  set_annotations(node.get(), std::move(annotations), nullptr);
-  if (mode == parsing_mode::INCLUDES) {
-    delete_at_the_end(node.release());
-  } else {
-    program->add_unnamed_type(std::move(node));
-  }
-  return result;
 }
 
 const t_type* parsing_driver::add_unnamed_typedef(
     std::unique_ptr<t_typedef> node,
     std::unique_ptr<t_annotations> annotations) {
   const t_type* result(node.get());
-  set_annotations(node.get(), std::move(annotations), nullptr);
+  set_annotations(node.get(), std::move(annotations));
   program->add_unnamed_typedef(std::move(node));
   return result;
 }
 
 const t_type* parsing_driver::add_placeholder_typedef(
-    std::unique_ptr<t_typedef> node,
+    std::unique_ptr<t_placeholder_typedef> node,
     std::unique_ptr<t_annotations> annotations) {
   const t_type* result(node.get());
-  set_annotations(node.get(), std::move(annotations), nullptr);
+  set_annotations(node.get(), std::move(annotations));
   program->add_placeholder_typedef(std::move(node));
   return result;
 }
 
-t_ref<t_const> parsing_driver::add_decl(
-    std::unique_ptr<t_const>&& node,
-    boost::optional<std::string> doc) {
+t_ref<t_const> parsing_driver::add_def(std::unique_ptr<t_const> node) {
   t_ref<t_const> result(node.get());
-  if (should_add_node(node, std::move(doc))) {
-    validate_const_type(node.get());
+  if (should_add_node(node)) {
     scope_cache->add_constant(scoped_name(*node), node.get());
     program->add_const(std::move(node));
   }
   return result;
 }
-
-t_ref<t_service> parsing_driver::add_decl(
-    std::unique_ptr<t_service>&& node,
-    boost::optional<std::string> doc) {
-  t_ref<t_service> result(node.get());
-  if (should_add_node(node, std::move(doc))) {
-    // TODO(afuller): Make interactions their own type.
-    if (node->is_interaction()) {
-      scope_cache->add_interaction(scoped_name(*node), node.get());
-      program->add_interaction(std::move(node));
-    } else {
-      scope_cache->add_service(scoped_name(*node), node.get());
-      program->add_service(std::move(node));
-    }
+t_ref<t_interaction> parsing_driver::add_def(
+    std::unique_ptr<t_interaction> node) {
+  t_ref<t_interaction> result(node.get());
+  if (should_add_node(node)) {
+    scope_cache->add_interaction(scoped_name(*node), node.get());
+    program->add_interaction(std::move(node));
   }
   return result;
 }
 
-t_ref<t_typedef> parsing_driver::add_decl(
-    std::unique_ptr<t_typedef>&& node,
-    boost::optional<std::string> doc) {
+t_ref<t_service> parsing_driver::add_def(std::unique_ptr<t_service> node) {
+  t_ref<t_service> result(node.get());
+  assert(!node->is_interaction());
+  if (should_add_node(node)) {
+    scope_cache->add_service(scoped_name(*node), node.get());
+    program->add_service(std::move(node));
+  }
+  return result;
+}
+
+t_ref<t_typedef> parsing_driver::add_def(std::unique_ptr<t_typedef> node) {
   t_ref<t_typedef> result(node.get());
-  if (should_add_type(node, std::move(doc))) {
+  if (should_add_type(node)) {
     program->add_typedef(std::move(node));
   }
   return result;
 }
 
-t_ref<t_struct> parsing_driver::add_decl(
-    std::unique_ptr<t_struct>&& node,
-    boost::optional<std::string> doc) {
+t_ref<t_struct> parsing_driver::add_def(std::unique_ptr<t_struct> node) {
   t_ref<t_struct> result(node.get());
-  if (should_add_type(node, std::move(doc))) {
+  if (should_add_type(node)) {
     program->add_struct(std::move(node));
   }
   return result;
 }
 
-t_ref<t_union> parsing_driver::add_decl(
-    std::unique_ptr<t_union>&& node,
-    boost::optional<std::string> doc) {
+t_ref<t_union> parsing_driver::add_def(std::unique_ptr<t_union> node) {
   t_ref<t_union> result(node.get());
-  if (should_add_type(node, std::move(doc))) {
+  if (should_add_type(node)) {
     program->add_struct(std::move(node));
   }
   return result;
 }
 
-t_ref<t_exception> parsing_driver::add_decl(
-    std::unique_ptr<t_exception>&& node,
-    boost::optional<std::string> doc) {
+t_ref<t_exception> parsing_driver::add_def(std::unique_ptr<t_exception> node) {
   t_ref<t_exception> result(node.get());
-  if (should_add_type(node, std::move(doc))) {
+  if (should_add_type(node)) {
     program->add_xception(std::move(node));
   }
   return result;
 }
 
-t_ref<t_enum> parsing_driver::add_decl(
-    std::unique_ptr<t_enum>&& node,
-    boost::optional<std::string> doc) {
+t_ref<t_enum> parsing_driver::add_def(std::unique_ptr<t_enum> node) {
   t_ref<t_enum> result(node.get());
-  if (should_add_type(node, std::move(doc))) {
+
+  if (should_add_type(node)) {
+    // Register enum value names in scope.
+    std::string type_prefix = ".";
+    for (const auto& value : node->consts()) {
+      // TODO(afuller): Remove ability to access unscoped enum values.
+      scope_cache->add_constant(scoped_name(value), &value);
+      scope_cache->add_constant(scoped_name(*node, value), &value);
+    }
     program->add_enum(std::move(node));
   }
   return result;
 }
+
+t_field_id parsing_driver::as_field_id(int64_t int_const) {
+  using limits = std::numeric_limits<t_field_id>;
+  if (int_const < limits::min() || int_const > limits::max()) {
+    // Not representable as a field id.
+    failure([&](auto& o) {
+      o << "Integer constant (" << int_const
+        << ") outside the range of field ids ([" << limits::min() << ", "
+        << limits::max() << "]).";
+    });
+  }
+  return int_const;
+}
+
+t_field_id parsing_driver::allocate_field_id(const std::string& name) {
+  if (params.strict >= 192) {
+    failure("Implicit field keys are deprecated and not allowed with -strict");
+  }
+  if (next_field_id_ < t_field::min_id) {
+    failure(
+        "Cannot allocate an id for `" + name +
+        "`. Automatic field ids are exhausted.");
+  }
+  return next_field_id_--;
+}
+
+void parsing_driver::reserve_field_id(t_field_id id) {
+  if (id < 0) {
+    /*
+     * Update next field id to be one less than the value.
+     * The FieldList parsing will catch any duplicate id values.
+     */
+    next_field_id_ = id - 1;
+  }
+}
+
 } // namespace compiler
 } // namespace thrift
 } // namespace apache

@@ -54,6 +54,8 @@ class MetadataTests(unittest.TestCase):
         _, typedef, fieldClass, *rest = hardStructClass.fields
         _, _, fieldInstance, *rest = hardStructClass.fields
         self.assertEqual(field.name, "name")
+        self.assertEqual(fieldClass.name, field.name)
+        self.assertEqual(fieldInstance.name, field.name)
         self.assertEqual(field.is_optional, False)
         self.assertEqual(fieldClass.is_optional, False)
         self.assertEqual(fieldInstance.is_optional, False)
@@ -69,6 +71,11 @@ class MetadataTests(unittest.TestCase):
         self.assertEqual(typedef.type.as_typedef().underlyingType.kind, ThriftKind.LIST)
 
         self.assertEqual(meta.structs["testing.EmptyUnion"].is_union, True)
+
+        mixedStruct = gen_metadata(mixed)
+        _, _, _, _, _, _, field, *rest = mixedStruct.fields
+        self.assertEqual(field.name, "some_field")
+        self.assertEqual(field.pyname, "some_field_")
 
     def test_metadata_struct_recursive(self) -> None:
         hard_struct = gen_metadata(hard)
@@ -191,6 +198,13 @@ class MetadataTests(unittest.TestCase):
         self.assertIsNotNone(parent)
         self.assertEqual(parent.name, "testing.TestingService")
 
+
+        streamFunc, *rest = serv2.functions
+        self.assertEqual(
+            streamFunc.return_type.as_stream().elemType.as_primitive(),
+            ThriftPrimitiveType.THRIFT_I32_TYPE,
+        )
+
     def test_metadata_structured_annotations(self) -> None:
         annotations = gen_metadata(TestingService).structuredAnnotations
         self.assertEqual(len(annotations), 1)
@@ -208,6 +222,7 @@ class MetadataTests(unittest.TestCase):
         self.assertEqual(first.as_map()[1.1].type, 2)
 
         self.assertEqual(second.type, 3)
+        self.assertEqual(second.as_int(), 3)
         self.assertEqual(third.as_list()[0].type, "a")
         self.assertEqual(third.as_list()[1].type, "b")
 

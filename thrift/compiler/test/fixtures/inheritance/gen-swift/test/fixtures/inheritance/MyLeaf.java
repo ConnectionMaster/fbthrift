@@ -10,7 +10,7 @@ package test.fixtures.inheritance;
 import com.facebook.swift.codec.*;
 import com.facebook.swift.codec.ThriftField.Requiredness;
 import com.facebook.swift.service.*;
-import com.facebook.swift.transport.client.*;
+import com.facebook.thrift.client.*;
 import com.google.common.util.concurrent.ListenableFuture;
 import java.io.*;
 import java.util.*;
@@ -51,9 +51,8 @@ public interface MyLeaf extends java.io.Closeable, test.fixtures.inheritance.MyN
     }
 
     @com.facebook.swift.service.ThriftService("MyLeaf")
-    interface Reactive extends Closeable, test.fixtures.inheritance.MyNode.Reactive {
-        @java.lang.Override void close();
-
+    interface Reactive extends reactor.core.Disposable, test.fixtures.inheritance.MyNode.Reactive {
+        @ThriftMethod(value = "do_leaf")
         reactor.core.publisher.Mono<Void> doLeaf();
 
         default reactor.core.publisher.Mono<Void> doLeaf(RpcOptions rpcOptions) {

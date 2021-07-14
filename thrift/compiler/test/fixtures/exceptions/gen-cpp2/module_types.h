@@ -19,6 +19,8 @@ struct error_message;
 struct internal_error_message;
 struct error_message;
 struct internal_error_message;
+struct message;
+struct error_code;
 } // namespace tag
 namespace detail {
 #ifndef APACHE_THRIFT_ACCESSOR_message
@@ -45,6 +47,14 @@ APACHE_THRIFT_DEFINE_ACCESSOR(error_message);
 #define APACHE_THRIFT_ACCESSOR_internal_error_message
 APACHE_THRIFT_DEFINE_ACCESSOR(internal_error_message);
 #endif
+#ifndef APACHE_THRIFT_ACCESSOR_message
+#define APACHE_THRIFT_ACCESSOR_message
+APACHE_THRIFT_DEFINE_ACCESSOR(message);
+#endif
+#ifndef APACHE_THRIFT_ACCESSOR_error_code
+#define APACHE_THRIFT_ACCESSOR_error_code
+APACHE_THRIFT_DEFINE_ACCESSOR(error_code);
+#endif
 } // namespace detail
 } // namespace thrift
 } // namespace apache
@@ -54,11 +64,12 @@ APACHE_THRIFT_DEFINE_ACCESSOR(internal_error_message);
 // END declare_enums
 // BEGIN forward_declare
 namespace cpp2 {
-class Banal;
 class Fiery;
 class Serious;
 class ComplexFieldNames;
 class CustomFieldNames;
+class ExceptionWithPrimitiveField;
+class Banal;
 } // cpp2
 // END forward_declare
 // BEGIN typedefs
@@ -68,7 +79,14 @@ class CustomFieldNames;
 // END hash_and_equal_to
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 namespace cpp2 {
-class Banal final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT Fiery final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -76,86 +94,12 @@ class Banal final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
-
- public:
-  using __fbthrift_cpp2_type = Banal;
-  static constexpr bool __fbthrift_cpp2_is_union =
-    false;
-
-
- public:
-
-  Banal() {}
-  // FragileConstructor for use in initialization lists only.
-  [[deprecated("This constructor is deprecated")]]
-  Banal(apache::thrift::FragileConstructor);
-
-  Banal(Banal&&) = default;
-
-  Banal(const Banal&) = default;
-
-
-  Banal& operator=(Banal&&) = default;
-
-  Banal& operator=(const Banal&) = default;
-  void __clear();
-  bool operator==(const Banal& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Banal& __x, const Banal& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Banal& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Banal& __x, const Banal& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Banal& __x, const Banal& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Banal& __x, const Banal& __y) {
-    return !(__x < __y);
-  }
-#endif
-
-  template <class Protocol_>
-  uint32_t read(Protocol_* iprot);
-  template <class Protocol_>
-  uint32_t serializedSize(Protocol_ const* prot_) const;
-  template <class Protocol_>
-  uint32_t serializedSizeZC(Protocol_ const* prot_) const;
-  template <class Protocol_>
-  uint32_t write(Protocol_* prot_) const;
-
-  const char* what() const noexcept override {
-    return "::cpp2::Banal";
-  }
-
- private:
-  template <class Protocol_>
-  void readNoXfer(Protocol_* iprot);
-
-  friend class ::apache::thrift::Cpp2Ops< Banal >;
-  friend void swap(Banal& a, Banal& b);
-};
-
-template <class Protocol_>
-uint32_t Banal::read(Protocol_* iprot) {
-  auto _xferStart = iprot->getCursorPosition();
-  readNoXfer(iprot);
-  return iprot->getCursorPosition() - _xferStart;
-}
-
-} // cpp2
-namespace cpp2 {
-class Fiery final : public apache::thrift::TException {
- private:
-  friend struct ::apache::thrift::detail::st::struct_private_access;
-
-  //  used by a static_assert in the corresponding source
-  static constexpr bool __fbthrift_cpp2_gen_json = false;
-  static constexpr bool __fbthrift_cpp2_gen_nimble = false;
-  static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::TRANSIENT;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::SERVER;
 
  public:
   using __fbthrift_cpp2_type = Fiery;
@@ -165,48 +109,33 @@ class Fiery final : public apache::thrift::TException {
 
  public:
 
-  Fiery() {}
+  Fiery();
+  explicit Fiery(std::string __message);
 
-  explicit Fiery(const std::string& __message) :
-      message(__message) {}
-
-  explicit Fiery(std::string&& __message) :
-      message(std::move(__message)) {}
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Fiery(apache::thrift::FragileConstructor, ::std::string message__arg);
 
-  Fiery(Fiery&&) = default;
+  Fiery(Fiery&&) noexcept;
 
-  Fiery(const Fiery&) = default;
+  Fiery(const Fiery& src);
 
 
-  Fiery& operator=(Fiery&&) = default;
-
-  Fiery& operator=(const Fiery&) = default;
+  Fiery& operator=(Fiery&&) noexcept;
+  Fiery& operator=(const Fiery& src);
   void __clear();
+
+  ~Fiery() override;
+
  public:
   ::std::string message;
 
+ private:
+
  public:
-  bool operator==(const Fiery& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Fiery& __x, const Fiery& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Fiery& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Fiery& __x, const Fiery& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Fiery& __x, const Fiery& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Fiery& __x, const Fiery& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+  bool operator==(const Fiery&) const;
+  bool operator<(const Fiery&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::required_field_ref<const T&> message_ref() const& {
@@ -237,6 +166,7 @@ class Fiery final : public apache::thrift::TException {
   }
 
   template <typename T_Fiery_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.message_ref() = BAR;` instead of `FOO.set_message(BAR);`")]]
   ::std::string& set_message(T_Fiery_message_struct_setter&& message_) {
     message = std::forward<T_Fiery_message_struct_setter>(message_);
     return message;
@@ -259,7 +189,7 @@ class Fiery final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Fiery >;
+  friend class ::apache::thrift::Cpp2Ops<Fiery>;
   friend void swap(Fiery& a, Fiery& b);
 };
 
@@ -272,7 +202,14 @@ uint32_t Fiery::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class Serious final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT Serious final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -280,6 +217,12 @@ class Serious final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::STATEFUL;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::SAFE;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = Serious;
@@ -289,52 +232,37 @@ class Serious final : public apache::thrift::TException {
 
  public:
 
-  Serious() {}
+  Serious();
+  explicit Serious(std::string __message);
 
-  explicit Serious(const std::string& __message) :
-      sonnet(__message) {}
-
-  explicit Serious(std::string&& __message) :
-      sonnet(std::move(__message)) {}
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   Serious(apache::thrift::FragileConstructor, ::std::string sonnet__arg);
 
-  Serious(Serious&&) = default;
+  Serious(Serious&&) noexcept;
 
-  Serious(const Serious&) = default;
+  Serious(const Serious& src);
 
 
-  Serious& operator=(Serious&&) = default;
-
-  Serious& operator=(const Serious&) = default;
+  Serious& operator=(Serious&&) noexcept;
+  Serious& operator=(const Serious& src);
   void __clear();
+
+  ~Serious() override;
+
  private:
   ::std::string sonnet;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool sonnet;
   } __isset = {};
-  bool operator==(const Serious& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const Serious& __x, const Serious& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const Serious& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const Serious& __x, const Serious& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const Serious& __x, const Serious& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const Serious& __x, const Serious& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const Serious&) const;
+  bool operator<(const Serious&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::optional_field_ref<const T&> sonnet_ref() const& {
@@ -366,6 +294,7 @@ class Serious final : public apache::thrift::TException {
   ::std::string* get_sonnet() && = delete;
 
   template <typename T_Serious_sonnet_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.sonnet_ref() = BAR;` instead of `FOO.set_sonnet(BAR);`")]]
   ::std::string& set_sonnet(T_Serious_sonnet_struct_setter&& sonnet_) {
     sonnet = std::forward<T_Serious_sonnet_struct_setter>(sonnet_);
     __isset.sonnet = true;
@@ -389,7 +318,7 @@ class Serious final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< Serious >;
+  friend class ::apache::thrift::Cpp2Ops<Serious>;
   friend void swap(Serious& a, Serious& b);
 };
 
@@ -402,7 +331,14 @@ uint32_t Serious::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class ComplexFieldNames final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT ComplexFieldNames final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -410,6 +346,12 @@ class ComplexFieldNames final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::CLIENT;
 
  public:
   using __fbthrift_cpp2_type = ComplexFieldNames;
@@ -419,55 +361,40 @@ class ComplexFieldNames final : public apache::thrift::TException {
 
  public:
 
-  ComplexFieldNames() {}
+  ComplexFieldNames();
+  explicit ComplexFieldNames(std::string __message);
 
-  explicit ComplexFieldNames(const std::string& __message) :
-      internal_error_message(__message) {}
-
-  explicit ComplexFieldNames(std::string&& __message) :
-      internal_error_message(std::move(__message)) {}
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   ComplexFieldNames(apache::thrift::FragileConstructor, ::std::string error_message__arg, ::std::string internal_error_message__arg);
 
-  ComplexFieldNames(ComplexFieldNames&&) = default;
+  ComplexFieldNames(ComplexFieldNames&&) noexcept;
 
-  ComplexFieldNames(const ComplexFieldNames&) = default;
+  ComplexFieldNames(const ComplexFieldNames& src);
 
 
-  ComplexFieldNames& operator=(ComplexFieldNames&&) = default;
-
-  ComplexFieldNames& operator=(const ComplexFieldNames&) = default;
+  ComplexFieldNames& operator=(ComplexFieldNames&&) noexcept;
+  ComplexFieldNames& operator=(const ComplexFieldNames& src);
   void __clear();
+
+  ~ComplexFieldNames() override;
+
  private:
   ::std::string error_message;
  private:
   ::std::string internal_error_message;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool error_message;
     bool internal_error_message;
   } __isset = {};
-  bool operator==(const ComplexFieldNames& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const ComplexFieldNames& __x, const ComplexFieldNames& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const ComplexFieldNames& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const ComplexFieldNames& __x, const ComplexFieldNames& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const ComplexFieldNames& __x, const ComplexFieldNames& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const ComplexFieldNames& __x, const ComplexFieldNames& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const ComplexFieldNames&) const;
+  bool operator<(const ComplexFieldNames&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> error_message_ref() const& {
@@ -518,6 +445,7 @@ class ComplexFieldNames final : public apache::thrift::TException {
   }
 
   template <typename T_ComplexFieldNames_error_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.error_message_ref() = BAR;` instead of `FOO.set_error_message(BAR);`")]]
   ::std::string& set_error_message(T_ComplexFieldNames_error_message_struct_setter&& error_message_) {
     error_message = std::forward<T_ComplexFieldNames_error_message_struct_setter>(error_message_);
     __isset.error_message = true;
@@ -533,6 +461,7 @@ class ComplexFieldNames final : public apache::thrift::TException {
   }
 
   template <typename T_ComplexFieldNames_internal_error_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.internal_error_message_ref() = BAR;` instead of `FOO.set_internal_error_message(BAR);`")]]
   ::std::string& set_internal_error_message(T_ComplexFieldNames_internal_error_message_struct_setter&& internal_error_message_) {
     internal_error_message = std::forward<T_ComplexFieldNames_internal_error_message_struct_setter>(internal_error_message_);
     __isset.internal_error_message = true;
@@ -556,7 +485,7 @@ class ComplexFieldNames final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< ComplexFieldNames >;
+  friend class ::apache::thrift::Cpp2Ops<ComplexFieldNames>;
   friend void swap(ComplexFieldNames& a, ComplexFieldNames& b);
 };
 
@@ -569,7 +498,14 @@ uint32_t ComplexFieldNames::read(Protocol_* iprot) {
 
 } // cpp2
 namespace cpp2 {
-class CustomFieldNames final : public apache::thrift::TException {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT CustomFieldNames final : public apache::thrift::TException {
  private:
   friend struct ::apache::thrift::detail::st::struct_private_access;
 
@@ -577,6 +513,12 @@ class CustomFieldNames final : public apache::thrift::TException {
   static constexpr bool __fbthrift_cpp2_gen_json = false;
   static constexpr bool __fbthrift_cpp2_gen_nimble = false;
   static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
 
  public:
   using __fbthrift_cpp2_type = CustomFieldNames;
@@ -586,55 +528,40 @@ class CustomFieldNames final : public apache::thrift::TException {
 
  public:
 
-  CustomFieldNames() {}
+  CustomFieldNames();
+  explicit CustomFieldNames(std::string __message);
 
-  explicit CustomFieldNames(const std::string& __message) :
-      internal_error_message(__message) {}
-
-  explicit CustomFieldNames(std::string&& __message) :
-      internal_error_message(std::move(__message)) {}
   // FragileConstructor for use in initialization lists only.
   [[deprecated("This constructor is deprecated")]]
   CustomFieldNames(apache::thrift::FragileConstructor, ::std::string error_message__arg, ::std::string internal_error_message__arg);
 
-  CustomFieldNames(CustomFieldNames&&) = default;
+  CustomFieldNames(CustomFieldNames&&) noexcept;
 
-  CustomFieldNames(const CustomFieldNames&) = default;
+  CustomFieldNames(const CustomFieldNames& src);
 
 
-  CustomFieldNames& operator=(CustomFieldNames&&) = default;
-
-  CustomFieldNames& operator=(const CustomFieldNames&) = default;
+  CustomFieldNames& operator=(CustomFieldNames&&) noexcept;
+  CustomFieldNames& operator=(const CustomFieldNames& src);
   void __clear();
+
+  ~CustomFieldNames() override;
+
  private:
   ::std::string error_message;
  private:
   ::std::string internal_error_message;
 
- public:
+ private:
   [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
   struct __isset {
     bool error_message;
     bool internal_error_message;
   } __isset = {};
-  bool operator==(const CustomFieldNames& rhs) const;
-#ifndef SWIG
-  friend bool operator!=(const CustomFieldNames& __x, const CustomFieldNames& __y) {
-    return !(__x == __y);
-  }
-#endif
-  bool operator<(const CustomFieldNames& rhs) const;
-#ifndef SWIG
-  friend bool operator>(const CustomFieldNames& __x, const CustomFieldNames& __y) {
-    return __y < __x;
-  }
-  friend bool operator<=(const CustomFieldNames& __x, const CustomFieldNames& __y) {
-    return !(__y < __x);
-  }
-  friend bool operator>=(const CustomFieldNames& __x, const CustomFieldNames& __y) {
-    return !(__x < __y);
-  }
-#endif
+
+ public:
+
+  bool operator==(const CustomFieldNames&) const;
+  bool operator<(const CustomFieldNames&) const;
 
   template <typename..., typename T = ::std::string>
   FOLLY_ERASE ::apache::thrift::field_ref<const T&> error_message_ref() const& {
@@ -685,6 +612,7 @@ class CustomFieldNames final : public apache::thrift::TException {
   }
 
   template <typename T_CustomFieldNames_error_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.error_message_ref() = BAR;` instead of `FOO.set_error_message(BAR);`")]]
   ::std::string& set_error_message(T_CustomFieldNames_error_message_struct_setter&& error_message_) {
     error_message = std::forward<T_CustomFieldNames_error_message_struct_setter>(error_message_);
     __isset.error_message = true;
@@ -700,6 +628,7 @@ class CustomFieldNames final : public apache::thrift::TException {
   }
 
   template <typename T_CustomFieldNames_internal_error_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.internal_error_message_ref() = BAR;` instead of `FOO.set_internal_error_message(BAR);`")]]
   ::std::string& set_internal_error_message(T_CustomFieldNames_internal_error_message_struct_setter&& internal_error_message_) {
     internal_error_message = std::forward<T_CustomFieldNames_internal_error_message_struct_setter>(internal_error_message_);
     __isset.internal_error_message = true;
@@ -723,12 +652,257 @@ class CustomFieldNames final : public apache::thrift::TException {
   template <class Protocol_>
   void readNoXfer(Protocol_* iprot);
 
-  friend class ::apache::thrift::Cpp2Ops< CustomFieldNames >;
+  friend class ::apache::thrift::Cpp2Ops<CustomFieldNames>;
   friend void swap(CustomFieldNames& a, CustomFieldNames& b);
 };
 
 template <class Protocol_>
 uint32_t CustomFieldNames::read(Protocol_* iprot) {
+  auto _xferStart = iprot->getCursorPosition();
+  readNoXfer(iprot);
+  return iprot->getCursorPosition() - _xferStart;
+}
+
+} // cpp2
+namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT ExceptionWithPrimitiveField final : public apache::thrift::TException {
+ private:
+  friend struct ::apache::thrift::detail::st::struct_private_access;
+
+  //  used by a static_assert in the corresponding source
+  static constexpr bool __fbthrift_cpp2_gen_json = false;
+  static constexpr bool __fbthrift_cpp2_gen_nimble = false;
+  static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::UNSPECIFIED;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::UNSPECIFIED;
+
+ public:
+  using __fbthrift_cpp2_type = ExceptionWithPrimitiveField;
+  static constexpr bool __fbthrift_cpp2_is_union =
+    false;
+
+
+ public:
+
+  ExceptionWithPrimitiveField();
+  explicit ExceptionWithPrimitiveField(std::string __message);
+
+  // FragileConstructor for use in initialization lists only.
+  [[deprecated("This constructor is deprecated")]]
+  ExceptionWithPrimitiveField(apache::thrift::FragileConstructor, ::std::string message__arg, ::std::int32_t error_code__arg);
+
+  ExceptionWithPrimitiveField(ExceptionWithPrimitiveField&&) noexcept;
+
+  ExceptionWithPrimitiveField(const ExceptionWithPrimitiveField& src);
+
+
+  ExceptionWithPrimitiveField& operator=(ExceptionWithPrimitiveField&&) noexcept;
+  ExceptionWithPrimitiveField& operator=(const ExceptionWithPrimitiveField& src);
+  void __clear();
+
+  ~ExceptionWithPrimitiveField() override;
+
+ private:
+  ::std::string message;
+ private:
+  ::std::int32_t error_code;
+
+ private:
+  [[deprecated("__isset field is deprecated in Thrift struct. Use _ref() accessors instead.")]]
+  struct __isset {
+    bool message;
+    bool error_code;
+  } __isset = {};
+
+ public:
+
+  bool operator==(const ExceptionWithPrimitiveField&) const;
+  bool operator<(const ExceptionWithPrimitiveField&) const;
+
+  template <typename..., typename T = ::std::string>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&> message_ref() const& {
+    return {this->message, __isset.message};
+  }
+
+  template <typename..., typename T = ::std::string>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&&> message_ref() const&& {
+    return {std::move(this->message), __isset.message};
+  }
+
+  template <typename..., typename T = ::std::string>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&> message_ref() & {
+    return {this->message, __isset.message};
+  }
+
+  template <typename..., typename T = ::std::string>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&&> message_ref() && {
+    return {std::move(this->message), __isset.message};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&> error_code_ref() const& {
+    return {this->error_code, __isset.error_code};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<const T&&> error_code_ref() const&& {
+    return {std::move(this->error_code), __isset.error_code};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&> error_code_ref() & {
+    return {this->error_code, __isset.error_code};
+  }
+
+  template <typename..., typename T = ::std::int32_t>
+  FOLLY_ERASE ::apache::thrift::field_ref<T&&> error_code_ref() && {
+    return {std::move(this->error_code), __isset.error_code};
+  }
+
+  const ::std::string& get_message() const& {
+    return message;
+  }
+
+  ::std::string get_message() && {
+    return std::move(message);
+  }
+
+  template <typename T_ExceptionWithPrimitiveField_message_struct_setter = ::std::string>
+  [[deprecated("Use `FOO.message_ref() = BAR;` instead of `FOO.set_message(BAR);`")]]
+  ::std::string& set_message(T_ExceptionWithPrimitiveField_message_struct_setter&& message_) {
+    message = std::forward<T_ExceptionWithPrimitiveField_message_struct_setter>(message_);
+    __isset.message = true;
+    return message;
+  }
+
+  ::std::int32_t get_error_code() const {
+    return error_code;
+  }
+
+  [[deprecated("Use `FOO.error_code_ref() = BAR;` instead of `FOO.set_error_code(BAR);`")]]
+  ::std::int32_t& set_error_code(::std::int32_t error_code_) {
+    error_code = error_code_;
+    __isset.error_code = true;
+    return error_code;
+  }
+
+  template <class Protocol_>
+  uint32_t read(Protocol_* iprot);
+  template <class Protocol_>
+  uint32_t serializedSize(Protocol_ const* prot_) const;
+  template <class Protocol_>
+  uint32_t serializedSizeZC(Protocol_ const* prot_) const;
+  template <class Protocol_>
+  uint32_t write(Protocol_* prot_) const;
+
+  const char* what() const noexcept override {
+    return message.c_str();
+  }
+
+ private:
+  template <class Protocol_>
+  void readNoXfer(Protocol_* iprot);
+
+  friend class ::apache::thrift::Cpp2Ops<ExceptionWithPrimitiveField>;
+  friend void swap(ExceptionWithPrimitiveField& a, ExceptionWithPrimitiveField& b);
+};
+
+template <class Protocol_>
+uint32_t ExceptionWithPrimitiveField::read(Protocol_* iprot) {
+  auto _xferStart = iprot->getCursorPosition();
+  readNoXfer(iprot);
+  return iprot->getCursorPosition() - _xferStart;
+}
+
+} // cpp2
+namespace cpp2 {
+#ifndef SWIG
+using ::apache::thrift::detail::operator!=;
+using ::apache::thrift::detail::operator>;
+using ::apache::thrift::detail::operator<=;
+using ::apache::thrift::detail::operator>=;
+#endif
+
+class FOLLY_EXPORT Banal final : public apache::thrift::TException {
+ private:
+  friend struct ::apache::thrift::detail::st::struct_private_access;
+
+  //  used by a static_assert in the corresponding source
+  static constexpr bool __fbthrift_cpp2_gen_json = false;
+  static constexpr bool __fbthrift_cpp2_gen_nimble = false;
+  static constexpr bool __fbthrift_cpp2_gen_has_thrift_uri = false;
+  static constexpr ::apache::thrift::ExceptionKind __fbthrift_cpp2_gen_exception_kind =
+         ::apache::thrift::ExceptionKind::PERMANENT;
+  static constexpr ::apache::thrift::ExceptionSafety __fbthrift_cpp2_gen_exception_safety =
+         ::apache::thrift::ExceptionSafety::SAFE;
+  static constexpr ::apache::thrift::ExceptionBlame __fbthrift_cpp2_gen_exception_blame =
+         ::apache::thrift::ExceptionBlame::CLIENT;
+
+ public:
+  using __fbthrift_cpp2_type = Banal;
+  static constexpr bool __fbthrift_cpp2_is_union =
+    false;
+
+
+ public:
+
+  Banal();
+
+  // FragileConstructor for use in initialization lists only.
+  [[deprecated("This constructor is deprecated")]]
+  Banal(apache::thrift::FragileConstructor);
+
+  Banal(Banal&&) noexcept;
+
+  Banal(const Banal& src);
+
+
+  Banal& operator=(Banal&&) noexcept;
+  Banal& operator=(const Banal& src);
+  void __clear();
+
+  ~Banal() override;
+
+
+ public:
+
+  bool operator==(const Banal&) const;
+  bool operator<(const Banal&) const;
+
+  template <class Protocol_>
+  uint32_t read(Protocol_* iprot);
+  template <class Protocol_>
+  uint32_t serializedSize(Protocol_ const* prot_) const;
+  template <class Protocol_>
+  uint32_t serializedSizeZC(Protocol_ const* prot_) const;
+  template <class Protocol_>
+  uint32_t write(Protocol_* prot_) const;
+
+  const char* what() const noexcept override {
+    return "::cpp2::Banal";
+  }
+
+ private:
+  template <class Protocol_>
+  void readNoXfer(Protocol_* iprot);
+
+  friend class ::apache::thrift::Cpp2Ops<Banal>;
+  friend void swap(Banal& a, Banal& b);
+};
+
+template <class Protocol_>
+uint32_t Banal::read(Protocol_* iprot) {
   auto _xferStart = iprot->getCursorPosition();
   readNoXfer(iprot);
   return iprot->getCursorPosition() - _xferStart;

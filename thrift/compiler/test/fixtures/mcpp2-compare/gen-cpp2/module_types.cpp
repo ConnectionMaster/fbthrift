@@ -167,9 +167,11 @@ void TccStructTraits<::some::valid::ns::Empty>::translateFieldName(
 
 namespace some { namespace valid { namespace ns {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 Empty::Empty(apache::thrift::FragileConstructor) {}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void Empty::__clear() {
   // clear all fields
 }
@@ -235,15 +237,17 @@ void TccStructTraits<::some::valid::ns::ASimpleStruct>::translateFieldName(
 
 namespace some { namespace valid { namespace ns {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 ASimpleStruct::ASimpleStruct(apache::thrift::FragileConstructor, ::std::int64_t boolField__arg) :
     boolField(std::move(boolField__arg)) {
   __isset.boolField = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void ASimpleStruct::__clear() {
   // clear all fields
-  boolField = 0;
+  this->boolField = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -308,15 +312,17 @@ void TccStructTraits<::some::valid::ns::ASimpleStructNoexcept>::translateFieldNa
 
 namespace some { namespace valid { namespace ns {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 ASimpleStructNoexcept::ASimpleStructNoexcept(apache::thrift::FragileConstructor, ::std::int64_t boolField__arg) :
     boolField(std::move(boolField__arg)) {
   __isset.boolField = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void ASimpleStructNoexcept::__clear() {
   // clear all fields
-  boolField = 0;
+  this->boolField = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -392,15 +398,25 @@ void TccStructTraits<::some::valid::ns::MyStruct>::translateFieldName(
 namespace some { namespace valid { namespace ns {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(const MyStruct&) = default;
+MyStruct& MyStruct::operator=(const MyStruct&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct() :
       MyBoolField(0),
       MyIntField(12LL),
-      MyStringField(apache::thrift::StringTraits< std::string>::fromStringLiteral("test")),
-      MyMapEnumAndInt(std::initializer_list<std::pair<const ::some::valid::ns::MyEnumA, ::std::string>>{{ ::some::valid::ns::MyEnumA::fieldA, apache::thrift::StringTraits< std::string>::fromStringLiteral("fieldA")},
-  { ::some::valid::ns::MyEnumA::fieldC, apache::thrift::StringTraits< std::string>::fromStringLiteral("fieldC")},
-  {static_cast< ::some::valid::ns::MyEnumA>(9), apache::thrift::StringTraits< std::string>::fromStringLiteral("nothing")}}) {}
+      MyStringField(apache::thrift::StringTraits<std::string>::fromStringLiteral("test")),
+      MyMapEnumAndInt(std::initializer_list<std::pair<const ::some::valid::ns::MyEnumA, ::std::string>>{{ ::some::valid::ns::MyEnumA::fieldA, apache::thrift::StringTraits<std::string>::fromStringLiteral("fieldA")},
+  { ::some::valid::ns::MyEnumA::fieldC, apache::thrift::StringTraits<std::string>::fromStringLiteral("fieldC")},
+  {static_cast< ::some::valid::ns::MyEnumA>(9), apache::thrift::StringTraits<std::string>::fromStringLiteral("nothing")}}) {
+}
 
-MyStruct::MyStruct(MyStruct&& other) noexcept :
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+MyStruct::~MyStruct() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyStruct::MyStruct(MyStruct&& other) noexcept  :
     MyBoolField(std::move(other.MyBoolField)),
     MyIntField(std::move(other.MyIntField)),
     MyStringField(std::move(other.MyStringField)),
@@ -411,10 +427,21 @@ MyStruct::MyStruct(MyStruct&& other) noexcept :
     MyBinaryListField4(std::move(other.MyBinaryListField4)),
     MyMapEnumAndInt(std::move(other.MyMapEnumAndInt)),
     __isset(other.__isset) {}
-
+MyStruct& MyStruct::operator=(FOLLY_MAYBE_UNUSED MyStruct&& other) noexcept {
+    this->MyBoolField = std::move(other.MyBoolField);
+    this->MyIntField = std::move(other.MyIntField);
+    this->MyStringField = std::move(other.MyStringField);
+    this->MyStringField2 = std::move(other.MyStringField2);
+    this->MyBinaryField = std::move(other.MyBinaryField);
+    this->MyBinaryField2 = std::move(other.MyBinaryField2);
+    this->MyBinaryField3 = std::move(other.MyBinaryField3);
+    this->MyBinaryListField4 = std::move(other.MyBinaryListField4);
+    this->MyMapEnumAndInt = std::move(other.MyMapEnumAndInt);
+    __isset = other.__isset;
+    return *this;
+}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
-MyStruct::~MyStruct() {}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 MyStruct::MyStruct(apache::thrift::FragileConstructor, bool MyBoolField__arg, ::std::int64_t MyIntField__arg, ::std::string MyStringField__arg, ::std::string MyStringField2__arg, ::std::string MyBinaryField__arg, ::std::string MyBinaryField2__arg, ::std::string MyBinaryField3__arg, ::std::vector<::std::string> MyBinaryListField4__arg, ::std::map<::some::valid::ns::MyEnumA, ::std::string> MyMapEnumAndInt__arg) :
@@ -437,17 +464,18 @@ MyStruct::MyStruct(apache::thrift::FragileConstructor, bool MyBoolField__arg, ::
   __isset.MyMapEnumAndInt = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyStruct::__clear() {
   // clear all fields
-  MyBoolField = 0;
-  MyIntField = 12LL;
-  MyStringField = apache::thrift::StringTraits< std::string>::fromStringLiteral("test");
-  MyStringField2 = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  MyBinaryField = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  MyBinaryField2 = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  MyBinaryField3 = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  MyBinaryListField4.clear();
-  MyMapEnumAndInt.clear();
+  this->MyBoolField = 0;
+  this->MyIntField = 12LL;
+  this->MyStringField = apache::thrift::StringTraits<std::string>::fromStringLiteral("test");
+  this->MyStringField2 = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->MyBinaryField = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->MyBinaryField2 = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->MyBinaryField3 = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->MyBinaryListField4.clear();
+  this->MyMapEnumAndInt.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -967,31 +995,31 @@ bool ComplexUnion::operator<(const ComplexUnion& rhs) const {
   }
 }
 
-std::unique_ptr<::some::valid::ns::MyStruct>& ComplexUnion::set_ref_field(::some::valid::ns::MyStruct const &t) {
+::std::unique_ptr<::some::valid::ns::MyStruct>& ComplexUnion::set_ref_field(::some::valid::ns::MyStruct const &t) {
   __clear();
   type_ = Type::ref_field;
-  ::new (std::addressof(value_.ref_field)) std::unique_ptr<::some::valid::ns::MyStruct>(new std::unique_ptr<::some::valid::ns::MyStruct>::element_type(t));
+  ::new (std::addressof(value_.ref_field)) ::std::unique_ptr<::some::valid::ns::MyStruct>(new ::std::unique_ptr<::some::valid::ns::MyStruct>::element_type(t));
   return value_.ref_field;
 }
 
-std::unique_ptr<::some::valid::ns::MyStruct>& ComplexUnion::set_ref_field(::some::valid::ns::MyStruct&& t) {
+::std::unique_ptr<::some::valid::ns::MyStruct>& ComplexUnion::set_ref_field(::some::valid::ns::MyStruct&& t) {
   __clear();
   type_ = Type::ref_field;
-  ::new (std::addressof(value_.ref_field)) std::unique_ptr<::some::valid::ns::MyStruct>(new std::unique_ptr<::some::valid::ns::MyStruct>::element_type(std::move(t)));
+  ::new (std::addressof(value_.ref_field)) ::std::unique_ptr<::some::valid::ns::MyStruct>(new ::std::unique_ptr<::some::valid::ns::MyStruct>::element_type(std::move(t)));
   return value_.ref_field;
 }
 
-std::shared_ptr<const ::some::valid::ns::MyStruct>& ComplexUnion::set_ref_field2(::some::valid::ns::MyStruct const &t) {
+::std::shared_ptr<const ::some::valid::ns::MyStruct>& ComplexUnion::set_ref_field2(::some::valid::ns::MyStruct const &t) {
   __clear();
   type_ = Type::ref_field2;
-  ::new (std::addressof(value_.ref_field2)) std::shared_ptr<const ::some::valid::ns::MyStruct>(new std::shared_ptr<const ::some::valid::ns::MyStruct>::element_type(t));
+  ::new (std::addressof(value_.ref_field2)) ::std::shared_ptr<const ::some::valid::ns::MyStruct>(new ::std::shared_ptr<const ::some::valid::ns::MyStruct>::element_type(t));
   return value_.ref_field2;
 }
 
-std::shared_ptr<const ::some::valid::ns::MyStruct>& ComplexUnion::set_ref_field2(::some::valid::ns::MyStruct&& t) {
+::std::shared_ptr<const ::some::valid::ns::MyStruct>& ComplexUnion::set_ref_field2(::some::valid::ns::MyStruct&& t) {
   __clear();
   type_ = Type::ref_field2;
-  ::new (std::addressof(value_.ref_field2)) std::shared_ptr<const ::some::valid::ns::MyStruct>(new std::shared_ptr<const ::some::valid::ns::MyStruct>::element_type(std::move(t)));
+  ::new (std::addressof(value_.ref_field2)) ::std::shared_ptr<const ::some::valid::ns::MyStruct>(new ::std::shared_ptr<const ::some::valid::ns::MyStruct>::element_type(std::move(t)));
   return value_.ref_field2;
 }
 
@@ -1138,17 +1166,66 @@ void TccStructTraits<::some::valid::ns::AnException>::translateFieldName(
 namespace some { namespace valid { namespace ns {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+AnException::AnException(const AnException&) = default;
+AnException& AnException::operator=(const AnException&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 AnException::AnException() :
       code(0),
       req_code(0),
       exception_list(std::initializer_list<::std::int32_t>{1,
   2,
   3}),
-      enum_field(static_cast< ::some::valid::ns::MyEnumA>(0)) {}
+      enum_field(static_cast< ::some::valid::ns::MyEnumA>(0)) {
+}
+
+AnException::AnException(std::string __message) : AnException() {
+  message2 = std::move(__message);
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 AnException::~AnException() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+AnException::AnException(AnException&& other) noexcept  :
+    code(std::move(other.code)),
+    req_code(std::move(other.req_code)),
+    message2(std::move(other.message2)),
+    req_message(std::move(other.req_message)),
+    exception_list(std::move(other.exception_list)),
+    exception_set(std::move(other.exception_set)),
+    exception_map(std::move(other.exception_map)),
+    req_exception_map(std::move(other.req_exception_map)),
+    enum_field(std::move(other.enum_field)),
+    enum_container(std::move(other.enum_container)),
+    a_struct(std::move(other.a_struct)),
+    a_set_struct(std::move(other.a_set_struct)),
+    a_union_list(std::move(other.a_union_list)),
+    union_typedef(std::move(other.union_typedef)),
+    a_union_typedef_list(std::move(other.a_union_typedef_list)),
+    __isset(other.__isset) {}
+AnException& AnException::operator=(FOLLY_MAYBE_UNUSED AnException&& other) noexcept {
+    this->code = std::move(other.code);
+    this->req_code = std::move(other.req_code);
+    this->message2 = std::move(other.message2);
+    this->req_message = std::move(other.req_message);
+    this->exception_list = std::move(other.exception_list);
+    this->exception_set = std::move(other.exception_set);
+    this->exception_map = std::move(other.exception_map);
+    this->req_exception_map = std::move(other.req_exception_map);
+    this->enum_field = std::move(other.enum_field);
+    this->enum_container = std::move(other.enum_container);
+    this->a_struct = std::move(other.a_struct);
+    this->a_set_struct = std::move(other.a_set_struct);
+    this->a_union_list = std::move(other.a_union_list);
+    this->union_typedef = std::move(other.union_typedef);
+    this->a_union_typedef_list = std::move(other.a_union_typedef_list);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 AnException::AnException(apache::thrift::FragileConstructor, ::std::int32_t code__arg, ::std::int32_t req_code__arg, ::std::string message2__arg, ::std::string req_message__arg, ::std::vector<::std::int32_t> exception_list__arg, ::std::set<::std::int64_t> exception_set__arg, ::std::map<::std::string, ::std::int32_t> exception_map__arg, ::std::map<::std::string, ::std::int32_t> req_exception_map__arg, ::some::valid::ns::MyEnumA enum_field__arg, ::std::vector<::some::valid::ns::MyEnumA> enum_container__arg, ::some::valid::ns::MyStruct a_struct__arg, ::std::set<::some::valid::ns::MyStruct> a_set_struct__arg, ::std::vector<::some::valid::ns::SimpleUnion> a_union_list__arg, ::some::valid::ns::unionTypeDef union_typedef__arg, ::std::vector<::some::valid::ns::unionTypeDef> a_union_typedef_list__arg) :
@@ -1181,23 +1258,24 @@ AnException::AnException(apache::thrift::FragileConstructor, ::std::int32_t code
   __isset.a_union_typedef_list = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void AnException::__clear() {
   // clear all fields
-  code = 0;
-  req_code = 0;
-  message2 = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  req_message = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  exception_list.clear();
-  exception_set.clear();
-  exception_map.clear();
-  req_exception_map.clear();
-  enum_field = static_cast< ::some::valid::ns::MyEnumA>(0);
-  enum_container.clear();
-  a_struct.__clear();
-  a_set_struct.clear();
-  a_union_list.clear();
-  union_typedef.clear();
-  a_union_typedef_list.clear();
+  this->code = 0;
+  this->req_code = 0;
+  this->message2 = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->req_message = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->exception_list.clear();
+  this->exception_set.clear();
+  this->exception_map.clear();
+  this->req_exception_map.clear();
+  this->enum_field = static_cast< ::some::valid::ns::MyEnumA>(0);
+  this->enum_container.clear();
+  this->a_struct.__clear();
+  this->a_set_struct.clear();
+  this->a_union_list.clear();
+  this->union_typedef.clear();
+  this->a_union_typedef_list.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -1499,6 +1577,36 @@ void TccStructTraits<::some::valid::ns::AnotherException>::translateFieldName(
 namespace some { namespace valid { namespace ns {
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+AnotherException::AnotherException(const AnotherException&) = default;
+AnotherException& AnotherException::operator=(const AnotherException&) = default;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+AnotherException::AnotherException() :
+      code(0),
+      req_code(0) {
+}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+AnotherException::~AnotherException() {}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+AnotherException::AnotherException(AnotherException&& other) noexcept  :
+    code(std::move(other.code)),
+    req_code(std::move(other.req_code)),
+    message(std::move(other.message)),
+    __isset(other.__isset) {}
+AnotherException& AnotherException::operator=(FOLLY_MAYBE_UNUSED AnotherException&& other) noexcept {
+    this->code = std::move(other.code);
+    this->req_code = std::move(other.req_code);
+    this->message = std::move(other.message);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 AnotherException::AnotherException(apache::thrift::FragileConstructor, ::std::int32_t code__arg, ::std::int32_t req_code__arg, ::std::string message__arg) :
     code(std::move(code__arg)),
     req_code(std::move(req_code__arg)),
@@ -1507,11 +1615,12 @@ AnotherException::AnotherException(apache::thrift::FragileConstructor, ::std::in
   __isset.message = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void AnotherException::__clear() {
   // clear all fields
-  code = 0;
-  req_code = 0;
-  message = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
+  this->code = 0;
+  this->req_code = 0;
+  this->message = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -1617,9 +1726,9 @@ containerStruct::containerStruct() :
   2,
   3,
   4}),
-      fieldE(apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring")),
-      req_fieldE(apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring")),
-      opt_fieldE(apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring")),
+      fieldE(apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring")),
+      req_fieldE(apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring")),
+      opt_fieldE(apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring")),
       fieldF(std::initializer_list<::std::vector<::std::int32_t>>{std::initializer_list<::std::int32_t>{1,
   3,
   5,
@@ -1631,11 +1740,11 @@ containerStruct::containerStruct() :
   10,
   12}}),
       fieldI(true),
-      fieldJ(std::initializer_list<std::pair<const ::std::string, ::std::vector<::std::int32_t>>>{{apache::thrift::StringTraits< std::string>::fromStringLiteral("subfieldA"), std::initializer_list<::std::int32_t>{1,
+      fieldJ(std::initializer_list<std::pair<const ::std::string, ::std::vector<::std::int32_t>>>{{apache::thrift::StringTraits<std::string>::fromStringLiteral("subfieldA"), std::initializer_list<::std::int32_t>{1,
   4,
   8,
   12}},
-  {apache::thrift::StringTraits< std::string>::fromStringLiteral("subfieldB"), std::initializer_list<::std::int32_t>{2,
+  {apache::thrift::StringTraits<std::string>::fromStringLiteral("subfieldB"), std::initializer_list<::std::int32_t>{2,
   5,
   9,
   13}}}),
@@ -1649,11 +1758,13 @@ containerStruct::containerStruct() :
    ::some::valid::ns::MyEnumA::fieldB,
    ::some::valid::ns::MyEnumA::fieldA}),
       fieldAC( ::some::valid::ns::MyEnumB::AField),
-      fieldAD(static_cast< ::a::different::ns::AnEnum>(0)) {}
+      fieldAD(static_cast< ::a::different::ns::AnEnum>(0)) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 containerStruct::~containerStruct() {}
+
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 containerStruct::containerStruct(apache::thrift::FragileConstructor, bool fieldA__arg, bool req_fieldA__arg, bool opt_fieldA__arg, ::std::map<::std::string, bool> fieldB__arg, ::std::map<::std::string, bool> req_fieldB__arg, ::std::map<::std::string, bool> opt_fieldB__arg, ::std::set<::std::int32_t> fieldC__arg, ::std::set<::std::int32_t> req_fieldC__arg, ::std::set<::std::int32_t> opt_fieldC__arg, ::std::string fieldD__arg, ::std::string fieldE__arg, ::std::string req_fieldE__arg, ::std::string opt_fieldE__arg, ::std::vector<::std::vector<::std::int32_t>> fieldF__arg, ::std::map<::std::string, ::std::map<::std::string, ::std::map<::std::string, ::std::int32_t>>> fieldG__arg, ::std::vector<::std::set<::std::int32_t>> fieldH__arg, bool fieldI__arg, ::std::map<::std::string, ::std::vector<::std::int32_t>> fieldJ__arg, ::std::vector<::std::vector<::std::vector<::std::vector<::std::int32_t>>>> fieldK__arg, ::std::set<::std::set<::std::set<bool>>> fieldL__arg, ::std::map<::std::set<::std::vector<::std::int32_t>>, ::std::map<::std::vector<::std::set<::std::string>>, ::std::string>> fieldM__arg, ::some::valid::ns::simpleTypeDef fieldN__arg, ::some::valid::ns::complexStructTypeDef fieldO__arg, ::std::vector<::some::valid::ns::mostComplexTypeDef> fieldP__arg, ::some::valid::ns::MyEnumA fieldQ__arg, ::some::valid::ns::MyEnumA fieldR__arg, ::some::valid::ns::MyEnumA req_fieldR__arg, ::some::valid::ns::MyEnumA opt_fieldR__arg, ::some::valid::ns::MyEnumA fieldS__arg, ::std::vector<::some::valid::ns::MyEnumA> fieldT__arg, ::std::vector<::some::valid::ns::MyEnumA> fieldU__arg, ::some::valid::ns::MyStruct fieldV__arg, ::some::valid::ns::MyStruct req_fieldV__arg, ::some::valid::ns::MyStruct opt_fieldV__arg, ::std::set<::some::valid::ns::MyStruct> fieldW__arg, ::some::valid::ns::ComplexUnion fieldX__arg, ::some::valid::ns::ComplexUnion req_fieldX__arg, ::some::valid::ns::ComplexUnion opt_fieldX__arg, ::std::vector<::some::valid::ns::ComplexUnion> fieldY__arg, ::some::valid::ns::unionTypeDef fieldZ__arg, ::std::vector<::some::valid::ns::unionTypeDef> fieldAA__arg, ::std::map<::some::valid::ns::IndirectionB, ::some::valid::ns::IndirectionC> fieldAB__arg, ::some::valid::ns::MyEnumB fieldAC__arg, ::a::different::ns::AnEnum fieldAD__arg, ::std::map<::std::string, ::std::int32_t> fieldAE__arg, ::some::valid::ns::IndirectionD fieldSD__arg) :
@@ -1744,54 +1855,55 @@ containerStruct::containerStruct(apache::thrift::FragileConstructor, bool fieldA
   __isset.fieldSD = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void containerStruct::__clear() {
   // clear all fields
-  fieldA = 0;
-  req_fieldA = 0;
-  opt_fieldA = 0;
-  fieldB.clear();
-  req_fieldB.clear();
-  opt_fieldB.clear();
-  fieldC.clear();
-  req_fieldC.clear();
-  opt_fieldC.clear();
-  fieldD = apache::thrift::StringTraits< std::string>::fromStringLiteral("");
-  fieldE = apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring");
-  req_fieldE = apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring");
-  opt_fieldE = apache::thrift::StringTraits< std::string>::fromStringLiteral("somestring");
-  fieldF.clear();
-  fieldG.clear();
-  fieldH.clear();
-  fieldI = true;
-  fieldJ.clear();
-  fieldK.clear();
-  fieldL.clear();
-  fieldM.clear();
-  fieldN = 0;
-  fieldO.clear();
-  fieldP.clear();
-  fieldQ = static_cast< ::some::valid::ns::MyEnumA>(0);
-  fieldR =  ::some::valid::ns::MyEnumA::fieldB;
-  req_fieldR =  ::some::valid::ns::MyEnumA::fieldB;
-  opt_fieldR =  ::some::valid::ns::MyEnumA::fieldB;
-  fieldS =  ::some::valid::ns::MyEnumA::fieldB;
-  fieldT.clear();
-  fieldU.clear();
-  fieldV.__clear();
-  req_fieldV.__clear();
-  opt_fieldV.__clear();
-  fieldW.clear();
-  fieldX.__clear();
-  req_fieldX.__clear();
-  opt_fieldX.__clear();
-  fieldY.clear();
-  fieldZ.clear();
-  fieldAA.clear();
-  fieldAB.clear();
-  fieldAC =  ::some::valid::ns::MyEnumB::AField;
-  fieldAD = static_cast< ::a::different::ns::AnEnum>(0);
-  fieldAE.clear();
-  ::apache::thrift::apply_indirection(fieldSD) = apache::thrift::StringTraits< ::folly::remove_cvref_t<::folly::invoke_result_t<::apache::thrift::detail::apply_indirection_fn, FooBar const&>>>::fromStringLiteral("");
+  this->fieldA = 0;
+  this->req_fieldA = 0;
+  this->opt_fieldA = 0;
+  this->fieldB.clear();
+  this->req_fieldB.clear();
+  this->opt_fieldB.clear();
+  this->fieldC.clear();
+  this->req_fieldC.clear();
+  this->opt_fieldC.clear();
+  this->fieldD = apache::thrift::StringTraits<std::string>::fromStringLiteral("");
+  this->fieldE = apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring");
+  this->req_fieldE = apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring");
+  this->opt_fieldE = apache::thrift::StringTraits<std::string>::fromStringLiteral("somestring");
+  this->fieldF.clear();
+  this->fieldG.clear();
+  this->fieldH.clear();
+  this->fieldI = true;
+  this->fieldJ.clear();
+  this->fieldK.clear();
+  this->fieldL.clear();
+  this->fieldM.clear();
+  this->fieldN = 0;
+  this->fieldO.clear();
+  this->fieldP.clear();
+  this->fieldQ = static_cast< ::some::valid::ns::MyEnumA>(0);
+  this->fieldR =  ::some::valid::ns::MyEnumA::fieldB;
+  this->req_fieldR =  ::some::valid::ns::MyEnumA::fieldB;
+  this->opt_fieldR =  ::some::valid::ns::MyEnumA::fieldB;
+  this->fieldS =  ::some::valid::ns::MyEnumA::fieldB;
+  this->fieldT.clear();
+  this->fieldU.clear();
+  this->fieldV.__clear();
+  this->req_fieldV.__clear();
+  this->opt_fieldV.__clear();
+  this->fieldW.clear();
+  this->fieldX.__clear();
+  this->req_fieldX.__clear();
+  this->opt_fieldX.__clear();
+  this->fieldY.clear();
+  this->fieldZ.clear();
+  this->fieldAA.clear();
+  this->fieldAB.clear();
+  this->fieldAC =  ::some::valid::ns::MyEnumB::AField;
+  this->fieldAD = static_cast< ::a::different::ns::AnEnum>(0);
+  this->fieldAE.clear();
+  ::apache::thrift::apply_indirection(this->fieldSD) = apache::thrift::StringTraits<::folly::remove_cvref_t<::folly::invoke_result_t<::apache::thrift::detail::apply_indirection_fn, FooBar const&>>>::fromStringLiteral("");
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -2542,7 +2654,8 @@ THRIFT_IGNORE_ISSET_USE_WARNING_END
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset.MyIncludedStruct = srcObj.__isset.MyIncludedStruct;
 THRIFT_IGNORE_ISSET_USE_WARNING_END
-  if (srcObj.ARefField) ARefField.reset(new ::some::valid::ns::AStruct(*srcObj.ARefField));
+  ARefField = ::apache::thrift::detail::st::copy_field<
+        ::apache::thrift::type_class::structure>(srcObj.ARefField);
   ARequiredField = srcObj.ARequiredField;
 }
 
@@ -2553,7 +2666,25 @@ MyIncludedStruct& MyIncludedStruct::operator=(const MyIncludedStruct& src) {
 }
 
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
-MyIncludedStruct::MyIncludedStruct(apache::thrift::FragileConstructor, ::a::different::ns::IncludedInt64 MyIncludedInt__arg, ::some::valid::ns::AStruct MyIncludedStruct__arg, std::unique_ptr<::some::valid::ns::AStruct> ARefField__arg, ::some::valid::ns::AStruct ARequiredField__arg) :
+MyIncludedStruct::MyIncludedStruct(MyIncludedStruct&& other) noexcept  :
+    MyIncludedInt(std::move(other.MyIncludedInt)),
+    MyIncludedStruct(std::move(other.MyIncludedStruct)),
+    ARefField(std::move(other.ARefField)),
+    ARequiredField(std::move(other.ARequiredField)),
+    __isset(other.__isset) {}
+MyIncludedStruct& MyIncludedStruct::operator=(FOLLY_MAYBE_UNUSED MyIncludedStruct&& other) noexcept {
+    this->MyIncludedInt = std::move(other.MyIncludedInt);
+    this->MyIncludedStruct = std::move(other.MyIncludedStruct);
+    this->ARefField = std::move(other.ARefField);
+    this->ARequiredField = std::move(other.ARequiredField);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+MyIncludedStruct::MyIncludedStruct(apache::thrift::FragileConstructor, ::a::different::ns::IncludedInt64 MyIncludedInt__arg, ::some::valid::ns::AStruct MyIncludedStruct__arg, ::std::unique_ptr<::some::valid::ns::AStruct> ARefField__arg, ::some::valid::ns::AStruct ARequiredField__arg) :
     MyIncludedInt(std::move(MyIncludedInt__arg)),
     MyIncludedStruct(std::move(MyIncludedStruct__arg)),
     ARefField(std::move(ARefField__arg)),
@@ -2562,12 +2693,13 @@ MyIncludedStruct::MyIncludedStruct(apache::thrift::FragileConstructor, ::a::diff
   __isset.MyIncludedStruct = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void MyIncludedStruct::__clear() {
   // clear all fields
-  MyIncludedInt = 42LL;
-  MyIncludedStruct.__clear();
-  if (ARefField) ARefField->__clear();
-  ARequiredField.__clear();
+  this->MyIncludedInt = 42LL;
+  this->MyIncludedStruct.__clear();
+  if (this->ARefField) this->ARefField->__clear();
+  this->ARequiredField.__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -2741,59 +2873,18 @@ AnnotatedStruct::AnnotatedStruct() :
       req_ref_type_unique(std::make_unique<::std::vector<::std::string>>()),
       base_type(0),
       indirection_a(0),
-      iobuf_type_val(apache::thrift::StringTraits< folly::IOBuf>::fromStringLiteral("value")),
-      iobuf_ptr_val(apache::thrift::StringTraits< std::unique_ptr<folly::IOBuf>>::fromStringLiteral("value2")),
-      struct_struct(::apache::thrift::detail::make_constant< ::some::valid::ns::containerStruct>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::fieldD>(apache::thrift::StringTraits< std::string>::fromStringLiteral("some string")), ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::fieldI>(false))) {}
-
-AnnotatedStruct::AnnotatedStruct(AnnotatedStruct&& other) noexcept :
-    no_annotation(std::move(other.no_annotation)),
-    cpp_unique_ref(std::move(other.cpp_unique_ref)),
-    cpp2_unique_ref(std::move(other.cpp2_unique_ref)),
-    container_with_ref(std::move(other.container_with_ref)),
-    req_cpp_unique_ref(std::move(other.req_cpp_unique_ref)),
-    req_cpp2_unique_ref(std::move(other.req_cpp2_unique_ref)),
-    req_container_with_ref(std::move(other.req_container_with_ref)),
-    opt_cpp_unique_ref(std::move(other.opt_cpp_unique_ref)),
-    opt_cpp2_unique_ref(std::move(other.opt_cpp2_unique_ref)),
-    opt_container_with_ref(std::move(other.opt_container_with_ref)),
-    ref_type_unique(std::move(other.ref_type_unique)),
-    ref_type_shared(std::move(other.ref_type_shared)),
-    ref_type_const(std::move(other.ref_type_const)),
-    req_ref_type_shared(std::move(other.req_ref_type_shared)),
-    req_ref_type_const(std::move(other.req_ref_type_const)),
-    req_ref_type_unique(std::move(other.req_ref_type_unique)),
-    opt_ref_type_const(std::move(other.opt_ref_type_const)),
-    opt_ref_type_unique(std::move(other.opt_ref_type_unique)),
-    opt_ref_type_shared(std::move(other.opt_ref_type_shared)),
-    base_type(std::move(other.base_type)),
-    list_type(std::move(other.list_type)),
-    set_type(std::move(other.set_type)),
-    map_type(std::move(other.map_type)),
-    map_struct_type(std::move(other.map_struct_type)),
-    iobuf_type(std::move(other.iobuf_type)),
-    iobuf_ptr(std::move(other.iobuf_ptr)),
-    list_i32_template(std::move(other.list_i32_template)),
-    list_string_template(std::move(other.list_string_template)),
-    set_template(std::move(other.set_template)),
-    map_template(std::move(other.map_template)),
-    typedef_list_template(std::move(other.typedef_list_template)),
-    typedef_deque_template(std::move(other.typedef_deque_template)),
-    typedef_set_template(std::move(other.typedef_set_template)),
-    typedef_map_template(std::move(other.typedef_map_template)),
-    indirection_a(std::move(other.indirection_a)),
-    indirection_b(std::move(other.indirection_b)),
-    indirection_c(std::move(other.indirection_c)),
-    iobuf_type_val(std::move(other.iobuf_type_val)),
-    iobuf_ptr_val(std::move(other.iobuf_ptr_val)),
-    struct_struct(std::move(other.struct_struct)),
-    __isset(other.__isset) {}
+      iobuf_type_val(apache::thrift::StringTraits<folly::IOBuf>::fromStringLiteral("value")),
+      iobuf_ptr_val(apache::thrift::StringTraits<std::unique_ptr<folly::IOBuf>>::fromStringLiteral("value2")),
+      struct_struct(::apache::thrift::detail::make_constant< ::some::valid::ns::containerStruct>(::apache::thrift::type_class::structure{}, ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::fieldD>(apache::thrift::StringTraits<std::string>::fromStringLiteral("some string")), ::apache::thrift::detail::wrap_struct_argument<::apache::thrift::tag::fieldI>(false))) {
+}
 
 THRIFT_IGNORE_ISSET_USE_WARNING_END
 
 AnnotatedStruct::~AnnotatedStruct() {}
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
-AnnotatedStruct::AnnotatedStruct(apache::thrift::FragileConstructor, ::some::valid::ns::containerStruct no_annotation__arg, std::unique_ptr<::some::valid::ns::containerStruct> cpp_unique_ref__arg, std::unique_ptr<::some::valid::ns::containerStruct> cpp2_unique_ref__arg, std::unique_ptr<::std::map<::std::int32_t, ::std::vector<::std::string>>> container_with_ref__arg, std::unique_ptr<::some::valid::ns::containerStruct> req_cpp_unique_ref__arg, std::unique_ptr<::some::valid::ns::containerStruct> req_cpp2_unique_ref__arg, std::unique_ptr<::std::vector<::std::string>> req_container_with_ref__arg, std::unique_ptr<::some::valid::ns::containerStruct> opt_cpp_unique_ref__arg, std::unique_ptr<::some::valid::ns::containerStruct> opt_cpp2_unique_ref__arg, std::unique_ptr<::std::set<::std::int32_t>> opt_container_with_ref__arg, std::unique_ptr<::some::valid::ns::containerStruct> ref_type_unique__arg, std::shared_ptr<::some::valid::ns::containerStruct> ref_type_shared__arg, std::shared_ptr<const ::std::map<::std::int32_t, ::std::vector<::std::string>>> ref_type_const__arg, std::shared_ptr<::some::valid::ns::containerStruct> req_ref_type_shared__arg, std::shared_ptr<const ::some::valid::ns::containerStruct> req_ref_type_const__arg, std::unique_ptr<::std::vector<::std::string>> req_ref_type_unique__arg, std::shared_ptr<const ::some::valid::ns::containerStruct> opt_ref_type_const__arg, std::unique_ptr<::some::valid::ns::containerStruct> opt_ref_type_unique__arg, std::shared_ptr<::std::set<::std::int32_t>> opt_ref_type_shared__arg, ::some::valid::ns::CppFakeI32 base_type__arg, ::some::valid::ns::FollySmallVectorI64 list_type__arg, ::some::valid::ns::SortedVectorSetString set_type__arg, ::some::valid::ns::FakeMap map_type__arg, ::some::valid::ns::UnorderedMapStruct map_struct_type__arg, ::some::valid::ns::IOBuf iobuf_type__arg, ::some::valid::ns::IOBufPtr iobuf_ptr__arg, std::list<::std::int32_t> list_i32_template__arg, std::deque<::std::string> list_string_template__arg, folly::sorted_vector_set<::std::string> set_template__arg, folly::sorted_vector_map<::std::int64_t, ::std::string> map_template__arg, ::some::valid::ns::std_list typedef_list_template__arg, ::some::valid::ns::std_deque typedef_deque_template__arg, ::some::valid::ns::folly_set typedef_set_template__arg, ::some::valid::ns::folly_map typedef_map_template__arg, ::some::valid::ns::IndirectionA indirection_a__arg, ::std::vector<::some::valid::ns::IndirectionB> indirection_b__arg, ::std::set<::some::valid::ns::IndirectionC> indirection_c__arg, ::some::valid::ns::IOBuf iobuf_type_val__arg, ::some::valid::ns::IOBufPtr iobuf_ptr_val__arg, ::some::valid::ns::containerStruct struct_struct__arg) :
+AnnotatedStruct::AnnotatedStruct(apache::thrift::FragileConstructor, ::some::valid::ns::containerStruct no_annotation__arg, ::std::unique_ptr<::some::valid::ns::containerStruct> cpp_unique_ref__arg, ::std::unique_ptr<::some::valid::ns::containerStruct> cpp2_unique_ref__arg, ::std::unique_ptr<::std::map<::std::int32_t, ::std::vector<::std::string>>> container_with_ref__arg, ::std::unique_ptr<::some::valid::ns::containerStruct> req_cpp_unique_ref__arg, ::std::unique_ptr<::some::valid::ns::containerStruct> req_cpp2_unique_ref__arg, ::std::unique_ptr<::std::vector<::std::string>> req_container_with_ref__arg, ::std::unique_ptr<::some::valid::ns::containerStruct> opt_cpp_unique_ref__arg, ::std::unique_ptr<::some::valid::ns::containerStruct> opt_cpp2_unique_ref__arg, ::std::unique_ptr<::std::set<::std::int32_t>> opt_container_with_ref__arg, ::std::unique_ptr<::some::valid::ns::containerStruct> ref_type_unique__arg, ::std::shared_ptr<::some::valid::ns::containerStruct> ref_type_shared__arg, ::std::shared_ptr<const ::std::map<::std::int32_t, ::std::vector<::std::string>>> ref_type_const__arg, ::std::shared_ptr<::some::valid::ns::containerStruct> req_ref_type_shared__arg, ::std::shared_ptr<const ::some::valid::ns::containerStruct> req_ref_type_const__arg, ::std::unique_ptr<::std::vector<::std::string>> req_ref_type_unique__arg, ::std::shared_ptr<const ::some::valid::ns::containerStruct> opt_ref_type_const__arg, ::std::unique_ptr<::some::valid::ns::containerStruct> opt_ref_type_unique__arg, ::std::shared_ptr<::std::set<::std::int32_t>> opt_ref_type_shared__arg, ::some::valid::ns::CppFakeI32 base_type__arg, ::some::valid::ns::FollySmallVectorI64 list_type__arg, ::some::valid::ns::SortedVectorSetString set_type__arg, ::some::valid::ns::FakeMap map_type__arg, ::some::valid::ns::UnorderedMapStruct map_struct_type__arg, ::some::valid::ns::IOBuf iobuf_type__arg, ::some::valid::ns::IOBufPtr iobuf_ptr__arg, std::list<::std::int32_t> list_i32_template__arg, std::deque<::std::string> list_string_template__arg, folly::sorted_vector_set<::std::string> set_template__arg, folly::sorted_vector_map<::std::int64_t, ::std::string> map_template__arg, ::some::valid::ns::std_list typedef_list_template__arg, ::some::valid::ns::std_deque typedef_deque_template__arg, ::some::valid::ns::folly_set typedef_set_template__arg, ::some::valid::ns::folly_map typedef_map_template__arg, ::some::valid::ns::IndirectionA indirection_a__arg, ::std::vector<::some::valid::ns::IndirectionB> indirection_b__arg, ::std::set<::some::valid::ns::IndirectionC> indirection_c__arg, ::some::valid::ns::IOBuf iobuf_type_val__arg, ::some::valid::ns::IOBufPtr iobuf_ptr_val__arg, ::some::valid::ns::containerStruct struct_struct__arg) :
     no_annotation(std::move(no_annotation__arg)),
     cpp_unique_ref(std::move(cpp_unique_ref__arg)),
     cpp2_unique_ref(std::move(cpp2_unique_ref__arg)),
@@ -2858,48 +2949,49 @@ AnnotatedStruct::AnnotatedStruct(apache::thrift::FragileConstructor, ::some::val
   __isset.struct_struct = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void AnnotatedStruct::__clear() {
   // clear all fields
-  no_annotation.__clear();
-  if (cpp_unique_ref) cpp_unique_ref->__clear();
-  if (cpp2_unique_ref) cpp2_unique_ref->__clear();
-  container_with_ref = ::apache::thrift::detail::make_mutable_smart_ptr(folly::tag_t<std::unique_ptr<::std::map<::std::int32_t, ::std::vector<::std::string>>>>());
-  if (req_cpp_unique_ref) req_cpp_unique_ref->__clear();
-  if (req_cpp2_unique_ref) req_cpp2_unique_ref->__clear();
-  req_container_with_ref = ::apache::thrift::detail::make_mutable_smart_ptr(folly::tag_t<std::unique_ptr<::std::vector<::std::string>>>());
-  opt_cpp_unique_ref.reset();
-  opt_cpp2_unique_ref.reset();
-  opt_container_with_ref.reset();
-  if (ref_type_unique) ref_type_unique->__clear();
-  if (ref_type_shared) ref_type_shared->__clear();
-  ref_type_const = ::apache::thrift::detail::make_mutable_smart_ptr(folly::tag_t<std::shared_ptr<const ::std::map<::std::int32_t, ::std::vector<::std::string>>>>());
-  if (req_ref_type_shared) req_ref_type_shared->__clear();
-  if (req_ref_type_const) req_ref_type_const.reset(new typename decltype(req_ref_type_const)::element_type());
-  req_ref_type_unique = ::apache::thrift::detail::make_mutable_smart_ptr(folly::tag_t<std::unique_ptr<::std::vector<::std::string>>>());
-  opt_ref_type_const.reset();
-  opt_ref_type_unique.reset();
-  opt_ref_type_shared.reset();
-  base_type = 0;
-  list_type.clear();
-  set_type.clear();
-  map_type.clear();
-  map_struct_type.clear();
-  iobuf_type = apache::thrift::StringTraits< folly::IOBuf>::fromStringLiteral("");
-  iobuf_ptr = apache::thrift::StringTraits< std::unique_ptr<folly::IOBuf>>::fromStringLiteral("");
-  list_i32_template.clear();
-  list_string_template.clear();
-  set_template.clear();
-  map_template.clear();
-  typedef_list_template.clear();
-  typedef_deque_template.clear();
-  typedef_set_template.clear();
-  typedef_map_template.clear();
-  ::apache::thrift::apply_indirection(indirection_a) = 0;
-  indirection_b.clear();
-  indirection_c.clear();
-  iobuf_type_val = apache::thrift::StringTraits< folly::IOBuf>::fromStringLiteral("value");
-  iobuf_ptr_val = apache::thrift::StringTraits< std::unique_ptr<folly::IOBuf>>::fromStringLiteral("value2");
-  struct_struct.__clear();
+  this->no_annotation.__clear();
+  if (this->cpp_unique_ref) this->cpp_unique_ref->__clear();
+  if (this->cpp2_unique_ref) this->cpp2_unique_ref->__clear();
+  this->container_with_ref = ::apache::thrift::detail::make_mutable_smart_ptr<::std::unique_ptr<::std::map<::std::int32_t, ::std::vector<::std::string>>>>();
+  if (this->req_cpp_unique_ref) this->req_cpp_unique_ref->__clear();
+  if (this->req_cpp2_unique_ref) this->req_cpp2_unique_ref->__clear();
+  this->req_container_with_ref = ::apache::thrift::detail::make_mutable_smart_ptr<::std::unique_ptr<::std::vector<::std::string>>>();
+  this->opt_cpp_unique_ref.reset();
+  this->opt_cpp2_unique_ref.reset();
+  this->opt_container_with_ref.reset();
+  if (this->ref_type_unique) this->ref_type_unique->__clear();
+  if (this->ref_type_shared) this->ref_type_shared->__clear();
+  this->ref_type_const = ::apache::thrift::detail::make_mutable_smart_ptr<::std::shared_ptr<const ::std::map<::std::int32_t, ::std::vector<::std::string>>>>();
+  if (this->req_ref_type_shared) this->req_ref_type_shared->__clear();
+  if (this->req_ref_type_const) this->req_ref_type_const.reset(new typename decltype(this->req_ref_type_const)::element_type());
+  this->req_ref_type_unique = ::apache::thrift::detail::make_mutable_smart_ptr<::std::unique_ptr<::std::vector<::std::string>>>();
+  this->opt_ref_type_const.reset();
+  this->opt_ref_type_unique.reset();
+  this->opt_ref_type_shared.reset();
+  this->base_type = 0;
+  this->list_type.clear();
+  this->set_type.clear();
+  this->map_type.clear();
+  this->map_struct_type.clear();
+  this->iobuf_type = apache::thrift::StringTraits<folly::IOBuf>::fromStringLiteral("");
+  this->iobuf_ptr = apache::thrift::StringTraits<std::unique_ptr<folly::IOBuf>>::fromStringLiteral("");
+  this->list_i32_template.clear();
+  this->list_string_template.clear();
+  this->set_template.clear();
+  this->map_template.clear();
+  this->typedef_list_template.clear();
+  this->typedef_deque_template.clear();
+  this->typedef_set_template.clear();
+  this->typedef_map_template.clear();
+  ::apache::thrift::apply_indirection(this->indirection_a) = 0;
+  this->indirection_b.clear();
+  this->indirection_c.clear();
+  this->iobuf_type_val = apache::thrift::StringTraits<folly::IOBuf>::fromStringLiteral("value");
+  this->iobuf_ptr_val = apache::thrift::StringTraits<std::unique_ptr<folly::IOBuf>>::fromStringLiteral("value2");
+  this->struct_struct.__clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -3518,6 +3610,38 @@ void TccStructTraits<::some::valid::ns::ComplexContainerStruct>::translateFieldN
 
 namespace some { namespace valid { namespace ns {
 
+ComplexContainerStruct::ComplexContainerStruct(const ComplexContainerStruct& srcObj) {
+  map_of_iobufs = srcObj.map_of_iobufs;
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+  __isset.map_of_iobufs = srcObj.__isset.map_of_iobufs;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+  map_of_iobuf_ptrs = ::apache::thrift::detail::st::copy_field<
+        ::apache::thrift::type_class::map<::apache::thrift::type_class::string, ::apache::thrift::type_class::binary>>(srcObj.map_of_iobuf_ptrs);
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+  __isset.map_of_iobuf_ptrs = srcObj.__isset.map_of_iobuf_ptrs;
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+}
+
+ComplexContainerStruct& ComplexContainerStruct::operator=(const ComplexContainerStruct& src) {
+  ComplexContainerStruct tmp(src);
+  swap(*this, tmp);
+  return *this;
+}
+
+THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
+ComplexContainerStruct::ComplexContainerStruct(ComplexContainerStruct&& other) noexcept  :
+    map_of_iobufs(std::move(other.map_of_iobufs)),
+    map_of_iobuf_ptrs(std::move(other.map_of_iobuf_ptrs)),
+    __isset(other.__isset) {}
+ComplexContainerStruct& ComplexContainerStruct::operator=(FOLLY_MAYBE_UNUSED ComplexContainerStruct&& other) noexcept {
+    this->map_of_iobufs = std::move(other.map_of_iobufs);
+    this->map_of_iobuf_ptrs = std::move(other.map_of_iobuf_ptrs);
+    __isset = other.__isset;
+    return *this;
+}
+THRIFT_IGNORE_ISSET_USE_WARNING_END
+
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 ComplexContainerStruct::ComplexContainerStruct(apache::thrift::FragileConstructor, ::std::map<::std::string, ::some::valid::ns::IOBuf> map_of_iobufs__arg, ::std::map<::std::string, ::some::valid::ns::IOBufPtr> map_of_iobuf_ptrs__arg) :
     map_of_iobufs(std::move(map_of_iobufs__arg)),
@@ -3526,10 +3650,11 @@ ComplexContainerStruct::ComplexContainerStruct(apache::thrift::FragileConstructo
   __isset.map_of_iobuf_ptrs = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void ComplexContainerStruct::__clear() {
   // clear all fields
-  map_of_iobufs.clear();
-  map_of_iobuf_ptrs.clear();
+  this->map_of_iobufs.clear();
+  this->map_of_iobuf_ptrs.clear();
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -3627,6 +3752,7 @@ void TccStructTraits<::some::valid::ns::FloatStruct>::translateFieldName(
 
 namespace some { namespace valid { namespace ns {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 FloatStruct::FloatStruct(apache::thrift::FragileConstructor, float floatField__arg, double doubleField__arg) :
     floatField(std::move(floatField__arg)),
@@ -3635,10 +3761,11 @@ FloatStruct::FloatStruct(apache::thrift::FragileConstructor, float floatField__a
   __isset.doubleField = true;
 }
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void FloatStruct::__clear() {
   // clear all fields
-  floatField = 0;
-  doubleField = 0;
+  this->floatField = 0;
+  this->doubleField = 0;
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
   __isset = {};
 THRIFT_IGNORE_ISSET_USE_WARNING_END
@@ -3834,13 +3961,15 @@ void TccStructTraits<::some::valid::ns::AllRequiredNoExceptMoveCtrStruct>::trans
 
 namespace some { namespace valid { namespace ns {
 
+
 THRIFT_IGNORE_ISSET_USE_WARNING_BEGIN
 AllRequiredNoExceptMoveCtrStruct::AllRequiredNoExceptMoveCtrStruct(apache::thrift::FragileConstructor, ::std::int64_t intField__arg) :
     intField(std::move(intField__arg)) {}
 THRIFT_IGNORE_ISSET_USE_WARNING_END
+
 void AllRequiredNoExceptMoveCtrStruct::__clear() {
   // clear all fields
-  intField = 0;
+  this->intField = 0;
 }
 
 bool AllRequiredNoExceptMoveCtrStruct::operator==(const AllRequiredNoExceptMoveCtrStruct& rhs) const {

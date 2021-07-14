@@ -19,21 +19,38 @@
 #include <atomic>
 
 #include <folly/io/async/EventBase.h>
+#include <thrift/lib/cpp2/server/AdaptiveConcurrency.h>
 
 namespace apache {
 namespace thrift {
 
+class AdaptiveConcurrencyController;
+
 class RequestStateMachine {
  public:
+  RequestStateMachine(
+      bool includeInRecentRequests, AdaptiveConcurrencyController& controller)
+      : includeInRecentRequests_(includeInRecentRequests),
+        adaptiveConcurrencyController_(controller) {
+    if (includeInRecentRequests_) {
+      adaptiveConcurrencyController_.requestStarted(started());
+    }
+  }
+
+  ~RequestStateMachine() {
+    if (includeInRecentRequests_ && getStartedProcessing()) {
+      adaptiveConcurrencyController_.requestFinished(
+          started(), std::chrono::steady_clock::now());
+    }
+  }
+
   // Returns true if the request has not been cancelled (via tryCancel())
   //
   // Note: using this method from a thread other than that of eventBase_
   //       presents a data race condition. As such, the isActive() API returning
   //       true should be considered a weak promise that a request is active
   //       and should not be relied upon for the purposes of synchronization.
-  bool isActive() const {
-    return !cancelled_.load(std::memory_order_relaxed);
-  }
+  bool isActive() const { return !cancelled_.load(std::memory_order_relaxed); }
 
   // Instruct whether request no longer requires processing.
   // This API may only be called from IO worker thread of the request.
@@ -79,11 +96,21 @@ class RequestStateMachine {
     return infoStartedProcessing_.load(std::memory_order_relaxed);
   }
 
+  FOLLY_NODISCARD bool includeInRecentRequests() const {
+    return includeInRecentRequests_;
+  }
+
+  std::chrono::steady_clock::time_point started() const { return started_; }
+
  private:
   std::atomic<bool> startProcessingOrQueueTimeout_{false};
   std::atomic<bool> cancelled_{false};
 
   std::atomic<bool> infoStartedProcessing_{false};
+  const bool includeInRecentRequests_;
+  const std::chrono::steady_clock::time_point started_{
+      std::chrono::steady_clock::now()};
+  AdaptiveConcurrencyController& adaptiveConcurrencyController_;
 };
 
 } // namespace thrift
